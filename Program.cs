@@ -8,9 +8,10 @@ namespace CeusDL2
         static void Main(string[] args)
         {
             Console.WriteLine("Tests");            
-            var data = new ParsableData("\"Hallo Welt\\n----------\"");
-            var p = new StringElementParser(data);
-            Console.WriteLine($"Result: {p.Parse()}");
+            var data = new ParsableData("text=\"Hallo Welt\\n----------\"");
+            var p = new NamedParameterParser(data);
+            var result = p.Parse();
+            Console.WriteLine($"Result: {result.Name} = {result.Value}");
         }
     }
 }
