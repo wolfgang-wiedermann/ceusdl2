@@ -1,12 +1,13 @@
 using System;
 using KDV.CeusDL.Parser.TmpModel;
+using KDV.CeusDL.Parser.Exceptions;
 
 using static KDV.CeusDL.Parser.NamedParameterParserState;
 
 namespace KDV.CeusDL.Parser
 {
     public enum NamedParameterParserState {
-        INITIAL, IN_NAME, IN_VALUE
+        INITIAL, IN_NAME, BEHIND_NAME, IN_VALUE
     }
 
     /** 
@@ -37,8 +38,11 @@ namespace KDV.CeusDL.Parser
                     case IN_NAME:
                         onInName(c);                        
                         break;
+                    case BEHIND_NAME:
+                        onBehindName(c);                        
+                        break;                        
                     case IN_VALUE:                        
-                        Data.Position--;
+                        Data.Back(1);
                         return result;                        
                     default:
                         throw new InvalidOperationException("Unreachable state reached in StringElementParser!");
@@ -53,15 +57,27 @@ namespace KDV.CeusDL.Parser
             }
         }
 
+        private void onBehindName(char c)
+        {
+            if(c == '=' && result.Name.Length > 0) {
+                state = IN_VALUE;
+                result.Value = stringElementParser.Parse();
+            } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {
+                throw new InvalidCharException("Invalid char behind param name", Data);
+            }
+        }
+
         private void onInName(char c)
         {
             if(c == '=' && result.Name.Length > 0) {
                 state = IN_VALUE;
                 result.Value = stringElementParser.Parse();
+            } else if(ParserUtil.IsNewLineOrWhitespace(c) && result.Name.Length > 0) {
+                state = BEHIND_NAME;                
             } else if(ParserUtil.IsValidNameChar(c)) {
                 result.Name += c;
             } else {
-                throw new InvalidCharException("Invalid char in param name");
+                throw new InvalidCharException("Invalid char in param name", Data);
             }
         }
 
@@ -73,7 +89,7 @@ namespace KDV.CeusDL.Parser
                 state = IN_NAME;
                 result.Name += c;
             } else {
-                throw new InvalidCharException("Invalid char before param name");
+                throw new InvalidCharException("Invalid char before param name", Data);
             }
         }
     }

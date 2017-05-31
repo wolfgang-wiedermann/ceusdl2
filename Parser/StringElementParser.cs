@@ -1,4 +1,5 @@
 using System;
+using KDV.CeusDL.Parser.Exceptions;
 
 using static KDV.CeusDL.Parser.StringElementParserEnum;
 
@@ -56,7 +57,7 @@ namespace KDV.CeusDL.Parser
                 case '\\': result += '\\';
                     break;
                 default:
-                    throw new InvalidCharException("Ungültige Escape-Sequenz gefunden");
+                    throw new InvalidCharException("Ungültige Escape-Sequenz gefunden", Data);
             }
         }
 
@@ -76,7 +77,7 @@ namespace KDV.CeusDL.Parser
             if(c == '"') {
                 state = IN_STRING;
             } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {
-                throw new InvalidCharException("Ungültiges Zeichen in String: StringElementParser.onInitial!");
+                throw new InvalidCharException("Ungültiges Zeichen in String: StringElementParser.onInitial!", Data);
             }
         }
     }

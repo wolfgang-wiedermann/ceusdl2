@@ -1,9 +1,10 @@
 using System;
 
-namespace KDV.CeusDL.Parser
+namespace KDV.CeusDL.Parser.Exceptions
 {
     internal class InvalidCharException : Exception
     {
+        
         public InvalidCharException()
         {
         }
@@ -11,6 +12,10 @@ namespace KDV.CeusDL.Parser
         public InvalidCharException(string message) : base(message)
         {
         }
+
+        public InvalidCharException(string message, ParsableData data) : base($"{message} in Line {data.Line} Column {data.Column}")
+        {
+        }        
 
         public InvalidCharException(string message, Exception innerException) : base(message, innerException)
         {

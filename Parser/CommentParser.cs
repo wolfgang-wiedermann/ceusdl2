@@ -1,4 +1,5 @@
 using System;
+using KDV.CeusDL.Parser.Exceptions;
 
 using static KDV.CeusDL.Parser.CommentParserEnum;
 
@@ -22,7 +23,7 @@ namespace KDV.CeusDL.Parser
         public override int Parse()
         {
             state = INITIAL;
-            Data.Position -= 2;         
+            Data.Back(2);         
 
             while(Data.HasNext()) {
                 char c = Data.Next();
@@ -70,10 +71,10 @@ namespace KDV.CeusDL.Parser
                 } else if(c2 == '*') {
                     state = IN_BLOCK_COMMENT;
                 } else {
-                    throw new InvalidCharException("Ungültiges Zeichen am Beginn des Kommentars");    
+                    throw new InvalidCharException("Ungültiges Zeichen am Beginn des Kommentars", Data);    
                 }
             } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {
-                throw new InvalidCharException("Ungültiges Zeichen vor Kommentar");
+                throw new InvalidCharException("Ungültiges Zeichen vor Kommentar", Data);
             }
         }
     }
