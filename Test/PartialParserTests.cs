@@ -38,6 +38,16 @@ namespace KDV.CeusDL.Test {
             p4 = new AttributeParser(data4);
             result4 = p4.Parse();
             Console.WriteLine($"Result4: {result4.AttributeType} {result4.Name} {result4.Parameters.Count}");
+
+            data4 = new ParsableData("fact Anzahl_F:decimal(len=\"1,0\",\n\t default=\"1\"); // ein default=\"1\" wäre hier noch nett");
+            p4 = new AttributeParser(data4);
+            result4 = p4.Parse();
+            Console.WriteLine($"Result4: {result4.AttributeType} {result4.Name} {result4.Parameters.Count}");
+
+            data4 = new ParsableData("ref JaNein.KNZ as Zulassung; // Zulassung_JaNein");
+            p4 = new AttributeParser(data4);
+            result4 = p4.Parse();
+            Console.WriteLine($"Result4: {result4.AttributeType} {result4.InterfaceName}.{result4.FieldName} {result4.Alias}");        
         }
     }
 }

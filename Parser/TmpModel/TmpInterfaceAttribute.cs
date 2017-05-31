@@ -5,7 +5,12 @@ using System.Linq;
 namespace KDV.CeusDL.Parser.TmpModel 
 {
     public class TmpInterfaceAttribute {    
-        /// base, ref, fact
+
+        public TmpInterfaceAttribute() {
+            this.Alias = "";
+        }
+
+        /// base, ref, fact        
         public string AttributeType {get;set;}
         // nur bei base und fact
         public string Name {
