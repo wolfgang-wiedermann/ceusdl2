@@ -1,4 +1,5 @@
 ﻿using System;
+using KDV.CeusDL.Parser;
 
 namespace CeusDL2
 {
@@ -6,7 +7,10 @@ namespace CeusDL2
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Tests");            
+            var data = new ParsableData("\"Hallo Welt\\n----------\"");
+            var p = new StringElementParser(data);
+            Console.WriteLine($"Result: {p.Parse()}");
         }
     }
 }
