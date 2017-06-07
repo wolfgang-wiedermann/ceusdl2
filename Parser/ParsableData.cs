@@ -1,3 +1,5 @@
+using System;
+
 namespace KDV.CeusDL.Parser
 {
     public class ParsableData {
@@ -13,7 +15,8 @@ namespace KDV.CeusDL.Parser
             this.Content = content;
             this.Position = 0;
             this.Line = 1;
-            this.Column = 0;
+            this.Column = 0
+            ;
         }
 
         public char Next() {
@@ -29,6 +32,14 @@ namespace KDV.CeusDL.Parser
             }
         }
 
+        public char Get(int idxPlus) {
+            lock(this) {
+                char c = Content[Position+idxPlus];
+                return c;
+            }
+        }
+
+        // Datenzeiger um num Schritte zurücksetzen
         public void Back(int num) {
             lock(this) {
                 for(int i = 0; i < num; i++) {
@@ -38,6 +49,22 @@ namespace KDV.CeusDL.Parser
                         Column = 0;
                     } else {
                         Column -= 1;
+                    }                
+                }
+            }
+        }
+
+        // Datenzeiger um num Schritte nach vorne setzen
+        public void Forward(int num)
+        {
+            lock(this) {
+                for(int i = 0; i < num; i++) {
+                    char c = Content[++Position];
+                    if(c == '\n') {
+                        Line += 1;
+                        Column = 0;
+                    } else {
+                        Column += 1;
                     }                
                 }
             }

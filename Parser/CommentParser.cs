@@ -22,8 +22,7 @@ namespace KDV.CeusDL.Parser
 
         public override int Parse()
         {
-            state = INITIAL;
-            Data.Back(2);         
+            state = INITIAL;            
 
             while(Data.HasNext()) {
                 char c = Data.Next();
@@ -49,8 +48,8 @@ namespace KDV.CeusDL.Parser
 
         private void onInBlockComment(char c)
         {
-            if(c == '*' && Data.Position+1 < Data.Content.Length && Data.Content[Data.Position+1] == '/') {
-                Data.Next();
+            if(c == '*' && ParserUtil.NextNonWhitespaceIs(Data, '/')) {
+                //Data.Next();
                 state = FINAL;
             }
         }
@@ -74,7 +73,7 @@ namespace KDV.CeusDL.Parser
                     throw new InvalidCharException("Ungültiges Zeichen am Beginn des Kommentars", Data);    
                 }
             } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {
-                throw new InvalidCharException("Ungültiges Zeichen vor Kommentar", Data);
+                throw new InvalidCharException($"Ungültiges Zeichen {c} vor Kommentar", Data);
             }
         }
     }

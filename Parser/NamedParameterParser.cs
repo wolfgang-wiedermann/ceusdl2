@@ -89,7 +89,7 @@ namespace KDV.CeusDL.Parser
                 state = IN_NAME;
                 result.Name += c;
             } else {
-                throw new InvalidCharException("Invalid char before param name", Data);
+                throw new InvalidCharException($"Invalid char {c} before param name", Data);
             }
         }
     }
