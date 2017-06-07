@@ -12,7 +12,8 @@ namespace KDV.CeusDL.Test {
             test.TestNamedParameterParser();
             test.TestCommentParser();
             test.TestAttributeParser();  
-            test.TestConfigParser();                 
+            test.TestConfigParser();   
+            test.TestInterfaceParser();              
         }
 
         public void TestNamedParameterParser() {
@@ -84,7 +85,7 @@ namespace KDV.CeusDL.Test {
             Console.WriteLine("------");
             
 
-            data = new ParsableData("  { /* Beispieldatei */ name=\"Wiedermann\";\n \n /* Beispieldatei */\n vorname=\"Wolfgang\";\n\n}");
+            data = new ParsableData("  { /* Beispieldatei */ name=\"Wiedermann\";\n \n /* Beispieldatei */\n vorname=\"Wolfgang\";\n\n}\n // Und noch ein Kommentar, der eigentlich ignoriert werden sollte...");
             p = new ConfigParser(data);
             result = p.Parse();
             
@@ -100,6 +101,18 @@ namespace KDV.CeusDL.Test {
             } else {
                 Console.WriteLine("Passt NICHT !!!");
             }
+        }
+
+        public void TestInterfaceParser() {
+            var data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo.ceusdl"));
+            var p = new InterfaceParser(data);
+            var result = p.Parse();
+
+            // TODO: Ausgabe
+
+            data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo2.ceusdl"));
+            p = new InterfaceParser(data);
+            result = p.Parse();
         }
     }
 }

@@ -1,0 +1,12 @@
+interface StudiengangHisInOne : DimTable(mandant="true") {
+    // Standard-Attributfelder
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    // Beziehungen
+    ref StudiengangSOSPOS.KNZ;
+    ref Studientyp.KNZ;
+    // Zusätzliche Attributfelder
+    // z. B. Kapazität, Überbuchung, etc. 
+    // (erfordert zusätzliche Custom-Tabelle)
+}

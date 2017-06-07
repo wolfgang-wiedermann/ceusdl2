@@ -1,0 +1,5 @@
+interface Semester : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
