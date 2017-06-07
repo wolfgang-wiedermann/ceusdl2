@@ -13,7 +13,8 @@ namespace KDV.CeusDL.Test {
             test.TestCommentParser();
             test.TestAttributeParser();  
             test.TestConfigParser();   
-            test.TestInterfaceParser();              
+            test.TestInterfaceParser();
+            test.TestFileParser();     
         }
 
         public void TestNamedParameterParser() {
@@ -63,7 +64,7 @@ namespace KDV.CeusDL.Test {
         }
 
         public void TestConfigParser() {
-            var data = new ParsableData("  { name=\"Wiedermann\";\n vorname=\"Wolfgang\";\n\n}");
+            var data = new ParsableData("config  {\r\n name=\"Wiedermann\";\n vorname=\"Wolfgang\";\n\n}");
             var p = new ConfigParser(data);
             var result = p.Parse();
             
@@ -74,7 +75,7 @@ namespace KDV.CeusDL.Test {
             Console.WriteLine("------");
             
 
-            data = new ParsableData("  { // Beispieldatei\n name=\"Wiedermann\";\n vorname=\"Wolfgang\";\n\n}");
+            data = new ParsableData(" config { // Beispieldatei\n name=\"Wiedermann\";\n vorname=\"Wolfgang\";\n\n}");
             p = new ConfigParser(data);
             result = p.Parse();
             
@@ -85,7 +86,7 @@ namespace KDV.CeusDL.Test {
             Console.WriteLine("------");
             
 
-            data = new ParsableData("  { /* Beispieldatei */ name=\"Wiedermann\";\n \n /* Beispieldatei */\n vorname=\"Wolfgang\";\n\n}\n // Und noch ein Kommentar, der eigentlich ignoriert werden sollte...");
+            data = new ParsableData("config { /* Beispieldatei */ name=\"Wiedermann\";\n \n /* Beispieldatei */\n vorname=\"Wolfgang\";\n\n}\n // Und noch ein Kommentar, der eigentlich ignoriert werden sollte...");
             p = new ConfigParser(data);
             result = p.Parse();
             
@@ -122,6 +123,16 @@ namespace KDV.CeusDL.Test {
             if(!result.Type.Equals(result2.Type)) throw new InvalidOperationException("Type nicht gleich!");
             if(!result.Attributes.Count.Equals(result2.Attributes.Count)) throw new InvalidOperationException("Anzahl Attribute nicht gleich!");
             if(!result.Parameters.Count.Equals(result2.Parameters.Count)) throw new InvalidOperationException("Anzahl Attribute nicht gleich!");
+        }
+
+        public void TestFileParser() {
+            var data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\file_demo.ceusdl"));
+            var p = new FileParser(data);
+            var result = p.Parse();
+
+            if(result.Config == null) throw new InvalidOperationException("Config darf nicht null sein!");
+            if(result.Config?.Parameters?.Count != 6) throw new InvalidOperationException("Falsche Zahl an Config-Parametern gefunden");
+            if(result.Interfaces?.Count != 2) throw new InvalidOperationException("Falsche Zahl an Interfaces gefunden");
         }
     }
 }

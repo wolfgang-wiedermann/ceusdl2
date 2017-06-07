@@ -1,0 +1,38 @@
+/*
+* Ein einfaches Beispiel für eine CEUSDL-Datei ...
+*/
+
+// ------------------------------------
+// Beispiel in CEUS-Definition-Language
+// ------------------------------------
+// 0. Basisdefinitionen
+config {
+     prefix="AP";
+     il_database="FH_AP_InterfaceLayer";
+     bl_database="FH_AP_BaseLayer";
+     bt_database="FH_AP_BaseLayer";
+     al_database="FH_AP_Warehouse";     
+     etl_db_server="CEUS-ETL";
+}
+// alternativ: prod_db_server="CEUS-DB"; -> aber besser immer nur eins!
+
+// Interface 1
+interface Semester : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+// Interface 2
+interface StudiengangHisInOne : DimTable(mandant="true") {
+    // Standard-Attributfelder
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    // Beziehungen
+    ref StudiengangSOSPOS.KNZ;
+    ref Studientyp.KNZ;
+    // Zusätzliche Attributfelder
+    // z. B. Kapazität, Überbuchung, etc. 
+    // (erfordert zusätzliche Custom-Tabelle)
+}

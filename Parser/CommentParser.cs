@@ -58,6 +58,7 @@ namespace KDV.CeusDL.Parser
         {
             if(c == '\n') {                
                 state = FINAL;
+                Data.Back(1);
             }
         }
 

@@ -8,7 +8,7 @@ using static KDV.CeusDL.Parser.ConfigParserEnum;
 namespace KDV.CeusDL.Parser
 {
     public enum ConfigParserEnum {
-        INITIAL, IN_PARAMLIST, BEHIND_PARAM, FINAL
+        INITIAL, BEFORE_PARAMLIST, IN_PARAMLIST, BEHIND_PARAM, BEFORE_FINAL, FINAL
     }
 
     /*
@@ -23,6 +23,7 @@ namespace KDV.CeusDL.Parser
     {
         private ConfigParserEnum state;
         private TmpConfig result;
+        private string buf;
         private NamedParameterParser namedParameterParser;
         private CommentParser commentParser;
 
@@ -35,6 +36,7 @@ namespace KDV.CeusDL.Parser
         public override TmpConfig Parse()
         {
             state = INITIAL;
+            buf = "";
             result = new TmpConfig();
             result.Parameters = new List<TmpNamedParameter>();
 
@@ -44,11 +46,17 @@ namespace KDV.CeusDL.Parser
                     case INITIAL:
                         onInitial(c);
                         break;
+                    case BEFORE_PARAMLIST:
+                        onBeforeParamList(c);
+                        break;
                     case IN_PARAMLIST:
                         onInParamList(c);
                         break;
                     case BEHIND_PARAM:
                         onBehindParam(c);
+                        break;
+                    case BEFORE_FINAL:
+                        onBeforeFinal(c);
                         break;
                     case FINAL:
                         return result;
@@ -60,10 +68,19 @@ namespace KDV.CeusDL.Parser
             return result;
         }
 
+        private void onBeforeFinal(char c)
+        {
+            if(c == '}') {
+                state = FINAL;
+            } else if (!ParserUtil.IsNewLineOrWhitespace(c)) {
+                throw new InvalidCharException($"Ungültiges Zeichen {c} in der Parameterliste der Config", Data);
+            }
+        }
+
         private void onBehindParam(char c)
         {
             if(c == ';' && ParserUtil.NextNonWhitespaceIs(Data, '}')) {
-                state = FINAL;    
+                state = BEFORE_FINAL;    
             } else if(c == ';') {                
                 state = IN_PARAMLIST;               
             } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {
@@ -89,12 +106,27 @@ namespace KDV.CeusDL.Parser
             state = BEHIND_PARAM;                         
         }
 
+        
+        private void onBeforeParamList(char c)
+        {
+            if(c == '{' && buf.Equals("config")) {
+                state = IN_PARAMLIST;
+                buf = "";
+            } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {
+                throw new InvalidCharException($"Ungültiges Zeichen {c} vor Parameterliste der Config", Data);
+            }
+        }
+
         private void onInitial(char c)
         {
-            if(c == '{') {
-                state = IN_PARAMLIST;
-            } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {
-                throw new InvalidCharException("Ungültiges Zeichen vor Parameterliste der Config", Data);
+            if(ParserUtil.IsValidNameChar(c)) {
+                buf += c;
+            } else if(c == '{') {
+                state = IN_PARAMLIST;            
+            } else if(ParserUtil.IsNewLineOrWhitespace(c) && buf.Length > 0) {
+                state = BEFORE_PARAMLIST;
+            } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {                
+                throw new InvalidCharException($"Ungültiges Zeichen {c} vor Parameterliste der Config", Data);
             }
         }
     }
