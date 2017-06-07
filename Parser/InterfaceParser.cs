@@ -91,7 +91,7 @@ namespace KDV.CeusDL.Parser
         private void onInInterfaceName(char c) {
             if(ParserUtil.IsValidNameChar(c)) {
                 result.Name += c;
-            } else if (ParserUtil.IsNewLineOrWhitespace(c) && result.Name.Length > 0) {
+            } else if (ParserUtil.IsNewLineOrWhitespace(c) && result.Name?.Length > 0) {
                 state = BEHIND_INTERFACE_NAME;
             } else if(c == '{' && result.Name.Length > 0) {
                 state = IN_INTERFACE_BODY;
@@ -185,7 +185,7 @@ namespace KDV.CeusDL.Parser
         private void onBehindInterfaceParams(char c) {
             if(c == '{') {
                 state = IN_INTERFACE_BODY;
-            } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {
+            } else if(!(ParserUtil.IsNewLineOrWhitespace(c) || c == ')')) {
                 throw new InvalidCharException($"Ungültiges Zeichen {c} in BEHIND_INTERFACE_PARAMS", Data);
             }
         }

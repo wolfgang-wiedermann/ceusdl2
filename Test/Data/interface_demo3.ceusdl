@@ -1,0 +1,17 @@
+interface     StudiengangHisInOne
+  :   DimTable(  mandant=  "true"
+  ) {
+    // Standard-Attributfelder
+
+
+    // Funktioniert nur hintereinander, wenn ein Blank nach dem ; kommt !!!
+    // das ist noch verbesserungswürdig.
+    base KNZ:varchar(len="50", primary_key="true"); base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    // Beziehungen
+    ref StudiengangSOSPOS.KNZ;
+    ref Studientyp.KNZ;
+    // Zusätzliche Attributfelder
+    // z. B. Kapazität, Überbuchung, etc. 
+    // (erfordert zusätzliche Custom-Tabelle)
+}

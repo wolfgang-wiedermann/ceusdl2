@@ -203,13 +203,13 @@ namespace KDV.CeusDL.Parser
                         state = IN_REF_INTERFACENAME;
                         break;
                     default:
-                        throw new InvalidTokenException("Ungültiges Token für AttributType => nur base, fact und ref erlaubt");
+                        throw new InvalidTokenException("Ungültiges Token für AttributType => nur base, fact und ref erlaubt", Data);
                 }
             } else if(ParserUtil.IsValidNameChar(c)) {
                 // Wechsel zu InAttributeType
                 this.result.AttributeType += c;                
             } else {
-                throw new InvalidCharException("Ungültiges Zeichen im AttributeType");
+                throw new InvalidCharException($"Ungültiges Zeichen {c} im AttributeType", Data);
             }
         }
 
@@ -222,7 +222,7 @@ namespace KDV.CeusDL.Parser
                 this.result.AttributeType += c;
                 this.state = IN_ATTRIBUTE_TYPE;
             } else {
-                throw new InvalidCharException("Ungültiges Zeichen ...");
+                throw new InvalidCharException("Ungültiges Zeichen ...", Data);
             }
         }
     }

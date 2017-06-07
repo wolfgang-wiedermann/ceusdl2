@@ -113,6 +113,15 @@ namespace KDV.CeusDL.Test {
             data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo2.ceusdl"));
             p = new InterfaceParser(data);
             result = p.Parse();
+
+            data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo3.ceusdl"));
+            p = new InterfaceParser(data);
+            var result2 = p.Parse();
+
+            if(!result.Name.Equals(result2.Name)) throw new InvalidOperationException("Name nicht gleich!");
+            if(!result.Type.Equals(result2.Type)) throw new InvalidOperationException("Type nicht gleich!");
+            if(!result.Attributes.Count.Equals(result2.Attributes.Count)) throw new InvalidOperationException("Anzahl Attribute nicht gleich!");
+            if(!result.Parameters.Count.Equals(result2.Parameters.Count)) throw new InvalidOperationException("Anzahl Attribute nicht gleich!");
         }
     }
 }
