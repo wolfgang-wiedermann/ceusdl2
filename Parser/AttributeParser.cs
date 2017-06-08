@@ -10,7 +10,8 @@ using static KDV.CeusDL.Parser.AttributeParserEnum;
 namespace KDV.CeusDL.Parser
 {
     public enum AttributeParserEnum {
-        INITIAL, IN_ATTRIBUTE_TYPE, IN_ATTRIBUTE_NAME, IN_REF_INTERFACENAME, IN_REF_FIELDNAME, BEHIND_REF_FIELDNAME, IN_DATATYPE, BEHIND_DATATYPE, IN_PARAMETERS, IN_ALIAS, FINAL
+        INITIAL, IN_ATTRIBUTE_TYPE, IN_ATTRIBUTE_NAME, IN_REF_INTERFACENAME, IN_REF_FIELDNAME, 
+        BEHIND_REF_FIELDNAME, IN_DATATYPE, BEHIND_DATATYPE, IN_PARAMETERS, IN_REF_PARAMETERS, BEHIND_REF_PARAMETERS, IN_ALIAS, FINAL
     }
 
     /*
@@ -63,6 +64,12 @@ namespace KDV.CeusDL.Parser
                     case IN_PARAMETERS:
                         onInParameters(c);
                         break;
+                    case IN_REF_PARAMETERS:
+                        onInRefParameters(c);
+                        break;
+                    case BEHIND_REF_PARAMETERS:
+                        onBehindRefParameters(c);
+                        break;
                     case IN_ALIAS:
                         onInAlias(c);
                         break;
@@ -96,6 +103,9 @@ namespace KDV.CeusDL.Parser
             } else if(c == 'a' && Data.Content[Data.Position] == 's') {
                 Data.Next();
                 state = IN_ALIAS;
+            } else if(c == '(') {
+                Data.Back(1);
+                state = IN_REF_PARAMETERS; 
             } else if(c == ';') {
                 state = FINAL;                            
             } else {
@@ -109,6 +119,9 @@ namespace KDV.CeusDL.Parser
                 result.FieldName += c;
             } else if(c == ' ') {
                 state = BEHIND_REF_FIELDNAME;
+            } else if(c == '(') {
+                Data.Back(1);
+                state = IN_REF_PARAMETERS; 
             } else if(c == ';') {
                 state = FINAL;
             } else {
@@ -139,6 +152,33 @@ namespace KDV.CeusDL.Parser
                 state = BEHIND_DATATYPE;
             } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {
                 throw new InvalidCharException("Ungültiges Zeichen in Parameterliste", Data);
+            }
+        }
+
+        private void onInRefParameters(char c)
+        {            
+            if(c == '(' || c == ',') {
+                var param = namedParameterParser.Parse();
+                result.Parameters.Add(param);
+                Data.Back(1);
+            } else if(c == ')') {                
+                state = BEHIND_REF_PARAMETERS;
+            } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {
+                throw new InvalidCharException("Ungültiges Zeichen in Parameterliste", Data);
+            }
+        }
+
+        private void onBehindRefParameters(char c)
+        {
+            if(ParserUtil.IsNewLineOrWhitespace(c)) {
+                // Ignorieren
+            } else if(c == 'a' && Data.Content[Data.Position] == 's') {
+                Data.Next();
+                state = IN_ALIAS;            
+            } else if(c == ';') {
+                state = FINAL;                            
+            } else {
+                throw new InvalidCharException($"Ungültiges Zeichen {c} nach Attribut-Parameterliste", Data);
             }
         }
 

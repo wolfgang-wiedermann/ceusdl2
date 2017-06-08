@@ -61,6 +61,12 @@ namespace KDV.CeusDL.Test {
             p4 = new AttributeParser(data4);
             result4 = p4.Parse();
             Console.WriteLine($"Result4: {result4.AttributeType} {result4.InterfaceName}.{result4.FieldName} {result4.Alias}");
+
+            // Neuer Testfall: ref-Attribute sollen auch Primärschlüssel-Bestandteile sein können!
+            data4 = new ParsableData("ref Tag.KNZ(primary_key=\"true\");");
+            p4 = new AttributeParser(data4);
+            result4 = p4.Parse();
+            Console.WriteLine($"Result4: {result4.AttributeType} {result4.InterfaceName}.{result4.FieldName} {result4.Alias}");
         }
 
         public void TestConfigParser() {
@@ -133,6 +139,22 @@ namespace KDV.CeusDL.Test {
             if(result.Config == null) throw new InvalidOperationException("Config darf nicht null sein!");
             if(result.Config?.Parameters?.Count != 6) throw new InvalidOperationException("Falsche Zahl an Config-Parametern gefunden");
             if(result.Interfaces?.Count != 2) throw new InvalidOperationException("Falsche Zahl an Interfaces gefunden");
+
+            data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\file_demo2.ceusdl"));
+            p = new FileParser(data);
+            result = p.Parse();
+
+            if(result.Config == null) throw new InvalidOperationException("Config darf nicht null sein!");
+            if(result.Config?.Parameters?.Count != 6) throw new InvalidOperationException("Falsche Zahl an Config-Parametern gefunden");
+            if(result.Interfaces?.Count != 34) throw new InvalidOperationException("Falsche Zahl an Interfaces gefunden");
+
+            data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\file_demo3.ceusdl"));
+            p = new FileParser(data);
+            result = p.Parse();
+
+            if(result.Config == null) throw new InvalidOperationException("Config darf nicht null sein!");
+            if(result.Config?.Parameters?.Count != 6) throw new InvalidOperationException("Falsche Zahl an Config-Parametern gefunden");
+            if(result.Interfaces?.Count != 34) throw new InvalidOperationException("Falsche Zahl an Interfaces gefunden");
         }
     }
 }

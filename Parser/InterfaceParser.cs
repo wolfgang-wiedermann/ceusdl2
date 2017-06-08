@@ -11,7 +11,7 @@ namespace KDV.CeusDL.Parser
         INITIAL, IN_INTERFACE_NAME, BEHIND_INTERFACE_NAME, 
         IN_INTERFACE_TYPE, BEHIND_INTERFACE_TYPE,
         IN_INTERFACE_PARAMS, BEHIND_INTERFACE_PARAMS, IN_INTERFACE_BODY,
-        FINAL
+        BEFORE_FINAL, FINAL
     }
 
     public class InterfaceParser : AbstractParser<TmpInterface>
@@ -62,6 +62,9 @@ namespace KDV.CeusDL.Parser
                         break;
                     case IN_INTERFACE_BODY:
                         onInInterfaceBody(c);
+                        break;
+                    case BEFORE_FINAL:
+                        onBeforeFinal(c);
                         break;
                     case FINAL:
                         return result;
@@ -154,11 +157,20 @@ namespace KDV.CeusDL.Parser
             } else if(ParserUtil.IsNewLineOrWhitespace(c) && ParserUtil.NextNonWhitespaceIs(Data, '/')) {
                 commentParser.Parse();
             } else if(ParserUtil.IsNewLineOrWhitespace(c) && ParserUtil.NextNonWhitespaceIs(Data, '}')) {
-                state = FINAL;            
+                state = BEFORE_FINAL;            
             } else if(ParserUtil.IsNewLineOrWhitespace(c)) {
                 var attr = attributeParser.Parse();
                 result.Attributes.Add(attr);
             }            
+        }
+        
+        private void onBeforeFinal(char c)
+        {
+            if(c == '}') {
+                state = FINAL;
+            } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {
+                throw new InvalidCharException($"Ungültiges Zeichen {c} in InterfaceParser.BEFORE_FINAL", Data);
+            }
         }
 
         private void onInInterfaceParams(char c)
