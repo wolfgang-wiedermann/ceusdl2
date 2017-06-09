@@ -8,7 +8,8 @@ namespace CeusDL2
     {
         static void Main(string[] args)
         {
-            PartialParserTest.RunTests();
+            //PartialParserTest.RunTests();
+            InterpreterTest.RunTests();
         }
     }
 }
