@@ -9,7 +9,8 @@ namespace CeusDL2
         static void Main(string[] args)
         {
             //PartialParserTest.RunTests();
-            InterpreterTest.RunTests();
+            //InterpreterTest.RunTests();
+            CeusDLGeneratorTest.RunTests();
         }
     }
 }
