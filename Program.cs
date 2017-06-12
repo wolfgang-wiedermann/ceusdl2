@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using KDV.CeusDL.Generator;
 using KDV.CeusDL.Generator.CeusDL;
 using KDV.CeusDL.Generator.IL;
 using KDV.CeusDL.Model.Core;
@@ -95,17 +96,21 @@ namespace CeusDL2
             var model = new CoreModel(result);
 
             // CeusDL generieren.
-            var cdlGen = new CeusDLGenerator(model);
-            File.WriteAllText(Path.Combine(GENERATED_CEUSDL, "generated.ceusdl"), cdlGen.GenerateCode());
+            ExecuteStep(new CeusDLGenerator(model));            
 
             // IL generieren.
-            var ilcGen = new CreateILGenerator(model);
-            File.WriteAllText(Path.Combine(GENERATED_SQL, "IL_Create.sql"), ilcGen.GenerateCode());
+            ExecuteStep(new CreateILGenerator(model));            
+            ExecuteStep(new DropILGenerator(model));
+            ExecuteStep(new LoadILGenerator(model));            
 
-            var ildGen = new DropILGenerator(model);
-            File.WriteAllText(Path.Combine(GENERATED_SQL, "IL_Drop.sql"), ildGen.GenerateCode());
+            // TODO: IL-Parser in C# generieren ... und dann BL
+        }
 
-            // TODO: IL-Parser in C# generieren ...
+        static void ExecuteStep(IGenerator generator) {
+            var code = generator.GenerateCode();
+            foreach(var file in code) {
+                File.WriteAllText(Path.Combine(GENERATED_CEUSDL, file.FileName), file.Content);
+            }
         }
     }
 }

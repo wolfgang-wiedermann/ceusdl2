@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using KDV.CeusDL.Model.Core;
 using KDV.CeusDL.Model.IL;
 
@@ -12,7 +13,7 @@ namespace KDV.CeusDL.Generator.IL {
             this.model = new ILModel(model);
         }
 
-        public string GenerateCode()
+        public List<GeneratorResult> GenerateCode()
         {
             string code = "--\n-- InterfaceLayer-Tabellen aus der Datenbank entfernen\n--\n\n";
             if(!string.IsNullOrEmpty(model.Database)) {
@@ -24,8 +25,10 @@ namespace KDV.CeusDL.Generator.IL {
                 code += $"DROP TABLE [dbo].[{ifa.Name}]\n";
                 code += "GO\n\n";
             }
-
-            return code;
+            
+            var result = new List<GeneratorResult>();
+            result.Add(new GeneratorResult("IL_Drop.sql", code));
+            return result;
         }
     }
 }

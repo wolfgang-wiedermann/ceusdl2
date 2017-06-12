@@ -5,9 +5,10 @@ using System;
 
 namespace KDV.CeusDL.Model.IL {
     public class ILAttribute
-    {
-        private CoreAttribute baseData;        
+    {        
         private CoreModel coreModel;
+
+        public CoreAttribute Core {get; private set;}        
 
         public ILInterface ParentInterface { get; private set; }
 
@@ -18,7 +19,7 @@ namespace KDV.CeusDL.Model.IL {
 
         public ILAttribute(CoreAttribute attr, ILInterface ifa, CoreModel model)
         {
-            this.baseData = attr;
+            this.Core = attr;
             this.ParentInterface = ifa;
             this.coreModel = model;
             

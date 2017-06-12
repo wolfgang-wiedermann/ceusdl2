@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using KDV.CeusDL.Model.Core;
 
 using static KDV.CeusDL.Model.Core.CoreInterfaceType;
@@ -13,14 +14,16 @@ namespace KDV.CeusDL.Generator.CeusDL
             this.model = model;            
         }
 
-        public string GenerateCode()
+        public List<GeneratorResult> GenerateCode()
         {
             string code = GenerateConfig(model.Config);
             foreach(var ifa in model.Interfaces) {
                 code += GenerateInterface(ifa, model);
             }
 
-            return code;
+            var result = new List<GeneratorResult>();
+            result.Add(new GeneratorResult("generated.ceusdl", code));
+            return result;
         }
 
         #region Interface-Generator

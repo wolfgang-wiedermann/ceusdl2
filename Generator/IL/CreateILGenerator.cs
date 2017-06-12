@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using KDV.CeusDL.Model.Core;
 using KDV.CeusDL.Model.IL;
 
@@ -12,7 +13,7 @@ namespace KDV.CeusDL.Generator.IL {
             this.model = new ILModel(model);
         }
 
-        public string GenerateCode()
+        public List<GeneratorResult> GenerateCode()
         {
             string code = $"/* Create-Statements für die InterfaceLayer des {model.coreModel.Config.Prefix}-Warehouse */\n\n";
             code += $"use {model.Database}\n\n";
@@ -21,7 +22,9 @@ namespace KDV.CeusDL.Generator.IL {
                 code += GenerateIfaCode(ifa);
             }
             
-            return code;
+            var result = new List<GeneratorResult>();
+            result.Add(new GeneratorResult("IL_Create.sql", code));
+            return result;
         }
 
         private string GenerateIfaCode(ILInterface ifa)
