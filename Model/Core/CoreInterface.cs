@@ -39,7 +39,7 @@ namespace KDV.CeusDL.Model.Core {
                         attr = new CoreRefAttribute(tmpAttr, this, model);
                         break;
                     case "fact":
-                        attr = new CoreBaseAttribute(tmpAttr, this, model);
+                        attr = new CoreFactAttribute(tmpAttr, this, model);
                         break;
                     default:
                         throw new InvalidAttributeTypeException($"Ungültiger Attribut-Typ {tmpAttr.AttributeType} in Interface {tmp.Name} gefunden");

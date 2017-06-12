@@ -19,5 +19,13 @@ namespace KDV.CeusDL.Model.Core {
                 IsPrimaryKey = true;
             }
         }
+
+        ///
+        /// Attributtyp-Spezifische Postprocessing-Schritte anstoßen, 
+        /// nachdem alle Attribute und Interfaces angelegt sind.
+        ///
+        internal virtual void PostProcess() {
+            // Normal ist da bisher nichts zu tun (außer bei Ref-Attributen)
+        }
     }
 }

@@ -35,4 +35,13 @@ interface StudiengangHisInOne : DimTable(mandant="true") {
     // Zusätzliche Attributfelder
     // z. B. Kapazität, Überbuchung, etc. 
     // (erfordert zusätzliche Custom-Tabelle)
+    fact Anzahl_Studenten:int(default="1");
+}
+
+interface StudiengangSOSPOS : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+}
+
+interface Studientyp : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
 }

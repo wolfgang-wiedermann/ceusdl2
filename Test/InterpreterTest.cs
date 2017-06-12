@@ -18,6 +18,10 @@ namespace KDV.CeusDL.Test {
 
         public void Test1(TmpParserResult result) {
             CoreModel m = new CoreModel(result);
+
+            if(!(m.Interfaces[1].Attributes[3] is CoreRefAttribute)) {
+                Console.WriteLine("Fehler: Das 4. Attribut im Interface StudiengangHISinOne muss ein RefAttribut sein.");
+            }
             
             Console.WriteLine("Und jetzt im Debugger testen!");
         }
