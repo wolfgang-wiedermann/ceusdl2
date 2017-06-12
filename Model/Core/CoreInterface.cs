@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections.Generic;
 using KDV.CeusDL.Parser.TmpModel;
 
@@ -23,6 +24,10 @@ namespace KDV.CeusDL.Model.Core {
         public CoreInterface(TmpInterface tmp, CoreModel model) {
             coreModel = model;
             BaseData = tmp;
+
+            if(tmp.Parameters != null && tmp.Parameters.Where(a => a.Name == "mandant" && a.Value == "true").Count() > 0) {
+                IsMandant = true;
+            }
 
             HistoryBy = null;
             Name = tmp.Name;            
@@ -67,6 +72,16 @@ namespace KDV.CeusDL.Model.Core {
                     return CoreInterfaceType.FACT_TABLE;
                 default:
                     throw new InvalidInterfaceTypeException($"Ungültiger Interface-Typ {typeName}");
+            }
+        }
+
+        internal void PostProcess() {
+            if(BaseData.Parameters != null && BaseData.Parameters.Where(a => a.Name == "history").Count() > 0) {
+                var history = BaseData.Parameters.Where(a => a.Name == "history").First();
+                HistoryBy = coreModel.GetAttributeByName(history.Value);
+            }
+            foreach(var attr in Attributes) {
+                attr.PostProcess();
             }
         }
     }

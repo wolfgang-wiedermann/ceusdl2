@@ -31,7 +31,7 @@ namespace KDV.CeusDL.Model.Core {
                 if(DataType == CoreDataType.VARCHAR) {
                     Length = Int32.Parse(lenStr);
                 } else {
-                    var split = lenStr.Split('.');
+                    var split = lenStr.Split(',');
                     if(split.Length != 2) {
                         throw new InvalidParameterException($"Für Attribute des Datentypen {tmp.DataType} ist die Angabe der Vor- und Nachkommastellen im len-Parameter erforderlich");
                     }

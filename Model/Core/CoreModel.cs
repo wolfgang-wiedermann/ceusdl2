@@ -17,9 +17,7 @@ namespace KDV.CeusDL.Model.Core {
 
             // Post-Processing um Ref-Attribute aufzulösen.
             foreach(var ifa in Interfaces) {
-                foreach(var attr in ifa.Attributes) {
-                    attr.PostProcess();
-                }
+                ifa.PostProcess();
             }
         }
 
