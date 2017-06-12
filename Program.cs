@@ -29,7 +29,8 @@ namespace CeusDL2
                 PrepareEnvironment(rootFolder);
                 //PartialParserTest.RunTests();
                 //InterpreterTest.RunTests();
-                CeusDLGeneratorTest.RunTests();
+                //CeusDLGeneratorTest.RunTests();
+                ExecuteCompilation(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\file_demo3.ceusdl");
             } else {
                 // Dieser Code wird beim Aufruf über Commandline ausgeführt
                 var cla = new CommandLineApplication();                
@@ -108,6 +109,11 @@ namespace CeusDL2
 
         static void ExecuteStep(IGenerator generator) {
             var code = generator.GenerateCode();
+
+            if(code == null) {
+                return;
+            }
+            
             foreach(var file in code) {
                 File.WriteAllText(Path.Combine(GENERATED_CEUSDL, file.FileName), file.Content);
             }
