@@ -42,6 +42,12 @@ namespace KDV.CeusDL.Test {
             if(!b.IsMandant) {
                 throw new Exception("ERROR: Das Interfaces Bewerber ist definitiv Mandanten-abhängig.");
             }
+            if(!b.IsHistorized) {
+                throw new Exception("ERROR: Das Interfaces Bewerber ist definitiv nach Tag.KNZ historisiert.");
+            }
+            if(!b.HistoryBy.ParentInterface.Name.Equals("Tag")) {
+                throw new Exception("ERROR: Das Interfaces Bewerber ist definitiv nach Tag.KNZ historisiert.");
+            }
             
             Console.WriteLine("Und jetzt im Debugger testen!");
         }
