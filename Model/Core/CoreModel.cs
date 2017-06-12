@@ -30,9 +30,13 @@ namespace KDV.CeusDL.Model.Core {
                 throw new InvalidParameterException("Attributreferenzen müssen in der Form INTERFACENAME.ATTRIBUTNAME angegeben werden.");
             }
 
-            return Interfaces.Where(i => i.Name == tokens[0])
+            return GetAttributeByName(tokens[0], tokens[1]);
+        }
+
+        public CoreAttribute GetAttributeByName(string ifaName, string attrName) {
+            return Interfaces.Where(i => i.Name == ifaName)
                              ?.First().Attributes
-                             .Where(a => a is CoreBaseAttribute && a.Name == tokens[1])
+                             .Where(a => a is CoreBaseAttribute && a.Name == attrName)
                              ?.First();
         } 
     }

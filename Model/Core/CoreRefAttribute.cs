@@ -19,16 +19,23 @@ namespace KDV.CeusDL.Model.Core {
             this.Alias = tmp.Alias;
         }
 
-        public override string Name { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
+        public override string Name { 
+            get {
+                if(string.IsNullOrEmpty(Alias)) {
+                    return $"{ReferencedInterface.Name}_{ReferencedAttribute.Name}";
+                } else {
+                    return $"{Alias}_{ReferencedInterface.Name}_{ReferencedAttribute.Name}";
+                }
+            } 
+            protected set => throw new NotImplementedException(); 
+        }
 
         ///
         /// Attributtyp-Spezifische Postprocessing-Schritte anstoßen, 
         /// nachdem alle Attribute und Interfaces angelegt sind.
         ///
-        internal override void PostProcess() {
-            var fieldName = BaseData.InterfaceName+"."+BaseData.FieldName;
-            Console.WriteLine("FieldName: "+fieldName);
-            ReferencedAttribute = (CoreBaseAttribute)coreModel.GetAttributeByName(fieldName);
+        internal override void PostProcess() {        
+            ReferencedAttribute = (CoreBaseAttribute)coreModel.GetAttributeByName(BaseData.InterfaceName, BaseData.FieldName);
         }
     }
 }
