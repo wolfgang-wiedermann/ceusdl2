@@ -82,7 +82,8 @@ namespace KDV.CeusDL.Parser
             if(c == ';' && ParserUtil.NextNonWhitespaceIs(Data, '}')) {
                 state = BEFORE_FINAL;    
             } else if(c == ';') {                
-                state = IN_PARAMLIST;               
+                state = IN_PARAMLIST;
+                Data.Back(1);             
             } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {
                 throw new InvalidCharException("Ungültiges Zeichen in der Parameterliste der Config", Data);
             }

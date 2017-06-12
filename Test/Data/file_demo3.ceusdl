@@ -7,7 +7,7 @@ config {
      prefix="AP";
      il_database="FH_AP_InterfaceLayer";
      bl_database="FH_AP_BaseLayer";
-     bt_database="FH_AP_BaseLayer";al_database="FH_AP_Warehouse";     
+     bt_database="FH_AP_BaseLayer";al_database="FH_AP_Warehouse";     // hier verliert er noch das a von al_database !!
      /*
       * Datenbank, aus der in die Produktivdatenbank kopiert werden soll...
       */
