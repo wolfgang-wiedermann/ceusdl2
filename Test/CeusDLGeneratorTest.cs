@@ -30,12 +30,15 @@ namespace KDV.CeusDL.Test {
 
         public void TestILModel(CoreModel input) {
             ILModel model = new ILModel(input);
-            Console.WriteLine(model.Database);
+            //Console.WriteLine(model.Database);
 
             var generator = new CreateILGenerator(input);
-            generator.GenerateCode();
+            var code = generator.GenerateCode();
 
-            Console.WriteLine("Fertig");
+            //var generator = new DropILGenerator(input);
+            //var code = generator.GenerateCode();
+
+            Console.WriteLine(code);
         }
     }
 }

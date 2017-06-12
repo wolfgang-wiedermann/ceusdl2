@@ -13,13 +13,14 @@ namespace KDV.CeusDL.Generator.CeusDL
             this.model = model;            
         }
 
-        public void GenerateCode()
+        public string GenerateCode()
         {
             string code = GenerateConfig(model.Config);
             foreach(var ifa in model.Interfaces) {
                 code += GenerateInterface(ifa, model);
             }
-            Console.WriteLine(code);
+
+            return code;
         }
 
         #region Interface-Generator

@@ -12,7 +12,7 @@ namespace KDV.CeusDL.Generator.IL {
             this.model = new ILModel(model);
         }
 
-        public void GenerateCode()
+        public string GenerateCode()
         {
             string code = $"/* Create-Statements für die InterfaceLayer des {model.coreModel.Config.Prefix}-Warehouse */\n\n";
             code += $"use {model.Database}\n\n";
@@ -20,7 +20,8 @@ namespace KDV.CeusDL.Generator.IL {
             foreach(var ifa in model.Interfaces) {
                 code += GenerateIfaCode(ifa);
             }
-            Console.WriteLine(code); // TODO: so ist das noch sch...
+            
+            return code;
         }
 
         private string GenerateIfaCode(ILInterface ifa)
