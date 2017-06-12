@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using KDV.CeusDL.Generator.CeusDL;
 using KDV.CeusDL.Generator.IL;
@@ -19,13 +20,13 @@ namespace KDV.CeusDL.Test {
             var result = p.Parse();
             var model = new CoreModel(result);
 
-            test.GenerateConfig(model);
+            test.GenerateCeusDL(model);
             test.TestILModel(model);
         }
 
-        public void GenerateConfig(CoreModel model) {
+        public void GenerateCeusDL(CoreModel model) {
             CeusDLGenerator gen = new CeusDLGenerator(model);
-            gen.GenerateCode();
+            var code = gen.GenerateCode();            
         }
 
         public void TestILModel(CoreModel input) {
