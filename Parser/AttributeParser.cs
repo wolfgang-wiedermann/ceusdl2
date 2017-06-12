@@ -30,8 +30,9 @@ namespace KDV.CeusDL.Parser
 
         public override TmpInterfaceAttribute Parse()
         {
-            state = INITIAL;
+            state = INITIAL;           
             result = new TmpInterfaceAttribute();
+            //result.InterfaceName = "";
             result.Parameters = new List<TmpNamedParameter>();
 
             while(Data.HasNext()) {
@@ -131,7 +132,7 @@ namespace KDV.CeusDL.Parser
 
         private void onInRefInterfaceName(char c)
         {
-            if(ParserUtil.IsNewLineOrWhitespace(c) && result.InterfaceName.Length == 0) {
+            if(ParserUtil.IsNewLineOrWhitespace(c) && string.IsNullOrEmpty(result.InterfaceName)) {
                 // Ignorieren
             } else if(ParserUtil.IsValidNameChar(c)) {
                 result.InterfaceName += c;

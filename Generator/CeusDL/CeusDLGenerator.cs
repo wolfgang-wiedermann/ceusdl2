@@ -85,8 +85,9 @@ namespace KDV.CeusDL.Generator.CeusDL
                     dirty = true;
                     code += $"unit=\"{attr.Unit}\"";
                 }
-                code += ");";
+                code += ")";
             }
+            code += ";";
             return code;
         }
 

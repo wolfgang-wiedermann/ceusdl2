@@ -12,6 +12,7 @@ namespace KDV.CeusDL.Test {
             var test = new CeusDLGeneratorTest();
 
             var data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\file_demo2.ceusdl"));
+            //var data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\sample.ceusdl"));
             var p = new FileParser(data);
             var result = p.Parse();
             var model = new CoreModel(result);
