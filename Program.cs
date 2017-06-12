@@ -97,17 +97,17 @@ namespace CeusDL2
             var model = new CoreModel(result);
 
             // CeusDL generieren.
-            ExecuteStep(new CeusDLGenerator(model));            
+            ExecuteStep(new CeusDLGenerator(model), GENERATED_CEUSDL);            
 
             // IL generieren.
-            ExecuteStep(new CreateILGenerator(model));            
-            ExecuteStep(new DropILGenerator(model));
-            ExecuteStep(new LoadILGenerator(model));            
+            ExecuteStep(new CreateILGenerator(model), GENERATED_SQL);            
+            ExecuteStep(new DropILGenerator(model), GENERATED_SQL);
+            ExecuteStep(new LoadILGenerator(model), GENERATED_SQL);            
 
             // TODO: IL-Parser in C# generieren ... und dann BL
         }
 
-        static void ExecuteStep(IGenerator generator) {
+        static void ExecuteStep(IGenerator generator, string baseFolder) {
             var code = generator.GenerateCode();
 
             if(code == null) {
@@ -115,7 +115,7 @@ namespace CeusDL2
             }
             
             foreach(var file in code) {
-                File.WriteAllText(Path.Combine(GENERATED_CEUSDL, file.FileName), file.Content);
+                File.WriteAllText(Path.Combine(baseFolder, file.FileName), file.Content);
             }
         }
     }
