@@ -15,7 +15,9 @@ namespace KDV.CeusDL.Model.IL {
             Interfaces = new List<ILInterface>();
 
             foreach(var ifa in model.Interfaces) {
-                Interfaces.Add(new ILInterface(ifa, model));
+                if(ifa.Type != CoreInterfaceType.DEF_TABLE && ifa.Type != CoreInterfaceType.DIM_VIEW) {
+                    Interfaces.Add(new ILInterface(ifa, model));
+                }
             }
         }
     }

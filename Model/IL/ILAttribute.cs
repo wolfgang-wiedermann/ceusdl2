@@ -37,12 +37,19 @@ namespace KDV.CeusDL.Model.IL {
                 Name = $"{baseAttr.ParentInterface.Name}_{baseAttr.Name}";
                 PrepareDataTypeAndParams(baseAttr.DataType, baseAttr.Length, baseAttr.Decimals);
             }
+
+            if(IsPrimaryKey) {
+                DataTypeParameters += " not null";
+            }
         }
 
         public ILAttribute(string name, CoreDataType dataType, int length, int decimals, bool primaryKey) {
             Name = name;
             IsPrimaryKey = primaryKey;
             PrepareDataTypeAndParams(dataType, length, decimals);
+            if(IsPrimaryKey) {
+                DataTypeParameters += " not null";
+            }
         }
 
         private void PrepareDataTypeAndParams(CoreDataType dataType, int length, int decimals)

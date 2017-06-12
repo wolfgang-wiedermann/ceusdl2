@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using KDV.CeusDL.Generator.CeusDL;
+using KDV.CeusDL.Generator.IL;
 using KDV.CeusDL.Model;
 using KDV.CeusDL.Model.Core;
 using KDV.CeusDL.Model.IL;
@@ -30,6 +31,11 @@ namespace KDV.CeusDL.Test {
         public void TestILModel(CoreModel input) {
             ILModel model = new ILModel(input);
             Console.WriteLine(model.Database);
+
+            var generator = new CreateILGenerator(input);
+            generator.GenerateCode();
+
+            Console.WriteLine("Fertig");
         }
     }
 }
