@@ -15,6 +15,8 @@ namespace KDV.CeusDL.Model.IL {
         public string Name {get; private set;}
         public string DataType {get; private set;}
         public CoreDataType CDataType {get; private set;}
+        public int Length {get; private set;}
+        public int Decimals {get; private set;}
         public string DataTypeParameters {get; private set;}
         public bool IsPrimaryKey {get; private set;}
 
@@ -62,6 +64,8 @@ namespace KDV.CeusDL.Model.IL {
                 case CoreDataType.INT:
                     DataType = "int";
                     DataTypeParameters = "";
+                    Length = 0;
+                    Decimals = 0;
                     break;
                 case CoreDataType.DATE:
                 case CoreDataType.TIME:
@@ -72,10 +76,14 @@ namespace KDV.CeusDL.Model.IL {
                 case CoreDataType.VARCHAR:
                     DataType = "varchar";
                     DataTypeParameters = $"({length})";
+                    Length = length;
+                    Decimals = 0;
                     break;
                 case CoreDataType.DECIMAL:
                     DataType = "decimal";
                     DataTypeParameters = $"({length},{decimals})";
+                    Length = length;
+                    Decimals = decimals;
                     break;
             }
         }

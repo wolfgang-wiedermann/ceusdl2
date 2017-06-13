@@ -91,6 +91,7 @@ namespace KDV.CeusDL.Generator.IL {
             //
             code += GenerateExecuteMethod(ifa);
             code += GenerateLoadMethod(ifa);
+            code += GenerateParseLineMethod(ifa);
             code += GenerateDeleteMethod(ifa);
             code += GenerateInsertSQLMethod(ifa);
             // 
@@ -106,9 +107,49 @@ namespace KDV.CeusDL.Generator.IL {
         private string GenerateInsertSQLMethod(ILInterface ifa)
         {
             string code = "";
-            code += $"        public string GetInsertSQL({ifa.ShortName}Line line) {{\n";
-            code += "            throw new NotImplementedException();\n";
+            code +=$"        public string GetInsertSQL({ifa.ShortName}Line line) {{\n";
+            code +=$"            string sql = \"insert into {ifa.FullName} (\";\n";
+
+            code += "            sql += \"";
+            foreach(var attr in ifa.Attributes) {
+                code += attr.Name;
+                if(!attr.Equals(ifa.Attributes.Last())) {
+                    code +=", ";
+                }                
+            }
+            code += "\";\n";
+
+            code += "            sql += \") values (\";\n";
+            
+            foreach(var attr in ifa.Attributes) {
+                code += "            sql += \"\'\";\n";
+                code +=$"            sql += line.{attr.Name}{GetSubstringIfNeeded(attr, ifa)};\n";                
+                if(attr.Equals(ifa.Attributes.Last())) {
+                    code += "            sql += \"\')\\n\";\n"; 
+                } else {
+                    code += "            sql += \"\', \";\n"; 
+                }            
+            }
+
+            code += "            return sql;\n";
             code += "        }\n\n";
+            return code;
+        }
+
+        private string GetSubstringIfNeeded(ILAttribute attr, ILInterface ifa) {
+            string code = "";
+            switch(attr.CDataType) {
+                case CoreDataType.DATE:
+                    return ".Substring(0, 10)";
+                case CoreDataType.DATETIME:
+                    return ".Substring(0, 20)";
+                case CoreDataType.DECIMAL:                    
+                    return $".Substring(0, {attr.Length})";
+                case CoreDataType.VARCHAR:
+                    return $".Substring(0, {attr.Length})";
+                case CoreDataType.INT:
+                    return ".Substring(0, 10)";
+            }
             return code;
         }
 
@@ -119,7 +160,10 @@ namespace KDV.CeusDL.Generator.IL {
         {   
             string code = "";
             code += $"        public void DeleteFromTable(DbConnection con) {{\n";
-            code += "            throw new NotImplementedException();\n";
+            code += "            using(var cmd = con.CreateCommand()) {\n";
+            code +=$"                cmd.CommandText = \"truncate table {ifa.FullName}\";\n";
+            code += "                cmd.ExecuteNonQuery();\n";
+            code += "            }\n";
             code += "        }\n\n";
             return code;
         }
@@ -130,7 +174,27 @@ namespace KDV.CeusDL.Generator.IL {
         private string GenerateLoadMethod(ILInterface ifa)
         {
             string code = "";
-            code += $"        public IEnumerable<{ifa.ShortName}Line> Load(string filename) {{\n";
+            code +=$"        public IEnumerable<{ifa.ShortName}Line> Load(string filename) {{\n";
+            code += "            if(!File.Exists(filename)) {\n";
+            code += "                throw new FileNotFoundException(filename);\n";
+            code += "            }\n\n";
+            code += "            using(var fs = new StreamReader(new FileStream(filename, FileMode.Open))) {\n";
+            code += "                string line = \"\";\n\n";
+            code += "                while((line = fs.ReadLine()) != null) {\n";
+            code += "                    yield return ParseLine(line);\n";
+            code += "                }\n";
+            code += "            }\n";
+            code += "        }\n\n";
+            return code;
+        }
+
+        ///
+        /// Load-Funktion
+        /// 
+        private string GenerateParseLineMethod(ILInterface ifa)
+        {
+            string code = "";
+            code +=$"        public {ifa.ShortName}Line ParseLine(string line) {{\n";
             code += "            throw new NotImplementedException();\n";
             code += "        }\n\n";
             return code;
