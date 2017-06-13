@@ -30,7 +30,7 @@ namespace CeusDL2
                 //PartialParserTest.RunTests();
                 //InterpreterTest.RunTests();
                 //CeusDLGeneratorTest.RunTests();
-                ExecuteCompilation(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\file_demo3.ceusdl");
+                ExecuteCompilation(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\file_demo2.ceusdl");
             } else {
                 // Dieser Code wird beim Aufruf über Commandline ausgeführt
                 var cla = new CommandLineApplication();                

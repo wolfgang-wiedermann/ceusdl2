@@ -15,7 +15,7 @@ namespace KDV.CeusDL.Generator.IL {
 
         public List<GeneratorResult> GenerateCode()
         {
-            string code = $"/* Create-Statements für die InterfaceLayer des {model.coreModel.Config.Prefix}-Warehouse */\n\n";
+            string code = "--\n-- InterfaceLayer\n--\n\n";
             code += $"use {model.Database}\n\n";
 
             foreach(var ifa in model.Interfaces) {
@@ -31,7 +31,7 @@ namespace KDV.CeusDL.Generator.IL {
         {
             string code = $"create table {ifa.FullName} (\n";
             foreach(var attr in ifa.Attributes) {
-                code += $"   {attr.Name} {attr.DataType}{attr.DataTypeParameters}";
+                code += $"    {attr.Name} {attr.DataType}{attr.DataTypeParameters}";
                 if(!ifa.Attributes.Last().Equals(attr)) {
                     code += ",";
                 }
