@@ -14,6 +14,7 @@ namespace KDV.CeusDL.Model.IL {
 
         public string Name {get; private set;}
         public string DataType {get; private set;}
+        public CoreDataType CDataType {get; private set;}
         public string DataTypeParameters {get; private set;}
         public bool IsPrimaryKey {get; private set;}
 
@@ -27,6 +28,7 @@ namespace KDV.CeusDL.Model.IL {
 
             if(attr is CoreRefAttribute) {                                
                 var baseAttr = ((CoreRefAttribute)attr).ReferencedAttribute;
+                CDataType = baseAttr.DataType;
                 if(string.IsNullOrEmpty(((CoreRefAttribute)attr).Alias)) {
                     Name = $"{baseAttr.ParentInterface.Name}_{baseAttr.Name}";
                 } else {
@@ -35,6 +37,7 @@ namespace KDV.CeusDL.Model.IL {
                 PrepareDataTypeAndParams(baseAttr.DataType, baseAttr.Length, baseAttr.Decimals);                
             } else {
                 var baseAttr = (CoreBaseAttribute) attr;                
+                CDataType = baseAttr.DataType;
                 Name = $"{baseAttr.ParentInterface.Name}_{baseAttr.Name}";
                 PrepareDataTypeAndParams(baseAttr.DataType, baseAttr.Length, baseAttr.Decimals);
             }

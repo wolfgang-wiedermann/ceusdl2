@@ -9,6 +9,8 @@ namespace KDV.CeusDL.Model.IL {
         private CoreModel coreModel;
 
         public string Name { get; private set; }
+
+        public string ShortName {get; private set;}
         public string FullName {get => string.IsNullOrEmpty(coreModel.Config.ILDatabase)?Name:$"{coreModel.Config.ILDatabase}.dbo.{Name}";}
 
         public List<ILAttribute> Attributes {get; private set;}
@@ -17,7 +19,8 @@ namespace KDV.CeusDL.Model.IL {
         public ILInterface(CoreInterface ifa, CoreModel model)
         {
             this.baseData = ifa;
-            this.coreModel = model;            
+            this.coreModel = model;
+            this.ShortName = ifa.Name;
 
             // Tabellennamen festlegen.
             if(string.IsNullOrEmpty(coreModel.Config.Prefix)) {

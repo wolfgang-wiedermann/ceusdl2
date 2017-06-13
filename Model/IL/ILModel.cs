@@ -9,10 +9,13 @@ namespace KDV.CeusDL.Model.IL {
 
         public CoreModel coreModel;
 
+        public string Namespace { get; private set; }
+
         public ILModel(CoreModel model) {
             coreModel = model;
             Database = model.Config.ILDatabase;            
             Interfaces = new List<ILInterface>();
+            Namespace = string.IsNullOrEmpty(model.Config.Prefix)?"Kdv.Loader":$"Kdv.Loader.{model.Config.Prefix}";
 
             foreach(var ifa in model.Interfaces) {
                 if(ifa.Type != CoreInterfaceType.DEF_TABLE && ifa.Type != CoreInterfaceType.DIM_VIEW) {

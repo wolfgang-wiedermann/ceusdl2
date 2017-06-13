@@ -19,6 +19,7 @@ namespace CeusDL2
     {
         static string GENERATED_SQL;
         static string GENERATED_CEUSDL;
+        static string GENERATED_CODE;
 
         static void Main(string[] args)
         {            
@@ -70,6 +71,7 @@ namespace CeusDL2
             var generated = Path.Combine(rootFolder, "Generated");
             var generatedSQL = Path.Combine(generated, "SQL");
             var generatedCeusDL = Path.Combine(generated, "CeusDL");            
+            var generatedCode = Path.Combine(generated, "CSharp");
 
             if(!Directory.Exists(generated)) {
                 Directory.CreateDirectory(generated);   
@@ -86,8 +88,13 @@ namespace CeusDL2
                 Directory.CreateDirectory(generatedCeusDL);   
             }
 
+            if(!Directory.Exists(generatedCode)) {
+                Directory.CreateDirectory(generatedCode);   
+            }
+
             GENERATED_SQL = generatedSQL;
             GENERATED_CEUSDL = generatedCeusDL;
+            GENERATED_CODE = generatedCode;
         }
 
         static void ExecuteCompilation(string srcFile) {
@@ -102,7 +109,7 @@ namespace CeusDL2
             // IL generieren.
             ExecuteStep(new CreateILGenerator(model), GENERATED_SQL);            
             ExecuteStep(new DropILGenerator(model), GENERATED_SQL);
-            ExecuteStep(new LoadILGenerator(model), GENERATED_SQL);            
+            ExecuteStep(new LoadILGenerator(model), GENERATED_CODE);            
 
             // TODO: IL-Parser in C# generieren ... und dann BL
         }
