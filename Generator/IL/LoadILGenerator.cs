@@ -122,13 +122,21 @@ namespace KDV.CeusDL.Generator.IL {
             code += "            sql += \") values (\";\n";
             
             foreach(var attr in ifa.Attributes) {
-                code += "            sql += \"\'\";\n";
-                code +=$"            sql += line.{attr.Name}{GetSubstringIfNeeded(attr, ifa)};\n";                
+                code +=$"            if(!string.IsNullOrEmpty(line.{attr.Name})) {{\n";
+                code +=$"                sql += \"\'\" + line.{attr.Name}{GetSubstringIfNeeded(attr, ifa)} + \"\'";                
                 if(attr.Equals(ifa.Attributes.Last())) {
-                    code += "            sql += \"\')\\n\";\n"; 
+                    code += ")\\n\";\n"; 
                 } else {
-                    code += "            sql += \"\', \";\n"; 
-                }            
+                    code += ", \";\n"; 
+                }
+                code += "            } else {\n";
+                code += "                sql += \"\'\'";
+                if(attr.Equals(ifa.Attributes.Last())) {
+                    code += ")\\n\";\n"; 
+                } else {
+                    code += ", \";\n"; 
+                }
+                code += "            }\n";
             }
 
             code += "            return sql;\n";
