@@ -28,13 +28,14 @@ namespace KDV.CeusDL.Model.IL {
             
             IsPrimaryKey = attr.IsPrimaryKey;
 
-            if(attr is CoreRefAttribute) {                                
-                var baseAttr = ((CoreRefAttribute)attr).ReferencedAttribute;
+            if(attr is CoreRefAttribute) {
+                var refAttr = (CoreRefAttribute)attr;                              
+                var baseAttr = refAttr.ReferencedAttribute;
                 CDataType = baseAttr.DataType;
-                if(string.IsNullOrEmpty(((CoreRefAttribute)attr).Alias)) {
+                if(string.IsNullOrEmpty(refAttr.Alias)) {
                     Name = $"{baseAttr.ParentInterface.Name}_{baseAttr.Name}";
                 } else {
-                    Name = $"{((CoreRefAttribute)attr).Alias}_{baseAttr.ParentInterface.Name}_{baseAttr.Name}";
+                    Name = $"{refAttr.Alias}_{baseAttr.ParentInterface.Name}_{baseAttr.Name}";
                 }
                 PrepareDataTypeAndParams(baseAttr.DataType, baseAttr.Length, baseAttr.Decimals);                
             } else {
