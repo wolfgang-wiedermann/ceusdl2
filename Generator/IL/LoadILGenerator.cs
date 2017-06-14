@@ -123,7 +123,7 @@ namespace KDV.CeusDL.Generator.IL {
             
             foreach(var attr in ifa.Attributes) {
                 code +=$"            if(!string.IsNullOrEmpty(line.{attr.Name})) {{\n";
-                code +=$"                sql += \"\'\" + line.{attr.Name}{GetSubstringIfNeeded(attr, ifa)} + \"\'";                
+                code +=$"                sql += \"\'\" + (line.{attr.Name}.Length>{GetMaxLength(attr)}?line.{attr.Name}{GetSubstringIfNeeded(attr, ifa)}:line.{attr.Name}) + \"\'";                
                 if(attr.Equals(ifa.Attributes.Last())) {
                     code += ")\\n\";\n"; 
                 } else {
@@ -145,20 +145,23 @@ namespace KDV.CeusDL.Generator.IL {
         }
 
         private string GetSubstringIfNeeded(ILAttribute attr, ILInterface ifa) {
-            string code = "";
+            return $".Substring(0, {GetMaxLength(attr)})";                        
+        }
+
+        private int GetMaxLength(ILAttribute attr) {
             switch(attr.CDataType) {
                 case CoreDataType.DATE:
-                    return ".Substring(0, 10)";
+                    return 10;
                 case CoreDataType.DATETIME:
-                    return ".Substring(0, 20)";
+                    return 20;
                 case CoreDataType.DECIMAL:                    
-                    return $".Substring(0, {attr.Length})";
+                    return attr.Length;
                 case CoreDataType.VARCHAR:
-                    return $".Substring(0, {attr.Length})";
+                    return attr.Length;
                 case CoreDataType.INT:
-                    return ".Substring(0, 10)";
+                    return 11; // 10 + Minus
             }
-            return code;
+            return 0;
         }
 
         ///
@@ -187,9 +190,11 @@ namespace KDV.CeusDL.Generator.IL {
             code += "                throw new FileNotFoundException(filename);\n";
             code += "            }\n\n";
             code += "            using(var fs = new StreamReader(new FileStream(filename, FileMode.Open))) {\n";
-            code += "                string line = \"\";\n\n";
+            code += "                string line = \"\";\n";
+            code += "                long i = 0;\n\n";
             code += "                while((line = fs.ReadLine()) != null) {\n";
-            code += "                    yield return ParseLine(line);\n";
+            code += "                    i += 1;\n";
+            code += "                    yield return ParseLine(line, i);\n";
             code += "                }\n";
             code += "            }\n";
             code += "        }\n\n";
@@ -202,10 +207,81 @@ namespace KDV.CeusDL.Generator.IL {
         private string GenerateParseLineMethod(ILInterface ifa)
         {
             string code = "";
-            code +=$"        public {ifa.ShortName}Line ParseLine(string line) {{\n";
-            code += "            throw new NotImplementedException();\n";
+            code +=$"        public {ifa.ShortName}Line ParseLine(string line, long lineNumber) {{\n";
+            // 
+            // Zustandsvariablen des Automaten
+            //
+            code += "            // Zustands- und Hilfsvariablen\n";
+            code +=$"            var state = {ifa.ShortName}ParserState.IN_{ifa.Attributes[0].Name.ToUpper()};\n";
+            code +=$"            var substate = {ifa.ShortName}ParserSubstate.INITIAL;\n";
+            code +=$"            var content = new {ifa.ShortName}Line();\n";
+            code += "            char c = ' ';\n";
+            code += "            string buf = \"\";\n\n";
+            //
+            // Schleife zur Verarbeitung der Daten
+            //
+            code += "            // Verarbeitung\n";
+            code += "            for(int i = 0; i < line.Length; i++) {\n";
+            code += "                c = line[i];\n";
+            code += "                switch(state) {\n";
+
+            foreach(var attr in ifa.Attributes) {
+                // Generierung der Cases
+                code += GenerateParseAttributeCase(ifa, attr);                
+            }
+
+            code +=$"                    case {ifa.ShortName}ParserState.FINAL:\n";
+            code +=$"                        return content;\n";
+
+            code += "                }\n";
+            code += "            }\n";
+
+            code +=$"            if(state == {ifa.ShortName}ParserState.FINAL) {{\n";
+            code += "                return content;\n";
+            code += "            } else {\n";            
+            code += "                throw new InvalidOperationException($\"Ungültiger State am Ende der Zeile {lineNumber} => {state}\");\n";
+            code += "            }\n";
             code += "        }\n\n";
             return code;
+        }
+
+        ///
+        /// Generierung eines einzelnen Cases (zu ParserState)
+        ///
+        private string GenerateParseAttributeCase(ILInterface ifa, ILAttribute attr)
+        {
+            string code = "";            
+            code +=$"case {ifa.ShortName}ParserState.IN_{attr.Name.ToUpper()}:\n";
+            /// Vor Anführungszeichen
+            code +=$"    if(substate == {ifa.ShortName}ParserSubstate.INITIAL) {{\n";
+            code += "        if(c == '\"') {\n";
+            code +=$"            substate = {ifa.ShortName}ParserSubstate.IN_STRING;\n";
+            code += "        } else if(c == ';') {\n";
+            // Zum nächsten Attribut weiterschalten
+            if(attr == ifa.Attributes.Last()) {
+                code +=$"            state = {ifa.ShortName}ParserState.FINAL;\n";
+            } else {
+                var nextAttr = ifa.Attributes[ifa.Attributes.IndexOf(attr)+1];
+                code +=$"            state = {ifa.ShortName}ParserState.IN_{nextAttr.Name.ToUpper()};\n";
+            }
+            code += "        } else {\n";            
+            code +=$"            throw new InvalidDataException($\"Ungültiges Zeichen vor {ifa.Name}.{attr.Name} Zeile {{i}}\");\n";
+            code += "        }\n";
+            /// Nach Anführungszeichen
+            code +=$"    }} else if(substate == {ifa.ShortName}ParserSubstate.IN_STRING) {{\n";
+            code += "        if(c == '\"') {\n";
+            code +=$"            content.{attr.Name} = buf;\n";
+            code += "            buf = \"\";\n";
+            code +=$"            substate = {ifa.ShortName}ParserSubstate.INITIAL;\n";
+            if(attr == ifa.Attributes.Last()) {
+                code +=$"            state = {ifa.ShortName}ParserState.FINAL;\n";
+            }            
+            code += "        } else {\n";
+            code += "            buf += c;\n";
+            code += "        }\n";
+            code += "    }\n";
+            code +=$"    break;\n";            
+            return code.Indent("                    ");
         }
 
         ///
@@ -233,6 +309,7 @@ namespace KDV.CeusDL.Generator.IL {
             code += "                        if(i > 0) {\n";
             code += "                            cmd.ExecuteNonQuery();\n";
             code += "                        }\n";
+            code += "                        i += 1;\n";
             code += "                    }\n";
             code += "                }\n";
             code += "            }\n";
@@ -245,15 +322,11 @@ namespace KDV.CeusDL.Generator.IL {
             string code = $"    public enum {ifa.ShortName}ParserState {{\n        ";
 
             foreach(var attr in ifa.Attributes) {
-                code += $"IN_{attr.Name.ToUpper()}";
-                if(ifa.Attributes.Last() != attr) {
-                    code += ", ";
-                } else {
-                    code += "\n";
-                }
-            }
+                code += $"IN_{attr.Name.ToUpper()}";                
+                code += ", ";                
+            }            
 
-            code += "    }\n\n";
+            code += "FINAL\n    }\n\n";
             return code;
         }
 
