@@ -123,7 +123,7 @@ namespace KDV.CeusDL.Generator.IL {
             
             foreach(var attr in ifa.Attributes) {
                 code +=$"            if(!string.IsNullOrEmpty(line.{attr.Name})) {{\n";
-                code +=$"                sql += \"\'\" + (line.{attr.Name}.Length>{GetMaxLength(attr)}?line.{attr.Name}{GetSubstringIfNeeded(attr, ifa)}:line.{attr.Name}) + \"\'";                
+                code +=$"                sql += \"\'\" + (line.{attr.Name}.Length>{GetMaxLength(attr)}?line.{attr.Name}{GetSubstringIfNeeded(attr, ifa)}:line.{attr.Name}).Replace(\"'\", \"''\") + \"\'";                
                 if(attr.Equals(ifa.Attributes.Last())) {
                     code += ")\\n\";\n"; 
                 } else {
