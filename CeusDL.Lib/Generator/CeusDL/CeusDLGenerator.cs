@@ -70,8 +70,8 @@ namespace KDV.CeusDL.Generator.CeusDL
                     // TODO: Hier passt noch nix wirklich!!!
                     //  * Einrückung falsch
                     //  * Abstand zwischen Kommentarzeilen falsch etc...                    
-                    code = code.Substring(0, code.Length-1);
-                    code += item.ToString();
+                    //code = code.Substring(0, code.Length-1);
+                    //code += item.ToString();
                 }                                
             }
             code += "}\n\n";
