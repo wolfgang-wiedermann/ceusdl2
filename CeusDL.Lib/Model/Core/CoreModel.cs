@@ -5,14 +5,26 @@ using KDV.CeusDL.Parser.TmpModel;
 namespace KDV.CeusDL.Model.Core {
     public class CoreModel {
         public CoreConfig Config {get; private set;}
-        public List<CoreInterface> Interfaces {get; private set;}
+        public List<CoreInterface> Interfaces {
+            get {
+                return Objects.Where(o => o is CoreInterface)
+                              .Select(o => (CoreInterface)o)
+                              .ToList<CoreInterface>();
+            }
+        }
+
+        public List<CoreMainLevelObject> Objects {get; private set;}
 
         public CoreModel(TmpParserResult result) {
             Config = new CoreConfig(result.Config);
 
-            Interfaces = new List<CoreInterface>();
-            foreach(var ifa in result.Interfaces) {
-                Interfaces.Add(new CoreInterface(ifa, this));
+            Objects = new List<CoreMainLevelObject>();
+            foreach(var obj in result.Objects) {
+                if(obj.IsInterface) {
+                    Objects.Add(new CoreInterface(obj.Interface, this));
+                } else if(obj.IsComment) {
+                    Objects.Add(new CoreComment(obj.Comment));
+                }
             }
 
             // Post-Processing um Ref-Attribute aufzulösen.

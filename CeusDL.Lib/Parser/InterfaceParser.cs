@@ -149,20 +149,26 @@ namespace KDV.CeusDL.Parser
                 Data.Back(1);
                 var comment = commentParser.Parse();
                 result.AddComment(comment);
+                commentParser.LastWasComment = true;
             } else if(c == 'f' || c == 'b' || c == 'r') {
                 Data.Back(1);
                 var attr = attributeParser.Parse();
                 result.AddAttribute(attr);
+                commentParser.LastWasComment = false;
             } else if(c == '}') {
                 state = FINAL;
+                commentParser.LastWasComment = false;
             } else if(ParserUtil.IsNewLineOrWhitespace(c) && ParserUtil.NextNonWhitespaceIs(Data, '/')) {
                 var comment = commentParser.Parse();
                 result.AddComment(comment);
+                commentParser.LastWasComment = true;
             } else if(ParserUtil.IsNewLineOrWhitespace(c) && ParserUtil.NextNonWhitespaceIs(Data, '}')) {
-                state = BEFORE_FINAL;            
+                state = BEFORE_FINAL;
+                commentParser.LastWasComment = false;          
             } else if(ParserUtil.IsNewLineOrWhitespace(c)) {
                 var attr = attributeParser.Parse();
                 result.AddAttribute(attr);
+                commentParser.LastWasComment = false;
             }            
         }
         
@@ -180,19 +186,24 @@ namespace KDV.CeusDL.Parser
             if(c == '/') {
                 Data.Back(1);
                 commentParser.Parse();
+                commentParser.LastWasComment = true;
             } else if(c == ')' || ParserUtil.NextNonWhitespaceIs(Data, ')')) {
                 state = BEHIND_INTERFACE_PARAMS;
+                commentParser.LastWasComment = false;
             } else if(ParserUtil.IsValidNameChar(c)) {
                 Data.Back(1);
                 var param = namedParameterParser.Parse();                
                 result.Parameters.Add(param);
                 Data.Back(1);
+                commentParser.LastWasComment = false;
             } else if(ParserUtil.IsNewLineOrWhitespace(c) && ParserUtil.NextNonWhitespaceIs(Data, '/')) {
                 commentParser.Parse();
+                commentParser.LastWasComment = true;
             } else if(ParserUtil.IsNewLineOrWhitespace(c)) {
                 var param = namedParameterParser.Parse();
                 result.Parameters.Add(param);
                 Data.Back(1);
+                commentParser.LastWasComment = false;
             }
         }
 

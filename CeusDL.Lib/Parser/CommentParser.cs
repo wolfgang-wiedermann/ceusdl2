@@ -16,17 +16,26 @@ namespace KDV.CeusDL.Parser
     public class CommentParser : AbstractParser<TmpComment>
     {
         private CommentParserEnum state;
-        private TmpComment result;
+        private TmpComment result;        
 
         public CommentParser(ParsableData data) : base(data)
         {
         }
 
+        public bool LastWasComment {
+            get; set;
+        } = false;
+
         public override TmpComment Parse()
         {
             state = INITIAL;
             result = new TmpComment();
-            result.WhitespacesBeforeComment = GetWhitespacesBeforeComment(Data);            
+
+            if(LastWasComment) {
+                result.WhitespacesBeforeComment = "";
+            } else {
+                result.WhitespacesBeforeComment = GetWhitespacesBeforeComment(Data);            
+            }
 
             while(Data.HasNext()) {
                 char c = Data.Next();
@@ -67,7 +76,7 @@ namespace KDV.CeusDL.Parser
         {
             string result = "";
             int pos = data.Position;
-            while(pos+1 < data.Content.Length && ParserUtil.IsNewLineOrWhitespace(data.Content[pos++])) {
+            while(pos+1 < data.Content.Length && ParserUtil.IsNewLineOrWhitespace(data.Content[++pos])) {
                 result += data.Content[pos];
             }
             return result;

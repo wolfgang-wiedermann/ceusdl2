@@ -75,14 +75,17 @@ namespace KDV.CeusDL.Parser
                 if(buf.Equals("interface")) {
                     var ifa = interfaceParser.Parse();
                     result.AddInterface(ifa);
+                    commentParser.LastWasComment = false;
                 } else if (buf.Equals("config")) {          
                     if(result.Config != null) {
                         throw new InvalidTokenException("Es wurde eine zweite config-Section in einer CEUSDL-Datei gefunden", Data);
                     }          
-                    result.Config = configParser.Parse();                                         
-                } else if (buf.StartsWith("//") || buf.StartsWith("/*")) {
+                    result.Config = configParser.Parse();
+                    commentParser.LastWasComment = false;                                     
+                } else if (buf.StartsWith("//") || buf.StartsWith("/*")) {                    
                     var comment = commentParser.Parse();                    
                     result.AddComment(comment);
+                    commentParser.LastWasComment = true;
                 }
                 state = INITIAL;
                 buf = "";

@@ -17,8 +17,12 @@ namespace KDV.CeusDL.Generator.CeusDL
         public List<GeneratorResult> GenerateCode()
         {
             string code = GenerateConfig(model.Config);
-            foreach(var ifa in model.Interfaces) {
-                code += GenerateInterface(ifa, model);
+            foreach(var obj in model.Objects) {
+                if(obj is CoreInterface) {                    
+                    code += GenerateInterface((CoreInterface)obj, model);
+                } else {                    
+                    code += obj.ToString();
+                }
             }
 
             var result = new List<GeneratorResult>();
@@ -49,22 +53,42 @@ namespace KDV.CeusDL.Generator.CeusDL
 
             // Und die Attribute setzen
             code += " {\n";
-            foreach(var attr in ifa.Attributes) {
-                code += "   ";
-                if(attr is CoreBaseAttribute) {
-                    code += GenerateBaseAttribute((CoreBaseAttribute)attr, ifa, model);
-                } else if(attr is CoreRefAttribute) {
-                    code += GenerateRefAttribute((CoreRefAttribute)attr, ifa, model);
-                }
-                code += "\n";
+            foreach(var item in ifa.ItemObjects) {                                
+                if(item is CoreFactAttribute) {
+                    code += "    ";
+                    code += GenerateFactAttribute((CoreFactAttribute)item, ifa, model);
+                    code += "\n";
+                } else if(item is CoreBaseAttribute) {
+                    code += "    ";
+                    code += GenerateBaseAttribute((CoreBaseAttribute)item, ifa, model);
+                    code += "\n";
+                } else if(item is CoreRefAttribute) {
+                    code += "    ";
+                    code += GenerateRefAttribute((CoreRefAttribute)item, ifa, model);
+                    code += "\n";
+                } else if(item is CoreComment) {
+                    // TODO: Hier passt noch nix wirklich!!!
+                    //  * Einrückung falsch
+                    //  * Abstand zwischen Kommentarzeilen falsch etc...                    
+                    code = code.Substring(0, code.Length-1);
+                    code += item.ToString();
+                }                                
             }
             code += "}\n\n";
             return code;
         }
 
-        private string GenerateBaseAttribute(CoreBaseAttribute attr, CoreInterface ifa, CoreModel model)
+        private string GenerateBaseAttribute(CoreBaseAttribute attr, CoreInterface ifa, CoreModel model) {
+            return GenerateBaseAttribute("base", attr, ifa, model);
+        }
+
+        private string GenerateFactAttribute(CoreBaseAttribute attr, CoreInterface ifa, CoreModel model) {
+            return GenerateBaseAttribute("fact", attr, ifa, model);
+        }
+
+        private string GenerateBaseAttribute(string type, CoreBaseAttribute attr, CoreInterface ifa, CoreModel model)
         {
-            var code = $"base {attr.Name}:{DataTypeToString(attr.DataType)}";
+            var code = $"{type} {attr.Name}:{DataTypeToString(attr.DataType)}";
             if(attr.IsPrimaryKey || attr.DataType == CoreDataType.DECIMAL 
                 || attr.DataType == CoreDataType.VARCHAR || !string.IsNullOrEmpty(attr.Unit)) 
             {                

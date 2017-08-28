@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using KDV.CeusDL.Parser.TmpModel;
 
 namespace KDV.CeusDL.Model.Core {
-    public class CoreInterface {
+    public class CoreInterface : CoreMainLevelObject {
 
         public string Name {get; private set;}
         public CoreInterfaceType Type {get; private set;}        
@@ -17,7 +17,14 @@ namespace KDV.CeusDL.Model.Core {
             }
         }
 
-        public List<CoreAttribute> Attributes {get; private set;}
+        public List<CoreItemLevelObject> ItemObjects {get; private set;}
+        public List<CoreAttribute> Attributes {
+            get {
+                return ItemObjects.Where(o => o is CoreAttribute)
+                                  .Select(o => (CoreAttribute)o)
+                                  .ToList<CoreAttribute>();
+            }
+        }
         protected CoreModel coreModel;
         protected TmpInterface BaseData {get;set;}
 
@@ -33,23 +40,31 @@ namespace KDV.CeusDL.Model.Core {
             Name = tmp.Name;            
             Type = ToInterfaceType(tmp.Type);
 
-            Attributes = new List<CoreAttribute>();
-            foreach(var tmpAttr in tmp.Attributes) {
-                CoreAttribute attr = null;
-                switch(tmpAttr.AttributeType) {
-                    case "base":
-                        attr = new CoreBaseAttribute(tmpAttr, this, model);
-                        break;
-                    case "ref":
-                        attr = new CoreRefAttribute(tmpAttr, this, model);
-                        break;
-                    case "fact":
-                        attr = new CoreFactAttribute(tmpAttr, this, model);
-                        break;
-                    default:
-                        throw new InvalidAttributeTypeException($"Ungültiger Attribut-Typ {tmpAttr.AttributeType} in Interface {tmp.Name} gefunden");
+            ItemObjects = new List<CoreItemLevelObject>();
+
+            foreach(var tmpObj in tmp.ItemObjects) {
+                if(tmpObj.IsAttribute) {
+                    var tmpAttr = tmpObj.Attribute;                    
+                    CoreAttribute attr = null;
+                    switch(tmpAttr.AttributeType) {
+                        case "base":
+                            attr = new CoreBaseAttribute(tmpAttr, this, model);
+                            break;
+                        case "ref":
+                            attr = new CoreRefAttribute(tmpAttr, this, model);
+                            break;
+                        case "fact":
+                            attr = new CoreFactAttribute(tmpAttr, this, model);
+                            break;
+                        default:
+                            throw new InvalidAttributeTypeException($"Ungültiger Attribut-Typ {tmpAttr.AttributeType} in Interface {tmp.Name} gefunden");
+                    }                    
+                    ItemObjects.Add(attr);
+                } else if(tmpObj.IsComment) {
+                    ItemObjects.Add(new CoreComment(tmpObj.Comment));
+                } else {
+                    throw new InvalidDataTypeException();
                 }
-                Attributes.Add(attr);
             }
             // TODO: Attribute übernehmen...
             //       aber wie löse ich die Ref-Attribute auf, wenn ich zu dem Zeitpunkt die

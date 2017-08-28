@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using KDV.CeusDL.Parser.TmpModel;
 
 namespace KDV.CeusDL.Model.Core {
-    public abstract class CoreAttribute {
+    public abstract class CoreAttribute : CoreItemLevelObject {
         public abstract string Name { get; protected set; }
         public bool IsPrimaryKey {get; protected set;}
         public CoreInterface ParentInterface {get; protected set;}
