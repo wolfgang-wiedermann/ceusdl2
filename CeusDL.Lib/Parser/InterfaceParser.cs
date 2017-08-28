@@ -33,7 +33,7 @@ namespace KDV.CeusDL.Parser
             state = INITIAL;
             buf = "";
             result = new TmpInterface();
-            result.Attributes = new List<TmpInterfaceAttribute>();
+            result.ItemObjects = new List<TmpItemLevelObject>();
             result.Parameters = new List<TmpNamedParameter>();
 
             while(Data.HasNext()) {
@@ -147,20 +147,22 @@ namespace KDV.CeusDL.Parser
         private void onInInterfaceBody(char c) {
             if(c == '/') {
                 Data.Back(1);
-                commentParser.Parse();
+                var comment = commentParser.Parse();
+                result.AddComment(comment);
             } else if(c == 'f' || c == 'b' || c == 'r') {
                 Data.Back(1);
                 var attr = attributeParser.Parse();
-                result.Attributes.Add(attr);
+                result.AddAttribute(attr);
             } else if(c == '}') {
                 state = FINAL;
             } else if(ParserUtil.IsNewLineOrWhitespace(c) && ParserUtil.NextNonWhitespaceIs(Data, '/')) {
-                commentParser.Parse();
+                var comment = commentParser.Parse();
+                result.AddComment(comment);
             } else if(ParserUtil.IsNewLineOrWhitespace(c) && ParserUtil.NextNonWhitespaceIs(Data, '}')) {
                 state = BEFORE_FINAL;            
             } else if(ParserUtil.IsNewLineOrWhitespace(c)) {
                 var attr = attributeParser.Parse();
-                result.Attributes.Add(attr);
+                result.AddAttribute(attr);
             }            
         }
         

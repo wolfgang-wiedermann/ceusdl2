@@ -33,7 +33,7 @@ namespace KDV.CeusDL.Parser
             state = INITIAL;
             buf = "";
             result = new TmpParserResult();
-            result.Interfaces = new List<TmpInterface>();
+            result.Objects = new List<TmpMainLevelObject>();
 
             while(Data.HasNext()) {
                 char c = Data.Next();
@@ -74,14 +74,15 @@ namespace KDV.CeusDL.Parser
                 Data.Back(buf.Length+1);
                 if(buf.Equals("interface")) {
                     var ifa = interfaceParser.Parse();
-                    result.Interfaces.Add(ifa);
+                    result.AddInterface(ifa);
                 } else if (buf.Equals("config")) {          
                     if(result.Config != null) {
                         throw new InvalidTokenException("Es wurde eine zweite config-Section in einer CEUSDL-Datei gefunden", Data);
                     }          
                     result.Config = configParser.Parse();                                         
                 } else if (buf.StartsWith("//") || buf.StartsWith("/*")) {
-                    commentParser.Parse();                    
+                    var comment = commentParser.Parse();                    
+                    result.AddComment(comment);
                 }
                 state = INITIAL;
                 buf = "";
