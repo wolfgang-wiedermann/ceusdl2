@@ -12,11 +12,19 @@ config {
 }
 // alternativ: prod_db_server="CEUS-DB"; -> aber besser immer nur eins!
 
+// Generelle Anmerkung:
+// DefTable, TemporalTable, DimTable und DimView dürfen nur einelementige Primärschlüssel besitzen?
+
 // 1. Interface Definitionen
 
 //
 // Zeit-Attribute
 //
+
+// Alternativ zu DefTable (als Spezialisierung) sollte ich für Zeit-Attribute noch
+// die Klasse TemporalTable vorsehen. Dann kann ich bei der Historisierung
+// festlegen, dass Attributhistorisierung nur mit Tabellen von Typ TemporalTable 
+// möglich ist...
 
 interface Semester : DefTable {
     base KNZ:varchar(len="50", primary_key="true");
@@ -36,6 +44,8 @@ interface HochschulSemester : DefTable {
     base LANGBEZ:varchar(len="500");
 }
 
+// TODO: Markierung des Feingranularsten Zeit-Attributs einführen
+// z. B. interface Tag : DefTable(finest_time_attribute="true") {
 interface Tag : DefTable {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");

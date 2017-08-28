@@ -5,7 +5,6 @@ using KDV.CeusDL.Generator.CeusDL;
 using KDV.CeusDL.Generator.IL;
 using KDV.CeusDL.Model.Core;
 using KDV.CeusDL.Parser;
-using KDV.CeusDL.Test;
 using Microsoft.Extensions.CommandLineUtils;
 
 namespace CeusDL2

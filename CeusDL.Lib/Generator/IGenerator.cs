@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 namespace KDV.CeusDL.Generator {
-    interface IGenerator {
+    public interface IGenerator {
         List<GeneratorResult> GenerateCode();
     }
 }
