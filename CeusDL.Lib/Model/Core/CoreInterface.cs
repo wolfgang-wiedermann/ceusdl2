@@ -118,6 +118,11 @@ namespace KDV.CeusDL.Model.Core {
             if(BaseData.Parameters != null && BaseData.Parameters.Where(a => a.Name == "history").Count() > 0) {
                 var history = BaseData.Parameters.Where(a => a.Name == "history").First();
                 HistoryBy = coreModel.GetAttributeByName(history.Value);
+
+                // Prüfen ob das gefundene Historienattribut auch aus einer TemporalTable stammt!
+                if(HistoryBy.ParentInterface.Type != CoreInterfaceType.TEMPORAL_TABLE) {
+                    throw new InvalidParameterException($"Fehler in Interface {Name}: Historisierung ist nur auf der Basis von TemporalTables möglich");
+                }
             }
             foreach(var attr in Attributes) {
                 attr.PostProcess();

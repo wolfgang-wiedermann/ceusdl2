@@ -13,6 +13,13 @@ namespace KDV.CeusDL.Model.Core {
             }
         }
 
+        // Liefert das feingranularste Zeitattribut...
+        public CoreInterface FinestTime {
+            get {
+                return Interfaces.Where(t => t.IsFinestTime).FirstOrDefault(null);
+            }
+        }
+
         public List<CoreMainLevelObject> Objects {get; private set;}
 
         public CoreModel(TmpParserResult result) {
