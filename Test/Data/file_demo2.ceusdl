@@ -27,9 +27,11 @@ config {
  festlegen, dass Attributhistorisierung nur mit Tabellen von Typ TemporalTable 
  möglich ist...
 
- Alternativ dazu könnte ich allerdings auch festlegen, dass Historisierung
- nur auf der Basis von Attributen aus DefTables möglich ist -> Das würde
- die Sprache nicht aufblasen und wäre trotzdem sprechend.
+ Idee angepasst: 
+ Die feinste Zeiteinheit wird mit TemporalTable(finest_time_attribute="true")
+ markiert. Alle gröberen Zeiteinheiten erhalten TemporalTable ohne weitere Parameter.
+ Eine TemporalTable kann nicht mandant="true" oder history="..." haben
+ 
 */
 
 interface Semester : DefTable {
@@ -51,8 +53,9 @@ interface HochschulSemester : DefTable {
 }
 
 // TODO: Markierung des Feingranularsten Zeit-Attributs einführen
-// z. B. interface Tag : DefTable(finest_time_attribute="true") {
-interface Tag : DefTable {
+// z. B. interface Tag : TemporalTable(finest_time_attribute="true") {
+//interface Tag : DefTable {
+interface Tag : TemporalTable(finest_time_attribute="true") {    
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
@@ -60,21 +63,21 @@ interface Tag : DefTable {
     ref Monat.KNZ;
 }
 
-interface Woche : DefTable {
+interface Woche : TemporalTable {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
     ref Jahr.KNZ;
 }
 
-interface Monat : DefTable {
+interface Monat : TemporalTable {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
     ref Jahr.KNZ;
 }
 
-interface Jahr : DefTable {
+interface Jahr : TemporalTable {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");

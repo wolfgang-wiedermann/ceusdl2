@@ -40,17 +40,21 @@ namespace KDV.CeusDL.Generator.CeusDL
 
             // Interface-Parameter setzen
             if(ifa.IsMandant || ifa.IsHistorized) {
-                code += "(";
+                code += "(";                
                 if(ifa.IsMandant) {
                     code += "mandant=\"true\"";
                 }
                 if(ifa.IsHistorized && ifa.IsMandant) {
                     code += ", ";
                 }
+
+                // Historisiert und FinestTime => Beides kann nicht gleichzeitig auftreten!!
                 if(ifa.IsHistorized) {
                     code += $"history=\"{ifa.HistoryBy.ParentInterface.Name}.{ifa.HistoryBy.Name}\"";
                 }
                 code += ")";
+            } else if(ifa.IsFinestTime) {
+                code += "(finest_time_attribute=\"true\")";
             }
 
             // Und die Attribute setzen
@@ -158,7 +162,9 @@ namespace KDV.CeusDL.Generator.CeusDL
         private string InterfaceTypeToString(CoreInterfaceType type) {
             switch(type) {
                 case DEF_TABLE:
-                    return "DefTable";                    
+                    return "DefTable";
+                case TEMPORAL_TABLE:
+                    return "TemporalTable";                     
                 case DIM_TABLE:
                     return "DimTable";
                 case DIM_VIEW:

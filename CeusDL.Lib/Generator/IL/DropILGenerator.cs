@@ -20,7 +20,7 @@ namespace KDV.CeusDL.Generator.IL {
                 code += $"use [{model.Database}]\nGO\n\n";
             }
 
-            foreach(var ifa in model.Interfaces) {
+            foreach(var ifa in model.Interfaces.Where(i => i.IsILRelevant())) {
                 code += $"IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{ifa.Name}]') AND type in (N'U'))\n";
                 code += $"DROP TABLE [dbo].[{ifa.Name}]\n";
                 code += "GO\n\n";

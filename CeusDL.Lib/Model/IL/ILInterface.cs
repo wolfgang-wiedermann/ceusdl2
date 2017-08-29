@@ -16,6 +16,15 @@ namespace KDV.CeusDL.Model.IL {
         public List<ILAttribute> Attributes {get; private set;}
         public List<ILAttribute> PrimaryKeyAttributes {get; private set;}
 
+        ///
+        /// Nur DimTable und FactTable gehören in die IL, der Rest beginnt
+        /// ab BL zu existieren !!
+        ///
+        public bool IsILRelevant() {
+            return baseData.Type == CoreInterfaceType.DIM_TABLE 
+                || baseData.Type == CoreInterfaceType.FACT_TABLE;
+        }
+
         public ILInterface(CoreInterface ifa, CoreModel model)
         {
             this.baseData = ifa;

@@ -8,7 +8,8 @@ namespace KDV.CeusDL.Model.Core {
         public string Name {get; private set;}
         public CoreInterfaceType Type {get; private set;}        
 
-        public bool IsMandant {get; private set;}        
+        public bool IsMandant {get; private set;} 
+        public bool IsFinestTime {get; private set;}       
         public CoreAttribute HistoryBy {get; private set;}
 
         public bool IsHistorized {
@@ -31,14 +32,35 @@ namespace KDV.CeusDL.Model.Core {
         public CoreInterface(TmpInterface tmp, CoreModel model) {
             coreModel = model;
             BaseData = tmp;
-
-            if(tmp.Parameters != null && tmp.Parameters.Where(a => a.Name == "mandant" && a.Value == "true").Count() > 0) {
-                IsMandant = true;
-            }
-
             HistoryBy = null;
             Name = tmp.Name;            
             Type = ToInterfaceType(tmp.Type);
+
+            if(tmp.Parameters != null && tmp.Parameters.Where(a => a.Name == "mandant" && a.Value == "true").Count() > 0) {
+                IsMandant = true;
+            }    
+
+            if(Type == CoreInterfaceType.TEMPORAL_TABLE && IsMandant) {
+                throw new InvalidParameterException($"Fehler in Interface {Name}: Eine TemporalTable kann nicht Mandantabhängig sein");
+            }
+
+            if(Type == CoreInterfaceType.TEMPORAL_TABLE && tmp.Parameters.Where(p => p.Name == "history").Count() > 0) {
+                throw new InvalidParameterException($"Fehler in Interface {Name}: Eine TemporalTable kann nicht historisiert werden");
+            }            
+
+            if(tmp.Parameters != null && tmp.Parameters.Where(a => a.Name == "finest_time_attribute" && a.Value == "true").Count() > 0) {
+                // Prüfung: InterfaceType muss TemporalTable sein
+                if(Type != CoreInterfaceType.TEMPORAL_TABLE) {                    
+                    throw new InvalidParameterException($"Fehler in Interface {Name}: Nur DefTables können finest_time_attribute sein");
+                }                
+
+                // Prüfung: Nur eine Tabelle kann finest_time_attribute sein
+                if(model.Interfaces.Where(i => i.IsFinestTime).Count() > 0) {
+                    throw new InvalidParameterException($"Fehler in Interface {Name}: Nur ein Interface kann finest_time_attribute sein");
+                }
+
+                IsFinestTime = true;                
+            }
 
             ItemObjects = new List<CoreItemLevelObject>();
 
@@ -79,6 +101,8 @@ namespace KDV.CeusDL.Model.Core {
             switch(typeName) {
                 case "DefTable":
                     return CoreInterfaceType.DEF_TABLE;
+                case "TemporalTable":
+                    return CoreInterfaceType.TEMPORAL_TABLE;
                 case "DimTable":
                     return CoreInterfaceType.DIM_TABLE;
                 case "DimView":

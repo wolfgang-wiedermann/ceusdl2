@@ -35,7 +35,8 @@ namespace KDV.CeusDL.Generator.IL {
 
         private IEnumerable<GeneratorResult> GenerateLoadCsvClasses()
         {
-            foreach(var ifa in model.Interfaces) {
+            // TODO: Die Loader brauchen wir eigentlich blos für DimTable und FactTable !!!
+            foreach(var ifa in model.Interfaces.Where(i => i.IsILRelevant())) {
                 yield return GenerateLoadCsvClasses(ifa);
             }
         }
