@@ -21,10 +21,16 @@ config {
 // Zeit-Attribute
 //
 
-// Alternativ zu DefTable (als Spezialisierung) sollte ich für Zeit-Attribute noch
-// die Klasse TemporalTable vorsehen. Dann kann ich bei der Historisierung
-// festlegen, dass Attributhistorisierung nur mit Tabellen von Typ TemporalTable 
-// möglich ist...
+/*
+ Alternativ zu DefTable (als Spezialisierung) sollte ich für Zeit-Attribute noch
+ die Klasse TemporalTable vorsehen. Dann kann ich bei der Historisierung
+ festlegen, dass Attributhistorisierung nur mit Tabellen von Typ TemporalTable 
+ möglich ist...
+
+ Alternativ dazu könnte ich allerdings auch festlegen, dass Historisierung
+ nur auf der Basis von Attributen aus DefTables möglich ist -> Das würde
+ die Sprache nicht aufblasen und wäre trotzdem sprechend.
+*/
 
 interface Semester : DefTable {
     base KNZ:varchar(len="50", primary_key="true");
