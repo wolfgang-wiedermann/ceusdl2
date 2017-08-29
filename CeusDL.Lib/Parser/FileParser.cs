@@ -81,6 +81,7 @@ namespace KDV.CeusDL.Parser
                         throw new InvalidTokenException("Es wurde eine zweite config-Section in einer CEUSDL-Datei gefunden", Data);
                     }          
                     result.Config = configParser.Parse();
+                    result.Objects.Add(new TmpMainLevelObject(result.Config));
                     commentParser.LastWasComment = false;                                     
                 } else if (buf.StartsWith("//") || buf.StartsWith("/*")) {                    
                     var comment = commentParser.Parse();                    

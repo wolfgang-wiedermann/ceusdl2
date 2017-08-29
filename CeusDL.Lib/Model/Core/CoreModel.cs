@@ -24,6 +24,10 @@ namespace KDV.CeusDL.Model.Core {
                     Objects.Add(new CoreInterface(obj.Interface, this));
                 } else if(obj.IsComment) {
                     Objects.Add(new CoreComment(obj.Comment));
+                } else if(obj.IsConfig) {
+                    // Hier nicht nochmal new CoreConfig sondern das bestehende
+                    // Objekt verwenden um zweimal auf das gleiche Objekt zu verweisen...
+                    Objects.Add(Config);
                 }
             }
 

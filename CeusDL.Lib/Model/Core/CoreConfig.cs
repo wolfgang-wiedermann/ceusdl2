@@ -2,7 +2,7 @@ using KDV.CeusDL.Parser.TmpModel;
 
 namespace KDV.CeusDL.Model.Core {
 
-    public class CoreConfig {
+    public class CoreConfig : CoreMainLevelObject {
 
         public string Prefix {get; private set;}
         public string ILDatabase {get; private set;}

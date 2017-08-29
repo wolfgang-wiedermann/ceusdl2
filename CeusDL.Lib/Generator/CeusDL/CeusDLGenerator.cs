@@ -16,12 +16,14 @@ namespace KDV.CeusDL.Generator.CeusDL
 
         public List<GeneratorResult> GenerateCode()
         {
-            string code = GenerateConfig(model.Config);
+            string code = "";
             foreach(var obj in model.Objects) {
                 if(obj is CoreInterface) {                    
                     code += GenerateInterface((CoreInterface)obj, model);
-                } else {                    
+                } else if(obj is CoreComment) {                    
                     code += obj.ToString();
+                } else if(obj is CoreConfig) {
+                    code += GenerateConfig(model.Config);
                 }
             }
 
@@ -179,7 +181,7 @@ namespace KDV.CeusDL.Generator.CeusDL
             code += GenerateConfigParameter("bl_database", config.BLDatabase);
             code += GenerateConfigParameter("il_database", config.ILDatabase);            
             code += GenerateConfigParameter("etl_db_server", config.EtlDbServer);
-            code += "\n}\n\n";
+            code += "\n}";
             return code;
         }
 
