@@ -2,7 +2,7 @@ using System;
 
 namespace KDV.CeusDL.Model.Core
 {
-    internal class InvalidParameterException : Exception
+    public class InvalidParameterException : Exception
     {
         public InvalidParameterException()
         {

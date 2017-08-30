@@ -1,6 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CeusDL.Lib.Test
+namespace CeusDL.Parser.Test
 {
     [TestClass]
     public class UnitTest1

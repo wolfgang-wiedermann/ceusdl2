@@ -2,7 +2,7 @@ using System;
 
 namespace KDV.CeusDL.Model.Core
 {
-    internal class InvalidDataTypeException : Exception
+    public class InvalidDataTypeException : Exception
     {
         public InvalidDataTypeException()
         {

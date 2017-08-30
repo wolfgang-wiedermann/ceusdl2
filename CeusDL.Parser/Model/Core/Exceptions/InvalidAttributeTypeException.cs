@@ -2,7 +2,7 @@ using System;
 
 namespace KDV.CeusDL.Model.Core
 {
-    internal class InvalidAttributeTypeException : Exception
+    public class InvalidAttributeTypeException : Exception
     {
         public InvalidAttributeTypeException()
         {

@@ -2,7 +2,7 @@ using System;
 
 namespace KDV.CeusDL.Model.Core
 {
-    internal class InvalidInterfaceTypeException : Exception
+    public class InvalidInterfaceTypeException : Exception
     {
         public InvalidInterfaceTypeException()
         {
