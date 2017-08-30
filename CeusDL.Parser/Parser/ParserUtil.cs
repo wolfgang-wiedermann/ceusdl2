@@ -23,14 +23,14 @@ namespace KDV.CeusDL.Parser
                 || c == '_' || c == '-';
         }
 
-        internal static bool IsValidDataType(string dataType)
+        public static bool IsValidDataType(string dataType)
         {
             return dataTypes.Contains(dataType);
         }
 
         /// Prüft das nächste Non-Whitespace-Zeichen ohne
         /// den Zeiger von data zu verändern...
-        internal static bool NextNonWhitespaceIs(ParsableData data, char c) {
+        public static bool NextNonWhitespaceIs(ParsableData data, char c) {
             for(int i = 0; (data.Position+i) < data.Content.Length; i++) {
                 char c2 = data.Get(i);
                 if(c2 == c) {

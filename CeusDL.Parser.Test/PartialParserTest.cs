@@ -1,22 +1,15 @@
 using System;
+using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using KDV.CeusDL.Parser;
+using KDV.CeusDL.Model.Core;
 
-namespace KDV.CeusDL.Test {
+namespace KDV.CeusDL.Parser.Test {
+
+    [TestClass]
     public class PartialParserTest {
-        public static void RunTests() {
-            Console.WriteLine("Tests");            
 
-            var test = new PartialParserTest();
-
-            test.TestNextNonWhitespaceIs();
-            test.TestNamedParameterParser();
-            test.TestCommentParser();
-            test.TestAttributeParser();  
-            test.TestConfigParser();   
-            test.TestInterfaceParser();
-            test.TestFileParser();     
-        }
-
+        [TestMethod]
         public void TestNamedParameterParser() {
             var data = new ParsableData("text=\"Hallo Welt\\n----------\"");
             var p = new NamedParameterParser(data);
@@ -27,8 +20,12 @@ namespace KDV.CeusDL.Test {
             p = new NamedParameterParser(data);
             result = p.Parse();
             Console.WriteLine($"Result : {result.Name} = {result.Value}");
+
+            Assert.AreEqual("text", result.Name);
+            Assert.AreEqual("Hallo Welt\n----------", result.Value);
         }
 
+        [TestMethod]
         public void TestCommentParser() {
             var data2 = new ParsableData("//LineComment\n\n   ");
             var p2 = new CommentParser(data2);
@@ -41,6 +38,7 @@ namespace KDV.CeusDL.Test {
             Console.WriteLine($"Result3: {result3}");
         }
 
+        [TestMethod]
         public void TestAttributeParser() {
              var data4 = new ParsableData("base KNZ:varchar(len=\"50\", primary_key=\"true\");");
             var p4 = new AttributeParser(data4);
@@ -69,6 +67,7 @@ namespace KDV.CeusDL.Test {
             Console.WriteLine($"Result4: {result4.AttributeType} {result4.InterfaceName}.{result4.FieldName} {result4.Alias}");
         }
 
+        [TestMethod]
         public void TestConfigParser() {
             var data = new ParsableData("config  {\r\n name=\"Wiedermann\";\n vorname=\"Wolfgang\";\n\n}");
             var p = new ConfigParser(data);
@@ -101,15 +100,18 @@ namespace KDV.CeusDL.Test {
             }
         }
 
+        [TestMethod]
         public void TestNextNonWhitespaceIs() {
             var data = new ParsableData("     // Hallo Welt\n so gehts doch nicht");
             if(ParserUtil.NextNonWhitespaceIs(data, '/')) {
-                Console.WriteLine("Passt");
+                Console.WriteLine("Passt");                
             } else {
                 Console.WriteLine("Passt NICHT !!!");
+                Assert.Fail("Passt nicht!");
             }
         }
 
+        [TestMethod]
         public void TestInterfaceParser() {
             var data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo.ceusdl"));
             var p = new InterfaceParser(data);
@@ -131,6 +133,7 @@ namespace KDV.CeusDL.Test {
             if(!result.Parameters.Count.Equals(result2.Parameters.Count)) throw new InvalidOperationException("Anzahl Attribute nicht gleich!");
         }
 
+        [TestMethod]
         public void TestFileParser() {
             var data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\file_demo.ceusdl"));
             var p = new FileParser(data);
@@ -138,7 +141,8 @@ namespace KDV.CeusDL.Test {
 
             if(result.Config == null) throw new InvalidOperationException("Config darf nicht null sein!");
             if(result.Config?.Parameters?.Count != 6) throw new InvalidOperationException("Falsche Zahl an Config-Parametern gefunden");
-            if(result.Interfaces?.Count != 2) throw new InvalidOperationException("Falsche Zahl an Interfaces gefunden");
+            Assert.AreEqual(4, result.Interfaces?.Count);
+            if(result.Interfaces?.Count != 4) throw new InvalidOperationException("Falsche Zahl an Interfaces gefunden");
 
             data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\file_demo2.ceusdl"));
             p = new FileParser(data);
@@ -155,6 +159,7 @@ namespace KDV.CeusDL.Test {
             if(result.Config == null) throw new InvalidOperationException("Config darf nicht null sein!");
             if(result.Config?.Parameters?.Count != 6) throw new InvalidOperationException("Falsche Zahl an Config-Parametern gefunden");
             if(result.Interfaces?.Count != 34) throw new InvalidOperationException("Falsche Zahl an Interfaces gefunden");
-        }
+        }    
     }
+
 }
