@@ -12,4 +12,8 @@
     <PackageReference Include="MSTest.TestFramework" Version="1.1.18" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CeusDL.Parser\CeusDL.Parser.csproj" />
+  </ItemGroup>
+
 </Project>

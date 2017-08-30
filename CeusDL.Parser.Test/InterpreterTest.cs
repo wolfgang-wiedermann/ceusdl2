@@ -1,24 +1,21 @@
 using System;
 using System.Linq;
-using KDV.CeusDL.Model;
-using KDV.CeusDL.Model.Core;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using KDV.CeusDL.Parser;
-using KDV.CeusDL.Parser.TmpModel;
+using KDV.CeusDL.Model.Core;
 
-namespace KDV.CeusDL.Test {
+namespace KDV.CeusDL.Parser.Test {
+
+    [TestClass]
     public class InterpreterTest {
-        public static void RunTests() {
-            var test = new InterpreterTest();
 
+        [TestMethod]
+        public void TestAttributeRecognition_Case1()
+        {
             var data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\file_demo.ceusdl"));
             var p = new FileParser(data);
             var result = p.Parse();
 
-            test.Test1(result);
-            test.TestWithBigCodeFile();
-        }
-
-        public void Test1(TmpParserResult result) {
             CoreModel m = new CoreModel(result);
 
             if(!(m.Interfaces[1].Attributes[3] is CoreRefAttribute)) {
@@ -28,7 +25,9 @@ namespace KDV.CeusDL.Test {
             Console.WriteLine("Und jetzt im Debugger testen!");
         }
 
-        public void TestWithBigCodeFile() {
+        [TestMethod]
+        public void TestAttributeRecognition_Case2()
+        {
             var data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\file_demo2.ceusdl"));
             var p = new FileParser(data);
             var result = p.Parse();
@@ -51,5 +50,8 @@ namespace KDV.CeusDL.Test {
             
             Console.WriteLine("Und jetzt im Debugger testen!");
         }
+
+        
     }
+
 }
