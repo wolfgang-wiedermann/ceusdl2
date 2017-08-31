@@ -46,9 +46,7 @@ namespace KDV.CeusDL.Generator.CeusDL
                 }
                 if(ifa.IsHistorized && ifa.IsMandant) {
                     code += ", ";
-                }
-
-                // Historisiert und FinestTime => Beides kann nicht gleichzeitig auftreten!!
+                }                
                 if(ifa.IsHistorized) {
                     code += $"history=\"{ifa.HistoryBy.ParentInterface.Name}.{ifa.HistoryBy.Name}\"";
                 }
@@ -61,21 +59,12 @@ namespace KDV.CeusDL.Generator.CeusDL
             code += " {";
             foreach(var item in ifa.ItemObjects) {                                
                 if(item is CoreFactAttribute) {
-                    //code += "    ";
                     code += GenerateFactAttribute((CoreFactAttribute)item, ifa, model);
-                    //code += "\n";
                 } else if(item is CoreBaseAttribute) {
-                    //code += "    ";
                     code += GenerateBaseAttribute((CoreBaseAttribute)item, ifa, model);
-                    //code += "\n";
                 } else if(item is CoreRefAttribute) {
-                    //code += "    ";
                     code += GenerateRefAttribute((CoreRefAttribute)item, ifa, model);
-                    //code += "\n";
-                } else if(item is CoreComment) {
-                    // TODO: Hier passt noch nix wirklich!!!
-                    //  * Einrückung falsch
-                    //  * Abstand zwischen Kommentarzeilen falsch etc...                    
+                } else if(item is CoreComment) {       
                     code += item.ToString();
                 }                                
             }
