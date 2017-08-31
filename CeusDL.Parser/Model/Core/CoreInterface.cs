@@ -28,13 +28,15 @@ namespace KDV.CeusDL.Model.Core {
         }
         protected CoreModel coreModel;
         protected TmpInterface BaseData {get;set;}
+        public string WhitespaceBefore { get; set; }
 
         public CoreInterface(TmpInterface tmp, CoreModel model) {
             coreModel = model;
             BaseData = tmp;
             HistoryBy = null;
-            Name = tmp.Name;            
+            Name = tmp.Name;                        
             Type = ToInterfaceType(tmp.Type);
+            WhitespaceBefore = tmp.WhitespaceBefore;
 
             if(tmp.Parameters != null && tmp.Parameters.Where(a => a.Name == "mandant" && a.Value == "true").Count() > 0) {
                 IsMandant = true;

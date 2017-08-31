@@ -17,7 +17,7 @@ namespace KDV.CeusDL.Parser
     public class InterfaceParser : AbstractParser<TmpInterface>
     {
         private InterfaceParserEnum state;
-        private string buf;
+        private string buf;        
         private TmpInterface result;
         private CommentParser commentParser;
         private AttributeParser attributeParser;
@@ -29,12 +29,14 @@ namespace KDV.CeusDL.Parser
             this.namedParameterParser = new NamedParameterParser(data);
         }
 
-        public override TmpInterface Parse() {
+        public override TmpInterface Parse(string whitespaceBefore) {
             state = INITIAL;
-            buf = "";
+            buf = "";            
             result = new TmpInterface();
             result.ItemObjects = new List<TmpItemLevelObject>();
             result.Parameters = new List<TmpNamedParameter>();
+
+            result.WhitespaceBefore = whitespaceBefore;
 
             while(Data.HasNext()) {
                 char c = Data.Next();
@@ -148,27 +150,21 @@ namespace KDV.CeusDL.Parser
             if(c == '/') {
                 Data.Back(1);
                 var comment = commentParser.Parse();
-                result.AddComment(comment);
-                commentParser.LastWasComment = true;
+                result.AddComment(comment);                
             } else if(c == 'f' || c == 'b' || c == 'r') {
                 Data.Back(1);
                 var attr = attributeParser.Parse();
-                result.AddAttribute(attr);
-                commentParser.LastWasComment = false;
+                result.AddAttribute(attr);                
             } else if(c == '}') {
-                state = FINAL;
-                commentParser.LastWasComment = false;
+                state = FINAL;                
             } else if(ParserUtil.IsNewLineOrWhitespace(c) && ParserUtil.NextNonWhitespaceIs(Data, '/')) {
-                var comment = commentParser.Parse();
-                result.AddComment(comment);
-                commentParser.LastWasComment = true;
+                var comment = commentParser.Parse(""+c);
+                result.AddComment(comment);                
             } else if(ParserUtil.IsNewLineOrWhitespace(c) && ParserUtil.NextNonWhitespaceIs(Data, '}')) {
-                state = BEFORE_FINAL;
-                commentParser.LastWasComment = false;          
+                state = BEFORE_FINAL;            
             } else if(ParserUtil.IsNewLineOrWhitespace(c)) {
-                var attr = attributeParser.Parse();
+                var attr = attributeParser.Parse(""+c);
                 result.AddAttribute(attr);
-                commentParser.LastWasComment = false;
             }            
         }
         
@@ -185,25 +181,20 @@ namespace KDV.CeusDL.Parser
         {
             if(c == '/') {
                 Data.Back(1);
-                commentParser.Parse();
-                commentParser.LastWasComment = true;
+                commentParser.Parse();                
             } else if(c == ')' || ParserUtil.NextNonWhitespaceIs(Data, ')')) {
-                state = BEHIND_INTERFACE_PARAMS;
-                commentParser.LastWasComment = false;
+                state = BEHIND_INTERFACE_PARAMS;                
             } else if(ParserUtil.IsValidNameChar(c)) {
                 Data.Back(1);
                 var param = namedParameterParser.Parse();                
                 result.Parameters.Add(param);
-                Data.Back(1);
-                commentParser.LastWasComment = false;
+                Data.Back(1);                
             } else if(ParserUtil.IsNewLineOrWhitespace(c) && ParserUtil.NextNonWhitespaceIs(Data, '/')) {
-                commentParser.Parse();
-                commentParser.LastWasComment = true;
+                commentParser.Parse();                
             } else if(ParserUtil.IsNewLineOrWhitespace(c)) {
                 var param = namedParameterParser.Parse();
                 result.Parameters.Add(param);
-                Data.Back(1);
-                commentParser.LastWasComment = false;
+                Data.Back(1);                
             }
         }
 

@@ -5,5 +5,7 @@ using KDV.CeusDL.Parser.TmpModel;
 namespace KDV.CeusDL.Model.Core {
     public interface CoreItemLevelObject {
 
+        string WhitespaceBefore {get;set;}
+
     }
 }

@@ -33,7 +33,7 @@ namespace KDV.CeusDL.Parser
             this.commentParser = new CommentParser(data);
         }
 
-        public override TmpConfig Parse()
+        public override TmpConfig Parse(string nothing)
         {
             state = INITIAL;
             buf = "";

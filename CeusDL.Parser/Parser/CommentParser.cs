@@ -16,27 +16,20 @@ namespace KDV.CeusDL.Parser
     public class CommentParser : AbstractParser<TmpComment>
     {
         private CommentParserEnum state;
-        private TmpComment result;        
+        private TmpComment result;    
+        private string whitespaceBuf;    
 
         public CommentParser(ParsableData data) : base(data)
         {
         }
 
-        public bool LastWasComment {
-            get; set;
-        } = false;
-
-        public override TmpComment Parse()
+        public override TmpComment Parse(string whitespaceBefore)
         {
             state = INITIAL;
+            whitespaceBuf = whitespaceBefore;
             result = new TmpComment();
-
-            if(LastWasComment) {
-                result.WhitespacesBeforeComment = "";
-            } else {
-                result.WhitespacesBeforeComment = GetWhitespacesBeforeComment(Data);            
-            }
-
+            result.WhitespaceBefore = whitespaceBefore;
+            
             while(Data.HasNext()) {
                 char c = Data.Next();
                 switch(state) {
@@ -59,34 +52,10 @@ namespace KDV.CeusDL.Parser
             return result;
         }
 
-        ///
-        /// Ermittelt ausgehend vom aktuellen Cursor alle Whitespace-Zeichen.
-        /// 
-        private string GetWhitespacesBeforeComment(ParsableData data)
-        {
-            string result = "";
-            int pos = data.Position;
-            while(pos > 0 && ParserUtil.IsNewLineOrWhitespace(data.Content[--pos])) {
-                result = data.Content[pos] + result;
-            }
-            return result;
-        }
-
-        private string GetWhitespacesBehindComment(ParsableData data)
-        {
-            string result = "";
-            int pos = data.Position;
-            while(pos+1 < data.Content.Length && ParserUtil.IsNewLineOrWhitespace(data.Content[++pos])) {
-                result += data.Content[pos];
-            }
-            return result;
-        }
-
         private void onInBlockComment(char c)
         {
             if(c == '*' && ParserUtil.NextNonWhitespaceIs(Data, '/')) {                
-                state = FINAL;
-                result.WhitespacesBehindComment = GetWhitespacesBehindComment(Data);
+                state = FINAL;                
             } else {
                 result.Comment += c;
             }            
@@ -95,8 +64,7 @@ namespace KDV.CeusDL.Parser
         private void onInLineComment(char c)
         {
             if(c == '\n') {                
-                state = FINAL;
-                result.WhitespacesBehindComment = GetWhitespacesBehindComment(Data);
+                state = FINAL;                
                 Data.Back(1);
             } else {
                 result.Comment += c;
@@ -108,15 +76,21 @@ namespace KDV.CeusDL.Parser
             if(c == '/') {
                 char c2 = Data.Next();
                 if(c2 == '/') {
+                    result.WhitespaceBefore = whitespaceBuf;
+                    whitespaceBuf = "";
                     state = IN_LINE_COMMENT;
                     result.CommentType = TmpCommentType.LINE_COMMENT;
                 } else if(c2 == '*') {
+                    result.WhitespaceBefore = whitespaceBuf;
+                    whitespaceBuf = "";
                     state = IN_BLOCK_COMMENT;
                     result.CommentType = TmpCommentType.BLOCK_COMMENT;
                 } else {
                     throw new InvalidCharException("Ungültiges Zeichen am Beginn des Kommentars", Data);    
                 }
-            } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {
+            } else if(ParserUtil.IsNewLineOrWhitespace(c)) {
+                whitespaceBuf += c;
+            } else {
                 throw new InvalidCharException($"Ungültiges Zeichen {c} vor Kommentar", Data);
             }
         }

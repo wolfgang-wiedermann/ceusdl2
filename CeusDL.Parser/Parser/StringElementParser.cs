@@ -17,7 +17,7 @@ namespace KDV.CeusDL.Parser
         {                
         }
 
-        public override string Parse()
+        public override string Parse(string nothing)
         {
             state = INITIAL;
             result = "";

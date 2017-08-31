@@ -36,7 +36,7 @@ namespace KDV.CeusDL.Generator.CeusDL
 
         private string GenerateInterface(CoreInterface ifa, CoreModel model)
         {
-            string code = $"interface {ifa.Name} : {InterfaceTypeToString(ifa.Type)}";            
+            string code = $"{ifa.WhitespaceBefore}interface {ifa.Name} : {InterfaceTypeToString(ifa.Type)}";            
 
             // Interface-Parameter setzen
             if(ifa.IsMandant || ifa.IsHistorized) {
@@ -58,29 +58,28 @@ namespace KDV.CeusDL.Generator.CeusDL
             }
 
             // Und die Attribute setzen
-            code += " {\n";
+            code += " {";
             foreach(var item in ifa.ItemObjects) {                                
                 if(item is CoreFactAttribute) {
-                    code += "    ";
+                    //code += "    ";
                     code += GenerateFactAttribute((CoreFactAttribute)item, ifa, model);
-                    code += "\n";
+                    //code += "\n";
                 } else if(item is CoreBaseAttribute) {
-                    code += "    ";
+                    //code += "    ";
                     code += GenerateBaseAttribute((CoreBaseAttribute)item, ifa, model);
-                    code += "\n";
+                    //code += "\n";
                 } else if(item is CoreRefAttribute) {
-                    code += "    ";
+                    //code += "    ";
                     code += GenerateRefAttribute((CoreRefAttribute)item, ifa, model);
-                    code += "\n";
+                    //code += "\n";
                 } else if(item is CoreComment) {
                     // TODO: Hier passt noch nix wirklich!!!
                     //  * Einrückung falsch
                     //  * Abstand zwischen Kommentarzeilen falsch etc...                    
-                    //code = code.Substring(0, code.Length-1);
-                    //code += item.ToString();
+                    code += item.ToString();
                 }                                
             }
-            code += "}\n\n";
+            code += "\n}";
             return code;
         }
 
@@ -94,7 +93,7 @@ namespace KDV.CeusDL.Generator.CeusDL
 
         private string GenerateBaseAttribute(string type, CoreBaseAttribute attr, CoreInterface ifa, CoreModel model)
         {
-            var code = $"{type} {attr.Name}:{DataTypeToString(attr.DataType)}";
+            var code = $"{attr.WhitespaceBefore}{type} {attr.Name}:{DataTypeToString(attr.DataType)}";
             if(attr.IsPrimaryKey || attr.DataType == CoreDataType.DECIMAL 
                 || attr.DataType == CoreDataType.VARCHAR || !string.IsNullOrEmpty(attr.Unit)) 
             {                
@@ -127,7 +126,7 @@ namespace KDV.CeusDL.Generator.CeusDL
 
         private string GenerateRefAttribute(CoreRefAttribute attr, CoreInterface ifa, CoreModel model)
         {
-            string code = $"ref  {attr.ReferencedInterface.Name}.{attr.ReferencedAttribute.Name}";
+            string code = $"{attr.WhitespaceBefore}ref  {attr.ReferencedInterface.Name}.{attr.ReferencedAttribute.Name}";
             if(attr.IsPrimaryKey) 
             {                                
                 code += "(primary_key=\"true\")";

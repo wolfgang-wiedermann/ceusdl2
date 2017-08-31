@@ -3,13 +3,15 @@ using System.Linq;
 
 namespace KDV.CeusDL.Parser.TmpModel 
 {
-    public class TmpInterface {
+    public class TmpInterface : ITmpBaseObject{
         public string Name {get;set;}
         public string Type {get;set;}
 
         public List<TmpNamedParameter> Parameters {get;set;}
 
         public List<TmpItemLevelObject> ItemObjects {get; set;}
+
+        public string WhitespaceBefore { get; set; }
 
         public List<TmpInterfaceAttribute> Attributes {
             get {

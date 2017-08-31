@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-
-namespace KDV.CeusDL.Parser.TmpModel 
+namespace KDV.CeusDL.Parser.TmpModel
 {
     public class TmpItemLevelObject {        
         private object content; 

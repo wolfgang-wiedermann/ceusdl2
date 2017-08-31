@@ -21,6 +21,7 @@ namespace KDV.CeusDL.Parser
     {
         private AttributeParserEnum state;
         private TmpInterfaceAttribute result;
+        private string whitespaceBuf;
         private NamedParameterParser namedParameterParser;
 
         public AttributeParser(ParsableData data) : base(data)
@@ -28,12 +29,15 @@ namespace KDV.CeusDL.Parser
             this.namedParameterParser = new NamedParameterParser(data);
         }
 
-        public override TmpInterfaceAttribute Parse()
-        {
+        public override TmpInterfaceAttribute Parse(string whitespaceBefore)
+        {            
             state = INITIAL;           
+            whitespaceBuf = whitespaceBefore; // Den Whitespace-Puffer mit evtl. bereits gelesenen Zeichen füllen
             result = new TmpInterfaceAttribute();
-            //result.InterfaceName = "";
-            result.Parameters = new List<TmpNamedParameter>();
+            result.AttributeType = "";
+            result.Parameters = new List<TmpNamedParameter>();            
+
+            result.WhitespaceBefore = whitespaceBefore;
 
             while(Data.HasNext()) {
                 char c = Data.Next();
@@ -256,12 +260,15 @@ namespace KDV.CeusDL.Parser
 
         private void onInitial(char c)
         {
-            if(ParserUtil.IsNewLineOrWhitespace(c)) {
-                // Vorangestellte unsichtbare Zeichen ignorieren
+            if(ParserUtil.IsNewLineOrWhitespace(c) && result.AttributeType.Length == 0) {
+                // Vorangestellte unsichtbare Zeichen erfassen
+                whitespaceBuf += c;
             } else if(ParserUtil.IsValidNameChar(c)) {
                 // Wechsel zu InAttributeType
+                this.result.WhitespaceBefore = whitespaceBuf;                
                 this.result.AttributeType += c;
                 this.state = IN_ATTRIBUTE_TYPE;
+                whitespaceBuf = "";
             } else {
                 throw new InvalidCharException("Ungültiges Zeichen ...", Data);
             }

@@ -16,6 +16,7 @@ namespace KDV.CeusDL.Parser
         private FileParserEnum state;
         private TmpParserResult result;
         private string buf;
+        private string whitespaceBuf;
 
         private CommentParser commentParser;
         private ConfigParser configParser;
@@ -28,10 +29,11 @@ namespace KDV.CeusDL.Parser
             interfaceParser = new InterfaceParser(data);
         }
 
-        public override TmpParserResult Parse()
+        public override TmpParserResult Parse(string xxx)
         {
             state = INITIAL;
             buf = "";
+            whitespaceBuf = "";
             result = new TmpParserResult();
             result.Objects = new List<TmpMainLevelObject>();
 
@@ -60,7 +62,8 @@ namespace KDV.CeusDL.Parser
                 buf += c;
                 state = IN_TOKEN;
             } else if(ParserUtil.IsNewLineOrWhitespace(c) && buf.Length == 0) {
-                // Ignorieren, Leerzeichen vor Token
+                // Sammeln der Leerzeichen vor dem Token
+                whitespaceBuf += c;
             } else {
                 throw new InvalidCharException($"Ungültiges Zeichen {c} in FileParser", Data);
             }
@@ -73,20 +76,20 @@ namespace KDV.CeusDL.Parser
             } else if(ParserUtil.IsNewLineOrWhitespace(c) && buf.Length > 0) {
                 Data.Back(buf.Length+1);
                 if(buf.Equals("interface")) {
-                    var ifa = interfaceParser.Parse();
+                    var ifa = interfaceParser.Parse(whitespaceBuf);                    
                     result.AddInterface(ifa);
-                    commentParser.LastWasComment = false;
+                    whitespaceBuf = "";
                 } else if (buf.Equals("config")) {          
                     if(result.Config != null) {
                         throw new InvalidTokenException("Es wurde eine zweite config-Section in einer CEUSDL-Datei gefunden", Data);
                     }          
-                    result.Config = configParser.Parse();
+                    result.Config = configParser.Parse(whitespaceBuf);
                     result.Objects.Add(new TmpMainLevelObject(result.Config));
-                    commentParser.LastWasComment = false;                                     
+                    whitespaceBuf = "";
                 } else if (buf.StartsWith("//") || buf.StartsWith("/*")) {                    
-                    var comment = commentParser.Parse();                    
-                    result.AddComment(comment);
-                    commentParser.LastWasComment = true;
+                    var comment = commentParser.Parse(whitespaceBuf);                    
+                    result.AddComment(comment);                    
+                    whitespaceBuf = "";
                 }
                 state = INITIAL;
                 buf = "";

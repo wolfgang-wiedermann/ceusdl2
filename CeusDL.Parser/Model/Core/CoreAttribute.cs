@@ -8,12 +8,15 @@ namespace KDV.CeusDL.Model.Core {
         public bool IsPrimaryKey {get; protected set;}
         public CoreInterface ParentInterface {get; protected set;}
         protected TmpInterfaceAttribute BaseData {get; set;}
+        public string WhitespaceBefore { get; set; }
+
         protected CoreModel coreModel;
 
         public CoreAttribute(TmpInterfaceAttribute tmp, CoreInterface parent, CoreModel model) {
             BaseData = tmp;
             ParentInterface = parent;
             coreModel = model;
+            WhitespaceBefore = tmp.WhitespaceBefore;
 
             if(tmp.Parameters != null && tmp.Parameters.Where(a => a.Name == "primary_key" && a.Value == "true").Count() > 0) {
                 IsPrimaryKey = true;

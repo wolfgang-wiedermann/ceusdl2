@@ -9,6 +9,10 @@ namespace KDV.CeusDL.Parser
             this.Data = data;
         }
 
-        public abstract T Parse();
+        public T Parse() {
+            return Parse("");
+        }
+        
+        public abstract T Parse(string whitespaceBefore);
     }
 }

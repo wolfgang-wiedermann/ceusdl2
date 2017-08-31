@@ -10,8 +10,11 @@ namespace KDV.CeusDL.Model.Core {
         public string BTDatabase {get; private set;}
         public string ALDatabase {get; private set;}
         public string EtlDbServer {get; private set;}
+        public string WhitespaceBefore { get; set; }
 
         public CoreConfig(TmpConfig tmp) {
+            WhitespaceBefore = tmp.WhitespaceBefore;
+            
             foreach(var param in tmp.Parameters) {
                 switch(param.Name) {
                     case "prefix":

@@ -6,6 +6,7 @@ namespace KDV.CeusDL.Model.Core {
     public class CoreComment : CoreItemLevelObject, CoreMainLevelObject {
         private TmpComment comment;
         public CoreComment(TmpComment comment) {
+            this.WhitespaceBefore = comment.WhitespaceBefore;
             this.comment = comment;
         }
 
@@ -15,11 +16,13 @@ namespace KDV.CeusDL.Model.Core {
             }
         }
 
+        public string WhitespaceBefore { get; set; }
+
         public override string ToString() {
             if(comment.CommentType == TmpCommentType.BLOCK_COMMENT) {
-                return $"{comment.WhitespacesBeforeComment}/*{comment.Comment}*/{comment.WhitespacesBehindComment}";
+                return $"{WhitespaceBefore}/*{comment.Comment}*/";
             } else {
-                return $"{comment.WhitespacesBeforeComment}//{comment.Comment}\n{comment.WhitespacesBehindComment}";
+                return $"{WhitespaceBefore}//{comment.Comment}\n";
             }
         }
     }

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace KDV.CeusDL.Parser.TmpModel 
 {
-    public class TmpInterfaceAttribute {    
+    public class TmpInterfaceAttribute : ITmpBaseObject {    
 
         public TmpInterfaceAttribute() {
             this.Alias = "";
@@ -55,6 +55,7 @@ namespace KDV.CeusDL.Parser.TmpModel
         public string DataType {get;set;}
         public string Alias {get;set;}
         public List<TmpNamedParameter> Parameters {get;set;}
+        public string WhitespaceBefore { get; set; }
 
         #region private
         private string name;

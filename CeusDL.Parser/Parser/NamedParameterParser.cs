@@ -24,7 +24,7 @@ namespace KDV.CeusDL.Parser
             this.stringElementParser = new StringElementParser(data);
         }
 
-        public override TmpNamedParameter Parse()
+        public override TmpNamedParameter Parse(string nothing)
         {
             state = INITIAL;
             result = new TmpNamedParameter();
