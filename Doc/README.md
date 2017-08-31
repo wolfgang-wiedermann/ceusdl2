@@ -92,7 +92,33 @@ Dabei können die Attribute als folgende Attribut-Typen auftreten:
 * __base-Attribut:__ Basis-Attribut, das Daten eines bestimmten Typs beinhaltet und ggf. Primärschlüssel eines Interfaces sein kann.
 * __ref-Attribut:__ Das Referenz-Attribut dient dazu, Beziehungen zwischen den Interfaces zu definieren. Sollten zwischen zwei Interfaces mehrere Beziehungen existieren, so müssen diese mittels Alias (siehe as, z. B. bei ref JaNein.KNZ as Zulassung) unterscheidbar gemacht werden.
 * __fact-Attribut:__ Das Fakt-Attribut darf nur in Interfaces vom Typ FactTable verwendet werden und dient dazu, die Attribute zu kennzeichnen, die im Warehouse-System später als Fakten Verwendung finden. Die Syntax des Fakt-Attributs ist gleich der des Basis-Attributs.
-* __calc-Attribut:__ Das Calc-Attribut (__NEU__) darf nur in Interfaces vom Typ FactTable und DimTable verwendet werden und dient dazu, Attribute in Interfaces zu spezizfizieren, deren Werte nicht mittels Datenlieferung übermittelt werden, sondern im Rahmen des Ladelaufs (nach IL-Load oder nach BL-Load) berechnet werden. Die zugehörigen Attribute sind ab IL im Datenbankschema enthalten, werden aber bei der Generierung des Ladecodes für IL (csv-Parser + Insert-Generator für IL) nicht berücksichtigt, sodass sie in der Datenlieferung nicht als Spalten enthalten sein dürfen.
+
+Überlegungen gibt es auch zu folgendem Attributtyp:
+
+* __calc-Attribut:__ Das Calc-Attribut (__NEU__) darf nur in Interfaces vom Typ FactTable und DimTable verwendet werden und dient dazu, Attribute in Interfaces zu spezizfizieren, deren Werte nicht mittels Datenlieferung übermittelt werden, sondern im Rahmen des Ladelaufs (nach IL-Load oder nach BL-Load) berechnet werden. Die zugehörigen Attribute sind ab IL im Datenbankschema enthalten, werden aber bei der Generierung des Ladecodes für IL (csv-Parser + Insert-Generator für IL) nicht berücksichtigt, sodass sie in der Datenlieferung nicht als Spalten enthalten sein dürfen. (__Hier stellt sich die Frage, ob evtl. auch ein Parameter calculated="true" beim base-Attribut und beim fact-Attribut eine Lösung sein könnte?__)
+
+```
+interface Blub : FactTable(mandant="true") {
+    // Also was ist besser
+    base Geburtsdatum:date;
+    base Alter:int(calculated="true"); // ich tendiere zu dieser Lösung
+    // oder
+    base Geburtsdatum:date;
+    calc Alter:int;
+
+    // bzw.
+
+    base Geburtsdatum:date;
+    fact Alter_F:int(calculated="true"); // ich tendiere zu dieser Lösung
+    // oder
+    base Geburtsdatum:date;
+    calc Alter_F:int;    
+}
+```
+
+Der Zentrale Nachteil des Schlüsselworts calc ist in dem Fall, dass hier keine Unterscheidung mehr zwischen Fakt und Base möglich ist,
+wenn das calculated="true" aber als Attributparameter erfasst wird, dann geht das, es wirkt sich dann aber etwas nachteilig
+auf die Filterung der Attribute bei der Code-Generierung für die IL-Loader aus. (Das ist aber dank Linq gut beherrschbar)
 
 Kommentare in CEUSDL
 --------------------
