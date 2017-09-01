@@ -24,7 +24,7 @@ namespace KDV.CeusDL.Parser
         private InterfaceParser interfaceParser;
 
         public FileParser(ParsableData data) : base(data)
-        {
+        {            
             commentParser = new CommentParser(data);
             configParser = new ConfigParser(data);
             importParser = new ImportParser(data);
@@ -37,6 +37,7 @@ namespace KDV.CeusDL.Parser
             buf = "";
             whitespaceBuf = "";
             result = new TmpParserResult();
+            result.Path = Data.FileName; 
             result.Objects = new List<TmpMainLevelObject>();
 
             while(Data.HasNext()) {

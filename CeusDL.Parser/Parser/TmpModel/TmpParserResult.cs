@@ -5,6 +5,8 @@ namespace KDV.CeusDL.Parser.TmpModel
 {
     public class TmpParserResult {
 
+        // Pfad der Main-Datei
+        public string Path {get; set;}
         public List<TmpMainLevelObject> Objects { get; set; }
         public TmpConfig Config {get;set;}
         public List<TmpInterface> Interfaces {

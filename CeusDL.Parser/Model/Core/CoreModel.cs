@@ -35,6 +35,15 @@ namespace KDV.CeusDL.Model.Core {
             }
         }
 
+        // Liste der direkten Imports dieses CoreModels
+        public List<CoreImport> OwnImports {
+            get {
+                return Objects.Where(o => o is CoreImport)
+                              .Select(o => (CoreImport)o)
+                              .ToList<CoreImport>();
+            }
+        }
+
         // Liefert das feingranularste Zeitattribut...
         public CoreInterface FinestTime {
             get {
