@@ -105,7 +105,7 @@ namespace KDV.CeusDL.Parser
             } else if(c == '(' && result.Name.Length > 0) {
                 state = IN_INTERFACE_PARAMS;
             } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {
-                throw new InvalidCharException($"Ungültiges Zeichen {c} in InterfaceParser.IN_INTERFACE_NAME");
+                throw new InvalidCharException($"Ungültiges Zeichen {c} in InterfaceParser.IN_INTERFACE_NAME", Data);
             }
         }
 
@@ -117,7 +117,7 @@ namespace KDV.CeusDL.Parser
             } else if(c == '(' && result.Name.Length > 0) {
                 state = IN_INTERFACE_PARAMS;
             } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {
-                throw new InvalidCharException($"Ungültiges Zeichen {c} in InterfaceParser.BEHIND_INTERFACE_NAME");
+                throw new InvalidCharException($"Ungültiges Zeichen {c} in InterfaceParser.BEHIND_INTERFACE_NAME", Data);
             }
         }
 
@@ -132,7 +132,7 @@ namespace KDV.CeusDL.Parser
             } else if(c == '(' && result.Type.Length > 0) {
                 state = IN_INTERFACE_PARAMS;
             } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {
-                throw new InvalidCharException($"Ungültiges Zeichen {c} in InterfaceParser.BEHIND_INTERFACE_NAME");
+                throw new InvalidCharException($"Ungültiges Zeichen {c} in InterfaceParser.BEHIND_INTERFACE_NAME", Data);
             }
         }
       
@@ -142,7 +142,7 @@ namespace KDV.CeusDL.Parser
             } else if(c == '(') {
                 state = IN_INTERFACE_PARAMS;
             } else if(!ParserUtil.IsNewLineOrWhitespace(c)) {
-                throw new InvalidCharException($"Ungültiges Zeichen {c} in InterfaceParser.BEHIND_INTERFACE_NAME");
+                throw new InvalidCharException($"Ungültiges Zeichen {c} in InterfaceParser.BEHIND_INTERFACE_NAME", Data);
             }
         }
         

@@ -51,7 +51,7 @@ namespace KDV.CeusDL.Parser
                     case FINAL:
                         return result;
                     default:
-                        throw new InvalidOperationException("Unreachable state reached in FileParser!");
+                        throw new InvalidOperationException("Unreachable state reached in FileParser : {Data.GetPosTextForException()}");
                 }
             }
 

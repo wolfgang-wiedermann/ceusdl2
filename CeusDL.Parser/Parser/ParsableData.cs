@@ -85,5 +85,10 @@ namespace KDV.CeusDL.Parser
                 return Position < Content.Length-1;
             }
         }
+
+        // Positionstext für die Ausgabe in Exceptions...
+        public string GetPosTextForException() {
+            return $"in File {FileName} at {Line}:{Column}";
+        }
     }
 }

@@ -12,7 +12,7 @@ namespace KDV.CeusDL.Parser.Exceptions
         {
         }
 
-        public InvalidTokenException(string message, ParsableData data) : base($"{message} in Line {data.Line} Column {data.Column}")
+        public InvalidTokenException(string message, ParsableData data) : base($"{message}  : {data.GetPosTextForException()}")
         {
         }
 

@@ -13,7 +13,7 @@ namespace KDV.CeusDL.Parser.Exceptions
         {
         }
 
-        public InvalidCharException(string message, ParsableData data) : base($"{message} in Line {data.Line} Column {data.Column}")
+        public InvalidCharException(string message, ParsableData data) : base($"{message} : {data.GetPosTextForException()}")
         {
         }        
 

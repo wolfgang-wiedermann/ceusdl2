@@ -66,7 +66,7 @@ namespace KDV.CeusDL.Parser
                     var innerResult = p.Parse();
                     result.Content = innerResult;
                 } else {
-                    throw new InvalidTokenException($"Ungültiges Token {buf} an Position {Data.Line}:{Data.Column}");
+                    throw new InvalidTokenException($"Ungültiges Token {buf}", Data);
                 }
             }
         }

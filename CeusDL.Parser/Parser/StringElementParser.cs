@@ -37,7 +37,7 @@ namespace KDV.CeusDL.Parser
                     case FINAL:
                         return result;                        
                     default:
-                        throw new InvalidOperationException("Unreachable state reached in StringElementParser!");
+                        throw new InvalidOperationException($"Unreachable state reached in StringElementParser : {Data.GetPosTextForException()}");
                 }
             }
 
