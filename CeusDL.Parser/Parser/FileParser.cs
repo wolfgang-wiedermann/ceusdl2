@@ -88,11 +88,7 @@ namespace KDV.CeusDL.Parser
                     result.Config = configParser.Parse(whitespaceBuf);
                     result.Objects.Add(new TmpMainLevelObject(result.Config));
                     whitespaceBuf = "";
-                 } else if (buf.Equals("import")) {          
-                    if(result.Config != null) {
-                        throw new InvalidTokenException("Es wurde eine zweite config-Section in einer CEUSDL-Datei gefunden", Data);
-                    }
-                    Data.Back("import ".Length);
+                 } else if (buf.Equals("import")) {                              
                     var import = importParser.Parse(whitespaceBuf);
                     result.Objects.Add(new TmpMainLevelObject(import));
                     whitespaceBuf = "";

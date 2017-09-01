@@ -68,6 +68,8 @@ namespace KDV.CeusDL.Parser
                 } else {
                     throw new InvalidTokenException($"Ungültiges Token {buf}", Data);
                 }
+            } else {
+                throw new InvalidCharException($"Ungültiges Zeichen {c}", Data);
             }
         }
     }

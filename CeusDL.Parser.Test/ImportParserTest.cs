@@ -16,5 +16,14 @@ namespace KDV.CeusDL.Parser.Test
             Assert.AreEqual(1, result?.Content?.Interfaces?.Count);
             Assert.AreEqual("Semester", result.Content.Interfaces[0].Name);
         }
+
+        [TestMethod]
+        public void TestParseWithSplitFile() {
+            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\split_main.ceusdl";
+            var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
+            var p = new FileParser(data);
+            var result = p.Parse();
+            Console.WriteLine("Geht?");
+        }
     }
 }
