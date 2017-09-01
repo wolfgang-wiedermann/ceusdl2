@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using KDV.CeusDL.Model.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace KDV.CeusDL.Parser.Test
@@ -23,7 +25,23 @@ namespace KDV.CeusDL.Parser.Test
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();
-            Console.WriteLine("Geht?");
+            
+            // TODO: Hier noch Asserts einbauen, bisher testet das halt einfach
+            //       obs ohne Exception durchläuft.
+        }
+
+        [TestMethod]
+        public void TestParseToCoreModelWithSplitFile() {
+            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\split_main.ceusdl";
+            var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
+            var p = new FileParser(data);
+            var result = p.Parse();
+            
+            var model = new CoreModel(result);
+
+            Assert.AreEqual(34, model.Interfaces.Count);
+            Assert.AreEqual("Tag", model.Interfaces.Where(i => i.Name == "Tag").First().Name);
+            Assert.AreEqual("Studienfach", model.Interfaces.Where(i => i.Name == "Studienfach").First().Name);
         }
     }
 }

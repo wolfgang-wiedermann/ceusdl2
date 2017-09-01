@@ -5,10 +5,32 @@ using KDV.CeusDL.Parser.TmpModel;
 namespace KDV.CeusDL.Model.Core {
     public class CoreModel {
         public CoreConfig Config {get; private set;}
+
+        // Alle Interfaces inclusive der Interfaces aus den Imports
         public List<CoreInterface> Interfaces {
             get {
+                var ifa = Objects.Where(o => o is CoreInterface)
+                                 .Select(o => (CoreInterface)o)                              
+                                 .ToList<CoreInterface>();
+
+                var imports = Objects.Where(o => o is CoreImport)
+                                     .Select(o => (CoreImport)o)
+                                     .ToList<CoreImport>();
+
+                foreach(var import in imports) {
+                    ifa.AddRange(import.Interfaces);
+                }                                     
+
+                return ifa;
+            }
+        }
+
+        // Interfaces, die direkt in der Datei, die diesem CoreModel zugrunde
+        // liegt implementiert sind (ohne Imports)
+        public List<CoreInterface> OwnInterfaces {
+            get {
                 return Objects.Where(o => o is CoreInterface)
-                              .Select(o => (CoreInterface)o)
+                              .Select(o => (CoreInterface)o)                              
                               .ToList<CoreInterface>();
             }
         }
@@ -35,6 +57,8 @@ namespace KDV.CeusDL.Model.Core {
                     // Hier nicht nochmal new CoreConfig sondern das bestehende
                     // Objekt verwenden um zweimal auf das gleiche Objekt zu verweisen...
                     Objects.Add(Config);
+                } else if(obj.IsImport) {
+                    Objects.Add(new CoreImport(obj.Import, this));
                 }
             }
 
