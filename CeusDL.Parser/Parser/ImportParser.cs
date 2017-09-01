@@ -56,7 +56,8 @@ namespace KDV.CeusDL.Parser
             } else if(ParserUtil.IsNewLineOrWhitespace(c) && buf.Length > 0) {
                 if(buf == "import") {
                     var temp = stringElementParser.Parse().Split('/');
-                    result.Path = Path.Combine(temp); // Zum Betriebssystem passende Slashes setzen.
+                    var fileName = Path.Combine(temp); // Zum Betriebssystem passende Slashes setzen.
+                    result.Path = Path.Combine(Data.BasePath, fileName);
                     state = FINAL;
                     buf = "";
                     // TODO: Hier mit einem neuen FileParser den Inhalt des Files einlesen 

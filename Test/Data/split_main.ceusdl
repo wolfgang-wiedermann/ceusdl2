@@ -12,8 +12,8 @@ config {
 }
 // alternativ: prod_db_server="CEUS-DB"; -> aber besser immer nur eins!
 
-import "../../../../Test/Data/split_part_studiengang.ceusdl"
-import "../../../../Test/Data/split_part_datum.ceusdl"
+import "split_part_studiengang.ceusdl"
+import "split_part_datum.ceusdl"
 
 // Generelle Anmerkung:
 // DefTable, TemporalTable, DimTable und DimView dürfen nur einelementige Primärschlüssel besitzen?

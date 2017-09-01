@@ -14,7 +14,7 @@ namespace KDV.CeusDL.Parser.Test
             var result = p.Parse();
             Console.WriteLine($"Result : {result.Path}");
 
-            Assert.AreEqual("..\\..\\..\\..\\Test\\Data\\interface_demo.ceusdl", result.Path);
+            StringAssert.EndsWith(result.Path, "..\\..\\..\\..\\Test\\Data\\interface_demo.ceusdl");
             Assert.AreEqual(1, result?.Content?.Interfaces?.Count);
             Assert.AreEqual("Semester", result.Content.Interfaces[0].Name);
         }

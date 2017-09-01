@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 namespace KDV.CeusDL.Parser
 {
@@ -12,6 +13,17 @@ namespace KDV.CeusDL.Parser
         public int Column { get; private set; }
         // Dateiname, aus der der Code eingelesen wurde
         public string FileName {get; private set;}
+        // Extrahiert den Pfad des Ordners aus dem FileName
+        public string BasePath {
+            get {
+                if(String.IsNullOrEmpty(FileName)) {
+                    throw new Exception("Ohne gesetzten FileName kann auch kein BasePath ermittelt werden!");
+                }
+                string fullPath = Path.GetFullPath(FileName);
+                string fileName = Path.GetFileName(FileName);
+                return fullPath.Substring(0, fullPath.Length - (fileName.Length + 1));
+            }
+        }
 
         public ParsableData(string content, string fileName) {
             this.Content = content;
