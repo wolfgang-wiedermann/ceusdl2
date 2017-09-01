@@ -120,6 +120,19 @@ Der Zentrale Nachteil des Schlüsselworts calc ist in dem Fall, dass hier keine 
 wenn das calculated="true" aber als Attributparameter erfasst wird, dann geht das, es wirkt sich dann aber etwas nachteilig
 auf die Filterung der Attribute bei der Code-Generierung für die IL-Loader aus. (Das ist aber dank Linq gut beherrschbar)
 
+Import-Statement
+----------------
+
+TODO: Gibts noch nicht, wird aber dringend gebraucht um den Code in mehrere Dateien aufteilen zu können.
+
+```
+import "dimensionen/datum.ceusdl"
+import "dimensionen/studiengang.ceusdl"
+```
+
+Offene Frage sind, zu was ist der import relativ, wenn es sich um verschachtelte Imports handelt, also
+eine importierte Datei weitere Dateien importiert. 
+
 Kommentare in CEUSDL
 --------------------
 

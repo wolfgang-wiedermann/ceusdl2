@@ -10,13 +10,23 @@ namespace KDV.CeusDL.Parser
         public int Line { get; private set; }
         // 1-basierte Positionsnummer in der Zeile
         public int Column { get; private set; }
+        // Dateiname, aus der der Code eingelesen wurde
+        public string FileName {get; private set;}
+
+        public ParsableData(string content, string fileName) {
+            this.Content = content;
+            this.Position = 0;
+            this.Line = 1;
+            this.Column = 0;
+            this.FileName = fileName;
+        }
 
         public ParsableData(string content) {
             this.Content = content;
             this.Position = 0;
             this.Line = 1;
-            this.Column = 0
-            ;
+            this.Column = 0;
+            this.FileName = "UNBEKANNTE_DATEI";
         }
 
         public char Next() {

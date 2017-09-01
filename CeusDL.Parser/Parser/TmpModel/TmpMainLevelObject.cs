@@ -9,6 +9,10 @@ namespace KDV.CeusDL.Parser.TmpModel
             content = ifa;
         }
 
+        public TmpMainLevelObject(TmpImport imp) {
+            content = imp;
+        }
+
         public TmpMainLevelObject(TmpComment comment) {            
             content = comment;
         }
@@ -20,6 +24,12 @@ namespace KDV.CeusDL.Parser.TmpModel
         public bool IsInterface {
             get {
                 return content is TmpInterface;
+            }
+        }
+
+        public bool IsImport {
+            get {
+                return content is TmpImport;
             }
         }
 
@@ -39,6 +49,16 @@ namespace KDV.CeusDL.Parser.TmpModel
             get {
                 if(IsInterface) {
                     return (TmpInterface) content;
+                } else {
+                    return null;
+                }
+            }
+        }
+
+        public TmpImport Import {
+            get {
+                if(IsImport) {
+                    return (TmpImport) content;
                 } else {
                     return null;
                 }

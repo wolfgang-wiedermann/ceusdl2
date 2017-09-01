@@ -97,7 +97,7 @@ namespace CeusDL2
         }
 
         static void ExecuteCompilation(string srcFile) {
-            var data = new ParsableData(System.IO.File.ReadAllText(srcFile));            
+            var data = new ParsableData(System.IO.File.ReadAllText(srcFile), srcFile);            
             var p = new FileParser(data);
             var result = p.Parse();
             var model = new CoreModel(result);

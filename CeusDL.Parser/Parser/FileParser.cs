@@ -20,12 +20,14 @@ namespace KDV.CeusDL.Parser
 
         private CommentParser commentParser;
         private ConfigParser configParser;
+        private ImportParser importParser;
         private InterfaceParser interfaceParser;
 
         public FileParser(ParsableData data) : base(data)
         {
             commentParser = new CommentParser(data);
             configParser = new ConfigParser(data);
+            importParser = new ImportParser(data);
             interfaceParser = new InterfaceParser(data);
         }
 
@@ -85,6 +87,14 @@ namespace KDV.CeusDL.Parser
                     }          
                     result.Config = configParser.Parse(whitespaceBuf);
                     result.Objects.Add(new TmpMainLevelObject(result.Config));
+                    whitespaceBuf = "";
+                 } else if (buf.Equals("import")) {          
+                    if(result.Config != null) {
+                        throw new InvalidTokenException("Es wurde eine zweite config-Section in einer CEUSDL-Datei gefunden", Data);
+                    }
+                    Data.Back("import ".Length);
+                    var import = importParser.Parse(whitespaceBuf);
+                    result.Objects.Add(new TmpMainLevelObject(import));
                     whitespaceBuf = "";
                 } else if (buf.StartsWith("//") || buf.StartsWith("/*")) {                    
                     var comment = commentParser.Parse(whitespaceBuf);                    
