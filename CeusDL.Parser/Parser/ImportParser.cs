@@ -60,8 +60,7 @@ namespace KDV.CeusDL.Parser
                     result.Path = Path.Combine(Data.BasePath, fileName);
                     state = FINAL;
                     buf = "";
-                    // TODO: Hier mit einem neuen FileParser den Inhalt des Files einlesen 
-                    //       und nach result.Content speichern.
+                    
                     var innerData = new ParsableData(System.IO.File.ReadAllText(result.Path), result.Path);            
                     var p = new FileParser(innerData);
                     var innerResult = p.Parse();
