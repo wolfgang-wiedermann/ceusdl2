@@ -12,6 +12,7 @@ namespace KDV.CeusDL.Model.Core {
             Objects = new List<CoreMainLevelObject>();                        
             WhitespaceBefore = tmp.WhitespaceBefore;
             Path = tmp.Path;
+            BaseDirectory = tmp.BaseDirectory;
             foreach(var obj in tmp.Content.Objects) {
                 if(obj.IsInterface) {
                     Objects.Add(new CoreInterface(obj.Interface, model));
@@ -69,5 +70,7 @@ namespace KDV.CeusDL.Model.Core {
         public string WhitespaceBefore { get; set; }
 
         public string Path { get; private set; }
+
+        public string BaseDirectory { get; private set; }
     }
 }

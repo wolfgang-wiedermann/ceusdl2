@@ -58,6 +58,7 @@ namespace KDV.CeusDL.Parser
                     var temp = stringElementParser.Parse().Split('/');
                     var fileName = Path.Combine(temp); // Zum Betriebssystem passende Slashes setzen.
                     result.Path = Path.Combine(Data.BasePath, fileName);
+                    result.BaseDirectory = Data.BasePath;
                     state = FINAL;
                     buf = "";
                     

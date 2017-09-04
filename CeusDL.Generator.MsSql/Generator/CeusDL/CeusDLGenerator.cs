@@ -14,8 +14,19 @@ namespace KDV.CeusDL.Generator.CeusDL
             this.model = model;            
         }
 
+        public CeusDLGenerator(CoreImport model) {            
+            this.model = new CoreModel(model);            
+        }
+
         public List<GeneratorResult> GenerateCode()
         {
+            var result = new List<GeneratorResult>();
+            GenerateCode(result);
+            return result;
+        }
+
+        public void GenerateCode(List<GeneratorResult> result)
+        {            
             string code = "";
             foreach(var obj in model.Objects) {
                 if(obj is CoreInterface) {                    
@@ -24,12 +35,12 @@ namespace KDV.CeusDL.Generator.CeusDL
                     code += obj.ToString();
                 } else if(obj is CoreConfig) {
                     code += GenerateConfig(model.Config);
+                } else if(obj is CoreImport) {
+                    code += GenerateImport((CoreImport)obj, model, result);
                 }
             }
-
-            var result = new List<GeneratorResult>();
-            result.Add(new GeneratorResult("generated.ceusdl", code));
-            return result;
+            
+            result.Add(new GeneratorResult(model.FileName, code));         
         }
 
         #region Interface-Generator
@@ -194,6 +205,16 @@ namespace KDV.CeusDL.Generator.CeusDL
                 return "";
             }            
         } 
+        #endregion
+        #region Import-Generator
+
+        private string GenerateImport(CoreImport obj, CoreModel model, List<GeneratorResult> result)
+        {
+            CeusDLGenerator generator = new CeusDLGenerator(obj);            
+            generator.GenerateCode(result);
+            return $"{obj.WhitespaceBefore}import \"{obj.Path.Substring(obj.BaseDirectory.Length+1).Replace(System.IO.Path.DirectorySeparatorChar, '/')}\"\n";
+        }
+
         #endregion
     }
 }

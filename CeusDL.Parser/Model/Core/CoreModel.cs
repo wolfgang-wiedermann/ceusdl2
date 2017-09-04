@@ -53,8 +53,11 @@ namespace KDV.CeusDL.Model.Core {
 
         public List<CoreMainLevelObject> Objects {get; private set;}
 
+        public string FileName {get; private set;}
+
         public CoreModel(TmpParserResult result) {
             Config = new CoreConfig(result.Config);
+            FileName = System.IO.Path.GetFileName(result.Path);
 
             Objects = new List<CoreMainLevelObject>();
             foreach(var obj in result.Objects) {
@@ -75,6 +78,12 @@ namespace KDV.CeusDL.Model.Core {
             foreach(var ifa in Interfaces) {
                 ifa.PostProcess();
             }
+        }        
+
+        public CoreModel(CoreImport import) {
+            Config = null;
+            FileName = import.Path.Replace(import.BaseDirectory+System.IO.Path.DirectorySeparatorChar, "");
+            Objects = import.Objects;
         }
 
         public CoreAttribute GetAttributeByName(string name) {
