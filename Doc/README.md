@@ -93,9 +93,17 @@ Dabei können die Attribute als folgende Attribut-Typen auftreten:
 * __ref-Attribut:__ Das Referenz-Attribut dient dazu, Beziehungen zwischen den Interfaces zu definieren. Sollten zwischen zwei Interfaces mehrere Beziehungen existieren, so müssen diese mittels Alias (siehe as, z. B. bei ref JaNein.KNZ as Zulassung) unterscheidbar gemacht werden.
 * __fact-Attribut:__ Das Fakt-Attribut darf nur in Interfaces vom Typ FactTable verwendet werden und dient dazu, die Attribute zu kennzeichnen, die im Warehouse-System später als Fakten Verwendung finden. Die Syntax des Fakt-Attributs ist gleich der des Basis-Attributs.
 
-Überlegungen gibt es auch zu folgendem Attributtyp:
+Kennzeichnung berechneter Attribute
 
-* __calc-Attribut:__ Das Calc-Attribut (__NEU__) darf nur in Interfaces vom Typ FactTable und DimTable verwendet werden und dient dazu, Attribute in Interfaces zu spezizfizieren, deren Werte nicht mittels Datenlieferung übermittelt werden, sondern im Rahmen des Ladelaufs (nach IL-Load oder nach BL-Load) berechnet werden. Die zugehörigen Attribute sind ab IL im Datenbankschema enthalten, werden aber bei der Generierung des Ladecodes für IL (csv-Parser + Insert-Generator für IL) nicht berücksichtigt, sodass sie in der Datenlieferung nicht als Spalten enthalten sein dürfen. (__Hier stellt sich die Frage, ob evtl. auch ein Parameter calculated="true" beim base-Attribut und beim fact-Attribut eine Lösung sein könnte?__)
+In DimTables und FactTables werden __base-Attribute__ und __fact-Attribute__ im Regelfall aus der Datenlieferung befüllt. Enthält die Datenlieferung oder der Datenbestand der BL aber bereits Felder, aus denen der Wert eines weiteren Attributs berechnet werden kann, so ist es oft wünschenswert, dieses Attribut aus der Datenlieferung ausklammern zu können um es im Rahmen des Ladevorgangs dynamisch zu berechnen. Für diesen Zweck sieht die CEUSDL die Kennzeichnung berechneter Attribute durch den Parameter __calculated="true"__ vor.
+
+Beispiel: (Die Datenlieferung enthält bereits ein Feld Geburtsdatum)
+
+```
+    base Alter:int(calculated="true");
+    // oder
+    fact Alter_F:int(calculated="true");
+```
 
 ```
 interface Blub : FactTable(mandant="true") {
@@ -123,15 +131,18 @@ auf die Filterung der Attribute bei der Code-Generierung für die IL-Loader aus.
 Import-Statement
 ----------------
 
-TODO: Gibts noch nicht, wird aber dringend gebraucht um den Code in mehrere Dateien aufteilen zu können.
+Um den CEUSDL-Code auf mehrere Dateien zu verteilen enthält die Sprache das import-Statement. 
 
 ```
 import "dimensionen/datum.ceusdl"
 import "dimensionen/studiengang.ceusdl"
 ```
 
-Offene Frage sind, zu was ist der import relativ, wenn es sich um verschachtelte Imports handelt, also
-eine importierte Datei weitere Dateien importiert. 
+Mit dem Import-Statement können zu includierende Dateien relativ zum Pfad der importierenden Datei referenziert werden. Dieses Verhalten stellt sicher, dass auch bei cascardierten Imports oder Imports in verschiedene Zielprojekte keine Probleme bei der Auflösung der Zielpfade entstehen.
+
+Die Pfade in den Import-Statements verwenden, sofern Sie Ordnerstrukturen berücksichtigen als Verzeichnistrenner immer den normalen Schrägstrich /. Er wird im Rahmen des Übersetzungsvorgangs automatisch in den jeweils zur Betriebssystemplattform passenden Verzeichnistrenner übersetzt. Der Backslash \ wird wie in anderen CEUSDL-Strings als Initiator für eine Escape-Sequenz betrachtet und in Verbindung mit dem zugehörigen Folgezeichen verarbeitet (also z. B. \n für Newline).
+
+Wichtig ist jedoch zu berücksichtigen, dass config-Blöcke, die in importierten Dateien enthalten sind generell ignoriert werden. Es gilt ausschließlich der Inhalt des config-Blocks der Hauptdatei. (Also der Datei, die direkt als Parameter an den CEUSDL-Compiler übergeben worden ist).
 
 Kommentare in CEUSDL
 --------------------
