@@ -13,6 +13,7 @@ namespace KDV.CeusDL.Model.Core {
         public int Length {get; private set;}
         public int Decimals {get; private set;}
         public string Unit {get; private set;}
+        public bool IsCalculated { get; private set; }
 
         public CoreBaseAttribute(TmpInterfaceAttribute tmp, CoreInterface parent, CoreModel model) : base(tmp, parent, model)
         {
@@ -21,6 +22,13 @@ namespace KDV.CeusDL.Model.Core {
 
             Length = 0;
             Decimals = 0;
+
+            if(tmp.Parameters.Where(p => p.Name == "calculated" && p.Value == "true").Count() == 1) {
+                IsCalculated = true;
+            } else {
+                IsCalculated = false;
+            }
+
             if(DataType == CoreDataType.DECIMAL || DataType == CoreDataType.VARCHAR) {
                 // Dann Länge ermitteln
                 var rs = tmp.Parameters.Where(p => p.Name == "len");

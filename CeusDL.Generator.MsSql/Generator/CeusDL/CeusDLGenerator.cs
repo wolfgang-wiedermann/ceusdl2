@@ -83,8 +83,11 @@ namespace KDV.CeusDL.Generator.CeusDL
         private string GenerateBaseAttribute(string type, CoreBaseAttribute attr, CoreInterface ifa, CoreModel model)
         {
             var code = $"{attr.WhitespaceBefore}{type} {attr.Name}:{DataTypeToString(attr.DataType)}";
-            if(attr.IsPrimaryKey || attr.DataType == CoreDataType.DECIMAL 
-                || attr.DataType == CoreDataType.VARCHAR || !string.IsNullOrEmpty(attr.Unit)) 
+            if(attr.IsPrimaryKey 
+                || attr.DataType == CoreDataType.DECIMAL 
+                || attr.DataType == CoreDataType.VARCHAR 
+                || !string.IsNullOrEmpty(attr.Unit)
+                || attr.IsCalculated) 
             {                
                 bool dirty = false;
                 code += "(";
@@ -106,6 +109,11 @@ namespace KDV.CeusDL.Generator.CeusDL
                     if(dirty) code +=", ";
                     dirty = true;
                     code += $"unit=\"{attr.Unit}\"";
+                }
+                if(attr.IsCalculated) {
+                    if(dirty) code +=", ";
+                    dirty = true;
+                    code += "calculated=\"true\"";
                 }
                 code += ")";
             }

@@ -1,0 +1,64 @@
+//
+// Herkunft - GeoAttribute
+//
+
+interface Kontinent : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base Laengengrad:varchar(len="50");
+    base Breitengrad:varchar(len="50");    
+}
+
+interface Land : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500"); 
+    base Laengengrad:varchar(len="50");
+    base Breitengrad:varchar(len="50");
+    ref Kontinent.KNZ;   
+}
+
+// Hinweis:
+// Bundesländer sind bei uns nur für Deutschland gepflegt => die Beziehung zu Land ist
+// hier nicht hilfreich, Land gehört statt dessen direkt in der Faktentabelle referenziert.
+interface Bundesland : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="50");
+    base Laengengrad:varchar(len="50");
+    base Breitengrad:varchar(len="50");    
+    //ref Land.KNZ;
+}
+
+interface Regierungsbezirk : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");    
+    base AMT_ID:varchar(len="50");
+    base Laengengrad:varchar(len="50");
+    base Breitengrad:varchar(len="50");
+    ref Bundesland.KNZ;
+}
+
+interface Kreis : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="50");
+    base Laengengrad:varchar(len="50");
+    base Breitengrad:varchar(len="50");
+    ref Bundesland.KNZ;
+    ref Regierungsbezirk.KNZ;
+}
+
+interface Ort : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base Postleitzahl:varchar(len="5");    
+    base Laengengrad:varchar(len="50");
+    base Breitengrad:varchar(len="50");
+    ref Kreis.KNZ;
+}

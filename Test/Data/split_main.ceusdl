@@ -1,7 +1,7 @@
 // ------------------------------------
 // Beispiel in CEUS-Definition-Language
 // ------------------------------------
-// 0. Basisdefinitionen
+
 config {
      prefix="AP";
      il_database="FH_AP_InterfaceLayer";
@@ -10,34 +10,22 @@ config {
      al_database="FH_AP_Warehouse";     
      etl_db_server="CEUS-ETL";
 }
-// alternativ: prod_db_server="CEUS-DB"; -> aber besser immer nur eins!
+
+// Imports
+// -------
 
 import "split_part_studiengang.ceusdl"
 import "split_part_datum.ceusdl"
+import "split_part_geografie.ceusdl"
 
-// Generelle Anmerkung:
-// DefTable, TemporalTable, DimTable und DimView dürfen nur einelementige Primärschlüssel besitzen?
-
-// 1. Interface Definitionen
+// Interface Definitionen
+// ----------------------
 
 //
 // Zeit-Attribute
 //
 
-/*
- Alternativ zu DefTable (als Spezialisierung) sollte ich für Zeit-Attribute noch
- die Klasse TemporalTable vorsehen. Dann kann ich bei der Historisierung
- festlegen, dass Attributhistorisierung nur mit Tabellen von Typ TemporalTable 
- möglich ist...
-
- Idee angepasst: 
- Die feinste Zeiteinheit wird mit TemporalTable(finest_time_attribute="true")
- markiert. Alle gröberen Zeiteinheiten erhalten TemporalTable ohne weitere Parameter.
- Eine TemporalTable kann nicht mandant="true" oder history="..." haben
- 
-*/
-
-interface Semester : DefTable {
+interface Semester : TemporalTable {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
@@ -45,7 +33,7 @@ interface Semester : DefTable {
 
 interface FachSemester : DefTable {
     base KNZ:varchar(len="50", primary_key="true");
-    base KURZBEZ:varchar(len="100");
+    base KURZBEZ:varchar(len="100"); // Eventuell ist statt einem alter ... auch eine Kennzeichnung des Attributs mit "former KURZBEZEICHNUNG" für Rename ausreichend;
     base LANGBEZ:varchar(len="500");
 }
 
@@ -81,71 +69,6 @@ interface Zulassungsart : DefTable {
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
     base HISKEY_ID:varchar(len="50");  // Evtl. noch rausnehmen, die gibts hier ja nicht!
-}
-
-//
-// Herkunft - GeoAttribute
-//
-
-interface Kontinent : DimTable(mandant="true") {
-    base KNZ:varchar(len="50", primary_key="true");
-    base KURZBEZ:varchar(len="100");
-    base LANGBEZ:varchar(len="500");
-    base Laengengrad:varchar(len="50");
-    base Breitengrad:varchar(len="50");    
-}
-
-interface Land : DimTable(mandant="true") {
-    base KNZ:varchar(len="50", primary_key="true");
-    base KURZBEZ:varchar(len="100");
-    base LANGBEZ:varchar(len="500"); 
-    base Laengengrad:varchar(len="50");
-    base Breitengrad:varchar(len="50");
-    ref Kontinent.KNZ;   
-}
-
-// Hinweis:
-// Bundesländer sind bei uns nur für Deutschland gepflegt => die Beziehung zu Land ist
-// hier nicht hilfreich, Land gehört statt dessen direkt in der Faktentabelle referenziert.
-interface Bundesland : DimTable(mandant="true") {
-    base KNZ:varchar(len="50", primary_key="true");
-    base KURZBEZ:varchar(len="100");
-    base LANGBEZ:varchar(len="500");
-    base AMT_ID:varchar(len="50");
-    base Laengengrad:varchar(len="50");
-    base Breitengrad:varchar(len="50");    
-    //ref Land.KNZ;
-}
-
-interface Regierungsbezirk : DimTable(mandant="true") {
-    base KNZ:varchar(len="50", primary_key="true");
-    base KURZBEZ:varchar(len="100");
-    base LANGBEZ:varchar(len="500");    
-    base AMT_ID:varchar(len="50");
-    base Laengengrad:varchar(len="50");
-    base Breitengrad:varchar(len="50");
-    ref Bundesland.KNZ;
-}
-
-interface Kreis : DimTable(mandant="true") {
-    base KNZ:varchar(len="50", primary_key="true");
-    base KURZBEZ:varchar(len="100");
-    base LANGBEZ:varchar(len="500");
-    base AMT_ID:varchar(len="50");
-    base Laengengrad:varchar(len="50");
-    base Breitengrad:varchar(len="50");
-    ref Bundesland.KNZ;
-    ref Regierungsbezirk.KNZ;
-}
-
-interface Ort : DimTable(mandant="true") {
-    base KNZ:varchar(len="50", primary_key="true");
-    base KURZBEZ:varchar(len="100");
-    base LANGBEZ:varchar(len="500");
-    base Postleitzahl:varchar(len="5");    
-    base Laengengrad:varchar(len="50");
-    base Breitengrad:varchar(len="50");
-    ref Kreis.KNZ;
 }
 
 //
@@ -222,6 +145,8 @@ interface Bewerber : FactTable(mandant="true", history="Tag.KNZ") {
     ref Geschlecht.KNZ;
     ref Tag.KNZ as Geburtstag;
 
+    base Alter:int(calculated="true"); // Beispiel für ein erstes Calculated-Attribut
+
     ref Semester.KNZ;
 
     ref HZBArt.KNZ; // Muss dann höchste HZB werden, denn lt. Andreas kann ein Bewerber mehrere HZBs haben
@@ -243,6 +168,7 @@ interface Bewerber : FactTable(mandant="true", history="Tag.KNZ") {
     // Fakten
     fact Anzahl_F:decimal(len="1,0"); // ein default="1" wäre hier noch nett
     fact HZBNote_F:decimal(len="3,2");
+    fact Alter_F:int(calculated="true"); // Beispiel für ein erstes Calculated-Fakt
 }
 
 interface Antrag : FactTable(mandant="true", history="Tag.KNZ") {

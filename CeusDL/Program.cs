@@ -27,10 +27,7 @@ namespace CeusDL2
                 // Dieser Code wird bei F5 in Visual Studio ausgeführt
                 string rootFolder = "."; 
                 PrepareEnvironment(rootFolder);
-                //PartialParserTest.RunTests();
-                //InterpreterTest.RunTests();
-                //CeusDLGeneratorTest.RunTests();
-                ExecuteCompilation(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\file_demo2.ceusdl");
+                ExecuteCompilation(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\split_main.ceusdl");
             } else {
                 // Dieser Code wird beim Aufruf über Commandline ausgeführt
                 var cla = new CommandLineApplication();                
@@ -110,7 +107,7 @@ namespace CeusDL2
             ExecuteStep(new DropILGenerator(model), GENERATED_SQL);
             ExecuteStep(new LoadILGenerator(model), GENERATED_CODE);            
 
-            // TODO: IL-Parser in C# generieren ... und dann BL
+            // TODO: BL, BT und AL generieren
         }
 
         static void ExecuteStep(IGenerator generator, string baseFolder) {
