@@ -11,6 +11,7 @@ namespace KDV.CeusDL.Model.Core {
         public bool IsMandant {get; private set;} 
         public bool IsFinestTime {get; private set;}       
         public CoreAttribute HistoryBy {get; private set;}
+        public string FormerName { get; private set; }
 
         public bool IsHistorized {
             get {
@@ -35,12 +36,16 @@ namespace KDV.CeusDL.Model.Core {
             BaseData = tmp;
             HistoryBy = null;
             Name = tmp.Name;                        
+            FormerName = null;
             Type = ToInterfaceType(tmp.Type);
             WhitespaceBefore = tmp.WhitespaceBefore;
 
             if(tmp.Parameters != null && tmp.Parameters.Where(a => a.Name == "mandant" && a.Value == "true").Count() > 0) {
                 IsMandant = true;
-            }    
+            }
+            if(tmp.Parameters != null && tmp.Parameters.Where(p => p.Name == "former_name").Count() > 0) {
+                FormerName = tmp.Parameters.Where(p => p.Name == "former_name").First().Value;
+            }
 
             if(Type == CoreInterfaceType.TEMPORAL_TABLE && IsMandant) {
                 throw new InvalidParameterException($"Fehler in Interface {Name}: Eine TemporalTable kann nicht Mandantabhängig sein");
