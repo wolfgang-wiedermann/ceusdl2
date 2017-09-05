@@ -95,7 +95,7 @@ Dabei können die Attribute als folgende Attribut-Typen auftreten:
 
 Kennzeichnung berechneter Attribute
 
-In DimTables und FactTables werden __base-Attribute__ und __fact-Attribute__ im Regelfall aus der Datenlieferung befüllt. Enthält die Datenlieferung oder der Datenbestand der BL aber bereits Felder, aus denen der Wert eines weiteren Attributs berechnet werden kann, so ist es oft wünschenswert, dieses Attribut aus der Datenlieferung ausklammern zu können um es im Rahmen des Ladevorgangs dynamisch zu berechnen. Für diesen Zweck sieht die CEUSDL die Kennzeichnung berechneter Attribute durch den Parameter __calculated="true"__ vor.
+In DimTables und FactTables werden die Attribute im Regelfall aus der Datenlieferung befüllt. Enthält die Datenlieferung oder der Datenbestand der BL aber bereits Felder, aus denen der Wert eines weiteren Attributs berechnet werden kann, so ist es oft wünschenswert, dieses Attribut aus der Datenlieferung ausklammern zu können um es im Rahmen des Ladevorgangs dynamisch zu berechnen. Für diesen Zweck sieht die CEUSDL die Kennzeichnung berechneter Attribute durch den Parameter __calculated="true"__ vor. Die Verwendung von calculated="true" ist im übrigen ___auch für ref-Attribute___ möglich.
 
 Beispiel: (Die Datenlieferung enthält bereits ein Feld Geburtsdatum)
 

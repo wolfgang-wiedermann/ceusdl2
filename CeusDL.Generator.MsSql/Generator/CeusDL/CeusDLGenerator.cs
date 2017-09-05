@@ -165,6 +165,15 @@ namespace KDV.CeusDL.Generator.CeusDL
                 dirty = true;                 
                 code += "(primary_key=\"true\"";
             }
+            if(attr.IsCalculated) {
+                if(!dirty) {
+                    code += "(";
+                } else {
+                    code += ", ";
+                }
+                dirty = true;
+                code += "calculated=\"true\"";
+            }
             if(!String.IsNullOrEmpty(attr.FormerName)) {
                 if(!dirty) {
                     code += "(";
