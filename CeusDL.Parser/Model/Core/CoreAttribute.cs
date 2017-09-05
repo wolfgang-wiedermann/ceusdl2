@@ -19,6 +19,7 @@ namespace KDV.CeusDL.Model.Core {
             ParentInterface = parent;
             coreModel = model;
             WhitespaceBefore = tmp.WhitespaceBefore;
+            IsCalculated = false;
             FormerName = null;
 
             if(tmp.Parameters != null && tmp.Parameters.Where(a => a.Name == "primary_key" && a.Value == "true").Count() > 0) {
@@ -29,9 +30,7 @@ namespace KDV.CeusDL.Model.Core {
             }
             if(tmp.Parameters.Where(p => p.Name == "calculated" && p.Value == "true").Count() == 1) {
                 IsCalculated = true;
-            } else {
-                IsCalculated = false;
-            }
+            } 
         }
 
         ///
