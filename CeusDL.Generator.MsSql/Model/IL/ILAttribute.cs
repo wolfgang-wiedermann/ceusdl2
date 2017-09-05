@@ -19,6 +19,7 @@ namespace KDV.CeusDL.Model.IL {
         public int Decimals {get; private set;}
         public string DataTypeParameters {get; private set;}
         public bool IsPrimaryKey {get; private set;}
+        public bool IsCalcualted {get; private set;}
 
         public ILAttribute(CoreAttribute attr, ILInterface ifa, CoreModel model)
         {
@@ -26,12 +27,13 @@ namespace KDV.CeusDL.Model.IL {
             this.ParentInterface = ifa;
             this.coreModel = model;
             
-            IsPrimaryKey = attr.IsPrimaryKey;
+            IsPrimaryKey = attr.IsPrimaryKey;    
 
-            if(attr is CoreRefAttribute) {
+            if(attr is CoreRefAttribute) {                
                 var refAttr = (CoreRefAttribute)attr;                              
                 var baseAttr = refAttr.ReferencedAttribute;
-                CDataType = baseAttr.DataType;
+                IsCalcualted = false;
+                CDataType = baseAttr.DataType;                
                 if(string.IsNullOrEmpty(refAttr.Alias)) {
                     Name = $"{baseAttr.ParentInterface.Name}_{baseAttr.Name}";
                 } else {
@@ -40,6 +42,7 @@ namespace KDV.CeusDL.Model.IL {
                 PrepareDataTypeAndParams(baseAttr.DataType, baseAttr.Length, baseAttr.Decimals);                
             } else {
                 var baseAttr = (CoreBaseAttribute) attr;                
+                IsCalcualted = baseAttr.IsCalculated;
                 CDataType = baseAttr.DataType;
                 Name = $"{baseAttr.ParentInterface.Name}_{baseAttr.Name}";
                 PrepareDataTypeAndParams(baseAttr.DataType, baseAttr.Length, baseAttr.Decimals);

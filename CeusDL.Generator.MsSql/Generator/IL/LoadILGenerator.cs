@@ -65,7 +65,7 @@ namespace KDV.CeusDL.Generator.IL {
         private string GenerateDataClass(ILInterface ifa)
         {            
             string code = $"    public class {ifa.ShortName}Line {{\n";
-            foreach(var attr in ifa.Attributes) {
+            foreach(var attr in ifa.NonCalculatedAttributes) {
                 code += $"        public string {attr.Name} {{ get; set; }}\n";
             }
             code += "    }\n\n";
@@ -112,9 +112,9 @@ namespace KDV.CeusDL.Generator.IL {
             code +=$"            string sql = \"insert into {ifa.FullName} (\";\n";
 
             code += "            sql += \"";
-            foreach(var attr in ifa.Attributes) {
+            foreach(var attr in ifa.NonCalculatedAttributes) {
                 code += attr.Name;
-                if(!attr.Equals(ifa.Attributes.Last())) {
+                if(!attr.Equals(ifa.NonCalculatedAttributes.Last())) {
                     code +=", ";
                 }                
             }
@@ -122,17 +122,17 @@ namespace KDV.CeusDL.Generator.IL {
 
             code += "            sql += \") values (\";\n";
             
-            foreach(var attr in ifa.Attributes) {
+            foreach(var attr in ifa.NonCalculatedAttributes) {
                 code +=$"            if(!string.IsNullOrEmpty(line.{attr.Name})) {{\n";
                 code +=$"                sql += \"\'\" + (line.{attr.Name}.Length>{GetMaxLength(attr)}?line.{attr.Name}{GetSubstringIfNeeded(attr, ifa)}:line.{attr.Name}).Replace(\"'\", \"''\") + \"\'";                
-                if(attr.Equals(ifa.Attributes.Last())) {
+                if(attr.Equals(ifa.NonCalculatedAttributes.Last())) {
                     code += ")\\n\";\n"; 
                 } else {
                     code += ", \";\n"; 
                 }
                 code += "            } else {\n";
                 code += "                sql += \"\'\'";
-                if(attr.Equals(ifa.Attributes.Last())) {
+                if(attr.Equals(ifa.NonCalculatedAttributes.Last())) {
                     code += ")\\n\";\n"; 
                 } else {
                     code += ", \";\n"; 
@@ -213,7 +213,7 @@ namespace KDV.CeusDL.Generator.IL {
             // Zustandsvariablen des Automaten
             //
             code += "            // Zustands- und Hilfsvariablen\n";
-            code +=$"            var state = {ifa.ShortName}ParserState.IN_{ifa.Attributes[0].Name.ToUpper()};\n";
+            code +=$"            var state = {ifa.ShortName}ParserState.IN_{ifa.NonCalculatedAttributes[0].Name.ToUpper()};\n";
             code +=$"            var substate = {ifa.ShortName}ParserSubstate.INITIAL;\n";
             code +=$"            var content = new {ifa.ShortName}Line();\n";
             code += "            char c = ' ';\n";
@@ -226,7 +226,7 @@ namespace KDV.CeusDL.Generator.IL {
             code += "                c = line[i];\n";
             code += "                switch(state) {\n";
 
-            foreach(var attr in ifa.Attributes) {
+            foreach(var attr in ifa.NonCalculatedAttributes) {
                 // Generierung der Cases
                 code += GenerateParseAttributeCase(ifa, attr);                
             }
@@ -259,10 +259,10 @@ namespace KDV.CeusDL.Generator.IL {
             code +=$"            substate = {ifa.ShortName}ParserSubstate.IN_STRING;\n";
             code += "        } else if(c == ';') {\n";
             // Zum nächsten Attribut weiterschalten
-            if(attr == ifa.Attributes.Last()) {
+            if(attr == ifa.NonCalculatedAttributes.Last()) {
                 code +=$"            state = {ifa.ShortName}ParserState.FINAL;\n";
             } else {
-                var nextAttr = ifa.Attributes[ifa.Attributes.IndexOf(attr)+1];
+                var nextAttr = ifa.NonCalculatedAttributes[ifa.NonCalculatedAttributes.IndexOf(attr)+1];
                 code +=$"            state = {ifa.ShortName}ParserState.IN_{nextAttr.Name.ToUpper()};\n";
             }
             code += "        } else {\n";            
@@ -274,7 +274,7 @@ namespace KDV.CeusDL.Generator.IL {
             code +=$"            content.{attr.Name} = buf;\n";
             code += "            buf = \"\";\n";
             code +=$"            substate = {ifa.ShortName}ParserSubstate.INITIAL;\n";
-            if(attr == ifa.Attributes.Last()) {
+            if(attr == ifa.NonCalculatedAttributes.Last()) {
                 code +=$"            state = {ifa.ShortName}ParserState.FINAL;\n";
             }            
             code += "        } else {\n";
@@ -322,7 +322,7 @@ namespace KDV.CeusDL.Generator.IL {
         {
             string code = $"    public enum {ifa.ShortName}ParserState {{\n        ";
 
-            foreach(var attr in ifa.Attributes) {
+            foreach(var attr in ifa.NonCalculatedAttributes) {
                 code += $"IN_{attr.Name.ToUpper()}";                
                 code += ", ";                
             }            

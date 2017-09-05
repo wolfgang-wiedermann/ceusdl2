@@ -14,6 +14,11 @@ namespace KDV.CeusDL.Model.IL {
         public string FullName {get => string.IsNullOrEmpty(coreModel.Config.ILDatabase)?Name:$"{coreModel.Config.ILDatabase}.dbo.{Name}";}
 
         public List<ILAttribute> Attributes {get; private set;}
+        public List<ILAttribute> NonCalculatedAttributes {
+            get {
+                return Attributes.Where(a => !a.IsCalcualted).ToList<ILAttribute>();
+            }
+        }
         public List<ILAttribute> PrimaryKeyAttributes {get; private set;}
 
         ///
