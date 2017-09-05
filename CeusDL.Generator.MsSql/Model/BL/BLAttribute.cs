@@ -1,17 +1,26 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using KDV.CeusDL.Model.Core;
 
 namespace KDV.CeusDL.Model.BL {
+    // TODO: 
+    // Die Klasse BLAttribute ist so einfach noch Mist. Die schmeiß ich morgen nochmal weg und schreib sie neu...
+    // Haupt-Defizit ist, dass man nicht sauber technisch bedingte Attribute im BLInterface anlegen kann
+    // IDEE:
+    // IBLAttribute -> BLBaseAttribute, BLRefAttribute, BLManualAttribute (letzteres für nachträglich hinzugefügte)
     public class BLAttribute
     {
+        private string name = null;
         internal CoreAttribute coreAttribute { get; private set; }
-        internal BLModel blModel { get; private set; } 
+        internal BLModel blModel { get; private set; }         
 
         public string Name {
             get {
-                if(this.coreAttribute is CoreRefAttribute) {
+                if(this.coreAttribute == null) {
+                    return this.name;
+                } else if(this.coreAttribute is CoreRefAttribute) {
                     var refAttr = (CoreRefAttribute)this.coreAttribute;
                     if(string.IsNullOrEmpty(refAttr.Alias)) {
                         return ReferencedAttribute.Name;
@@ -49,13 +58,25 @@ namespace KDV.CeusDL.Model.BL {
             this.ParentInterface = parent;
         }
 
+        public BLAttribute(string name, CoreDataType dataType, int? length, int? decimals, BLInterface parent) {
+            this.ParentInterface = parent;
+            this.name = name;
+            this.coreAttribute = null;
+            // TODO: etc.
+        }
+
         public void PostProcess() {
             // Postprocessing betrifft nur Ref-Attribute!
             if(coreAttribute is CoreRefAttribute) {
                 var refAttr = (CoreRefAttribute)coreAttribute;
                 var refIfa = this.blModel.Interfaces.Where(i => i.coreInterface.Name == refAttr.ReferencedInterface.Name).First();
-                this.ReferencedAttribute = refIfa.Attributes.Where(a => a.coreAttribute.Name == refAttr.ReferencedAttribute.Name).First();
+                this.ReferencedAttribute = refIfa.Attributes.Where(a => a?.coreAttribute?.Name == refAttr.ReferencedAttribute.Name).First();
             }
+        }
+
+        internal string GetTypeDefinition()
+        {
+            return "varchar(123)"; // TODO: noch richtig ausprogrammieren
         }
     }
 }

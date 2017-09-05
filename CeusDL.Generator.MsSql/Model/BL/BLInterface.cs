@@ -5,6 +5,10 @@ using System.Linq;
 using KDV.CeusDL.Model.Core;
 
 namespace KDV.CeusDL.Model.BL {
+
+    // TODO: hier fehlt noch der gesamte Mandant-Zeugs!!!
+    //       also die Reaktion auf mandant="true"... (vgl. ILInterface ...)
+    // TODO: hier fehlt auch noch, dass ab BL immer eine ID-Spalte enthalten sein muss!
     public class BLInterface
     {  
         internal CoreInterface coreInterface {get; private set;}
@@ -67,11 +71,22 @@ namespace KDV.CeusDL.Model.BL {
             this.coreInterface = coreInterface;    
             this.coreModel = blModel.coreModel;
             this.blModel = blModel;
+
             this.Attributes = new List<BLAttribute>();
 
+            // Mandant-Spalte hinzufügen
+            if(coreInterface.IsMandant) {
+                 this.Attributes.Add(new BLAttribute("Mandant_ID", CoreDataType.INT, null, null, this));  // Evtl. muss das hier auch noch Mandant_KNZ sein!
+            }
+
+            // ID-Spalte hinzufügen
+            this.Attributes.Add(new BLAttribute($"{coreInterface.Name}_ID", CoreDataType.INT, null, null, this)); 
+            
             foreach(var attr in coreInterface.Attributes) {
                 this.Attributes.Add(new BLAttribute(attr, this));
             }
+
+            // TODO: Technisch erforderliche Spalten wie T_MODIFIKATION etc. hinzufügen
         }
 
         public void PostProcess() {

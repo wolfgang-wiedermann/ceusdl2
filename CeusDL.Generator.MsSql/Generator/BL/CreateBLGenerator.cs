@@ -19,7 +19,7 @@ namespace KDV.CeusDL.Generator.BL {
             code += "-- Def-Interfaces: \n";
             foreach(var ifa in model.DefInterfaces.OrderBy(i => i.MaxReferenceDepth)) {
                 code += "-- Depth: "+ifa.MaxReferenceDepth+"\n";                
-                code += $"create table {ifa.FullName} ()\nGO\n\n";
+                code += GenerateDefTable(ifa);
             }
 
             code += "-- Dim-Interfaces: \n";
@@ -37,6 +37,26 @@ namespace KDV.CeusDL.Generator.BL {
             var result = new List<GeneratorResult>();
             result.Add(new GeneratorResult("BL_Create.sql", code));
             return result;
+        }
+
+        internal string GenerateDefTable(BLInterface defTable) {
+            string code ="";
+            code += $"create table {defTable.FullName} (";
+            foreach(var attr in defTable.Attributes) {
+                code += GenerateDefAttribute(attr, defTable).Indent("   ");
+            }
+            code += ")\nGO\n\n";
+            return code;
+        }
+
+        internal string GenerateDefAttribute(BLAttribute attr, BLInterface defTable)
+        {
+            string code = $"{attr.Name} {attr.GetTypeDefinition()}";            
+            if(defTable.Attributes.Last() != attr) {
+                code += ", ";
+            }
+            code += "\n";
+            return code;
         }
     }
 }
