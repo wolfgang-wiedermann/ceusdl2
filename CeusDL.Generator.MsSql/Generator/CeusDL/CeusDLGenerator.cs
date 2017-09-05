@@ -50,20 +50,39 @@ namespace KDV.CeusDL.Generator.CeusDL
             string code = $"{ifa.WhitespaceBefore}interface {ifa.Name} : {InterfaceTypeToString(ifa.Type)}";            
 
             // Interface-Parameter setzen
+            // --------------------------
+            bool dirty = false;
+            // Mandant und Historie
             if(ifa.IsMandant || ifa.IsHistorized) {
                 code += "(";                
                 if(ifa.IsMandant) {
+                    dirty = true;
                     code += "mandant=\"true\"";
                 }
                 if(ifa.IsHistorized && ifa.IsMandant) {
                     code += ", ";
                 }                
                 if(ifa.IsHistorized) {
+                    dirty = true;
                     code += $"history=\"{ifa.HistoryBy.ParentInterface.Name}.{ifa.HistoryBy.Name}\"";
                 }
-                code += ")";
+            // Ggf. feinste Zeiteinheit festlegen
             } else if(ifa.IsFinestTime) {
-                code += "(finest_time_attribute=\"true\")";
+                dirty = true;
+                code += "(finest_time_attribute=\"true\"";
+            }
+            // Falls Vorhanden alten Namen eintragen.
+            if(!String.IsNullOrEmpty(ifa.FormerName)) {
+                if(dirty) {
+                    code += ", ";
+                } else {
+                    code += "(";
+                }
+                dirty = true;
+                code += $"former_name=\"{ifa.FormerName}\"";
+            }
+            if(dirty) {
+                code += ")";
             }
 
             // Und die Attribute setzen
@@ -126,6 +145,11 @@ namespace KDV.CeusDL.Generator.CeusDL
                     dirty = true;
                     code += "calculated=\"true\"";
                 }
+                if(!String.IsNullOrEmpty(attr.FormerName)) {
+                    if(dirty) code +=", ";
+                    dirty = true;
+                    code += $"former_name=\"{attr.FormerName}\"";
+                }
                 code += ")";
             }
             code += ";";
@@ -135,10 +159,24 @@ namespace KDV.CeusDL.Generator.CeusDL
         private string GenerateRefAttribute(CoreRefAttribute attr, CoreInterface ifa, CoreModel model)
         {
             string code = $"{attr.WhitespaceBefore}ref  {attr.ReferencedInterface.Name}.{attr.ReferencedAttribute.Name}";
+            bool dirty = false;
             if(attr.IsPrimaryKey) 
-            {                                
-                code += "(primary_key=\"true\")";
+            {             
+                dirty = true;                 
+                code += "(primary_key=\"true\"";
             }
+            if(!String.IsNullOrEmpty(attr.FormerName)) {
+                if(!dirty) {
+                    code += "(";
+                } else {
+                    code += ", ";
+                }
+                dirty = true;
+                code += $"former_name=\"{attr.FormerName}\"";
+            }
+            if(dirty) {
+                code += ")";
+            }            
             if(!string.IsNullOrEmpty(attr.Alias)) {
                 code += $" as {attr.Alias}";
             }

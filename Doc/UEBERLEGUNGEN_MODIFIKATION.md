@@ -118,12 +118,12 @@ Für die drei gegebenen Fallgruppen hätte ich folgende Ansätze:
 
 ```
 // Beispiel: Neu hinzufügen eines Alias:
-ref  Jahr.KNZ as Geburtsjahr(former_name="");
+ref  Jahr.KNZ(former_name="") as Geburtsjahr;
 ```
 
 ```
 // Beispiel: Umbenennen eines Alias:
-ref  Jahr.KNZ as Geburtsjahr(former_name="GebJahr");
+ref  Jahr.KNZ(former_name="GebJahr") as Geburtsjahr;
 ```
 
 ```
