@@ -25,9 +25,9 @@ import "split_part_geografie.ceusdl"
 // Zeit-Attribute
 //
 
-interface Semester : TemporalTable {
+interface Semester : TemporalTable(former_name="SEM") { // Beispiel für Umbenennung beim Interface
     base KNZ:varchar(len="50", primary_key="true");
-    base KURZBEZ:varchar(len="100");
+    base KURZBEZ:varchar(len="100", former_name="KBEZ"); // Beispiel für Umbenennung beim base- oder fact-Attribut
     base LANGBEZ:varchar(len="500");
 }
 

@@ -13,7 +13,7 @@ interface Woche : TemporalTable {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
-    ref Jahr.KNZ;
+    ref Jahr.KNZ(former_name="Johr");
 }
 
 interface Monat : TemporalTable {

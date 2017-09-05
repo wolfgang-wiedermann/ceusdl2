@@ -9,6 +9,7 @@ namespace KDV.CeusDL.Model.Core {
         public CoreInterface ParentInterface {get; protected set;}
         protected TmpInterfaceAttribute BaseData {get; set;}
         public string WhitespaceBefore { get; set; }
+        public string FormerName { get; protected set; }
 
         protected CoreModel coreModel;
 
@@ -17,9 +18,13 @@ namespace KDV.CeusDL.Model.Core {
             ParentInterface = parent;
             coreModel = model;
             WhitespaceBefore = tmp.WhitespaceBefore;
+            FormerName = null;
 
             if(tmp.Parameters != null && tmp.Parameters.Where(a => a.Name == "primary_key" && a.Value == "true").Count() > 0) {
                 IsPrimaryKey = true;
+            }
+            if(tmp.Parameters != null && tmp.Parameters.Where(p => p.Name == "former_name").Count() > 0) {
+                FormerName = tmp.Parameters.Where(p => p.Name == "former_name").First().Value;
             }
         }
 
