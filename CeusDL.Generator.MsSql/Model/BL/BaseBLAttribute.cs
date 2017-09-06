@@ -7,26 +7,79 @@ using KDV.CeusDL.Model.Core;
 namespace KDV.CeusDL.Model.BL {
     public class BaseBLAttribute : IBLAttribute
     {
-        public string Name => throw new NotImplementedException();
+        #region Private Attributes
+        private CoreBaseAttribute coreAttribute = null;
+        #endregion
 
-        public string FullName => throw new NotImplementedException();
+        #region Public Properties
+        public string Name { 
+            get {
+                return $"{this.coreAttribute.ParentInterface.Name}_{this.coreAttribute.Name}";
+            }
+        }
 
-        public CoreDataType DataType => throw new NotImplementedException();
+        public string FullName {
+            get {
+                if(ParentInterface != null) {
+                    return $"{ParentInterface.Name}.{Name}";
+                } else {
+                    return $"UNKNOWN_TABLE.{Name}";
+                }
+            }
+        }
 
-        public int Length => throw new NotImplementedException();
+        public CoreDataType DataType {
+            get {
+                return this.coreAttribute.DataType;
+            }
+        }
 
-        public int Decimals => throw new NotImplementedException();
+        public int Length {
+            get {
+                return this.coreAttribute.Length;
+            }
+        }
 
-        public bool IsPrimaryKey => throw new NotImplementedException();
+        public int Decimals {
+            get {
+                return this.coreAttribute.Decimals;
+            }
+        }
 
-        public bool IsIdentity => throw new NotImplementedException();
+        public bool IsPrimaryKey {
+            get {
+                // In der BL sind Attribute aus dem ceusdl-File nie PK
+                return false;
+            }
+        }
 
-        public IBLInterface ParentInterface => throw new NotImplementedException();
+        public bool IsPartOfUniqueKey {
+            get {
+                // In der BL wird der Primärschlüssel aus dem Quellsystem (ggf. ergänzt um Mandant und Historienattribut)
+                // in einen Unique-Key umgewandelt.
+                return this.coreAttribute.IsPrimaryKey;
+            }
+        }
 
-        public bool IsPartOfUniqueKey => throw new NotImplementedException();
+        public bool IsIdentity {
+            get {
+                // In der BL sind Attribute aus dem ceusdl-File nie Identity
+                return false;
+            }
+        }
+
+        public IBLInterface ParentInterface { get; private set; }
+        
+        #endregion
+
+        public BaseBLAttribute(CoreBaseAttribute coreAttribute, IBLInterface parentInterface) {                        
+            this.coreAttribute = coreAttribute;            
+            this.ParentInterface = parentInterface;
+        }
 
         public string GetSqlDataTypeDefinition()
         {
+            // TODO: das hier ist noch nicht alles !!!
             return BaseBLAttribute.GenerateSqlDataTypeDefinition(this);
         }
 

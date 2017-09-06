@@ -13,6 +13,11 @@ namespace KDV.CeusDL.Model.Core {
         public string WhitespaceBefore { get; set; }
 
         public CoreConfig(TmpConfig tmp) {
+            // Wenn die ceusdl-Datei keine Config-Block enthält.
+            if(tmp == null) {
+                return;
+            }
+
             WhitespaceBefore = tmp.WhitespaceBefore;
             
             foreach(var param in tmp.Parameters) {
