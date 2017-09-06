@@ -44,12 +44,6 @@ namespace KDV.CeusDL.Model.BL {
 
         #endregion       
 
-        // Default-Konstruktor nur für Testfälle und andere innerhalb des Namespace
-        // sichtbar machen.
-        [Obsolete]
-        public DefaultBLInterface() {
-        } 
-
         public DefaultBLInterface(CoreInterface coreInterface, BLModel model) {
             this.coreInterface = coreInterface;
             this.ParentModel = model;

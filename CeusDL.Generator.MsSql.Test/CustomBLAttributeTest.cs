@@ -58,7 +58,7 @@ namespace KDV.CeusDL.Model.BL.Test
         [TestMethod]
         public void TestCustomBLAttribute_TableID_Sample1()
         {
-            IBLInterface parent = new DefaultBLInterface() {
+            IBLInterface parent = new BLInterfaceMock() {
                 ShortName = "Semester"
             };
 
@@ -81,7 +81,7 @@ namespace KDV.CeusDL.Model.BL.Test
         [TestMethod]
         public void TestCustomBLAttribute_TModifikation()
         {
-            IBLInterface parent = new DefaultBLInterface() {
+            IBLInterface parent = new BLInterfaceMock() {
                 ShortName = "Semester"
             };
 
@@ -106,7 +106,7 @@ namespace KDV.CeusDL.Model.BL.Test
         [TestMethod]
         public void TestCustomBLAttribute_TBemerkung()
         {
-            IBLInterface parent = new DefaultBLInterface() {
+            IBLInterface parent = new BLInterfaceMock() {
                 ShortName = "Semester"
             };
 
@@ -131,7 +131,7 @@ namespace KDV.CeusDL.Model.BL.Test
         [TestMethod]
         public void TestCustomBLAttribute_TBenutzer()
         {
-            IBLInterface parent = new DefaultBLInterface() {
+            IBLInterface parent = new BLInterfaceMock() {
                 ShortName = "Semester"
             };
 
@@ -156,7 +156,7 @@ namespace KDV.CeusDL.Model.BL.Test
         [TestMethod]
         public void TestCustomBLAttribute_TSystem()
         {
-            IBLInterface parent = new DefaultBLInterface() {
+            IBLInterface parent = new BLInterfaceMock() {
                 ShortName = "Semester"
             };
 
@@ -181,7 +181,7 @@ namespace KDV.CeusDL.Model.BL.Test
         [TestMethod]
         public void TestCustomBLAttribute_TErstDat()
         {
-            IBLInterface parent = new DefaultBLInterface() {
+            IBLInterface parent = new BLInterfaceMock() {
                 ShortName = "Semester"
             };
 
@@ -205,7 +205,7 @@ namespace KDV.CeusDL.Model.BL.Test
         [TestMethod]
         public void TestCustomBLAttribute_TAendDat()
         {
-            IBLInterface parent = new DefaultBLInterface() {
+            IBLInterface parent = new BLInterfaceMock() {
                 ShortName = "Semester"
             };
 
@@ -229,7 +229,7 @@ namespace KDV.CeusDL.Model.BL.Test
         [TestMethod]
         public void TestCustomBLAttribute_TLadelaufNR()
         {
-            IBLInterface parent = new DefaultBLInterface() {
+            IBLInterface parent = new BLInterfaceMock() {
                 ShortName = "Semester"
             };
 
