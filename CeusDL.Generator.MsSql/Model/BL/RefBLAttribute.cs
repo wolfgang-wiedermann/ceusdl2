@@ -78,7 +78,8 @@ namespace KDV.CeusDL.Model.BL {
 
         public IBLInterface ParentInterface { get; private set; }        
 
-        public IBLAttribute ReferencedAttribute { get; private set; } // TODO: im PostProcessing setzen
+        // WICHTIG: Wird erst im PostProcessing gesetzt !!!
+        public IBLAttribute ReferencedAttribute { get; private set; } 
         
         #endregion
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using KDV.CeusDL.Model.Core;
 
@@ -7,7 +8,7 @@ namespace KDV.CeusDL.Model.BL {
     public class DefaultBLInterface : IBLInterface
     {   
         #region Private Attributes
-        private CoreInterface coreInterface = null;
+        internal CoreInterface coreInterface = null;
 
         #endregion
         #region Public Properties
@@ -30,11 +31,28 @@ namespace KDV.CeusDL.Model.BL {
 
         public CoreInterfaceType InterfaceType {get; set; }
 
-        public bool IsHistorized => throw new NotImplementedException();
+        public bool IsHistorized {
+            get {
+                return this.coreInterface.IsHistorized;
+            }
+        }
 
-        public IBLAttribute HistoryAttribute => throw new NotImplementedException();
+        public IBLAttribute HistoryAttribute {
+            get {
+                if(IsHistorized) {
+                    // Fraglich, ob das schon funktioniert!
+                    return Attributes.Where(a => a.ShortName == this.coreInterface.HistoryBy.Name).First();
+                } else {
+                    return null;
+                }
+            }
+        }
 
-        public bool IsMandant => throw new NotImplementedException();
+        public bool IsMandant {
+            get {
+                return this.coreInterface.IsMandant;
+            }
+        }
 
         public List<IBLAttribute> PrimaryKeyAttributes => throw new NotImplementedException();
 
