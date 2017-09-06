@@ -14,6 +14,7 @@ namespace KDV.CeusDL.Model.BL {
         int Decimals { get; }
         bool IsPrimaryKey { get; }
         bool IsIdentity { get; }
+        bool IsPartOfUniqueKey { get; } // Markiert den Original-PK aus dem Quellsystem!
         IBLInterface ParentInterface { get; }
 
         #endregion Properties

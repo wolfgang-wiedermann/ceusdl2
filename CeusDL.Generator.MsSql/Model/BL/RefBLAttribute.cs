@@ -23,6 +23,8 @@ namespace KDV.CeusDL.Model.BL {
 
         public IBLInterface ParentInterface => throw new NotImplementedException();
 
+        public bool IsPartOfUniqueKey => throw new NotImplementedException();
+
         public string GetSqlDataTypeDefinition()
         {
             throw new NotImplementedException();
