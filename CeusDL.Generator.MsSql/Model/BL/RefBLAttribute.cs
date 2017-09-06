@@ -90,7 +90,7 @@ namespace KDV.CeusDL.Model.BL {
 
         public string GetSqlDataTypeDefinition()
         {
-            throw new NotImplementedException();
+            return ReferencedAttribute.GetSqlDataTypeDefinition();
         }
 
         public void PostProcess()

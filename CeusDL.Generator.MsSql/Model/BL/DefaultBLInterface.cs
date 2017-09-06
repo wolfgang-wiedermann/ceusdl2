@@ -29,7 +29,11 @@ namespace KDV.CeusDL.Model.BL {
 
         public List<IBLAttribute> Attributes { get; private set; }
 
-        public CoreInterfaceType InterfaceType {get; set; }
+        public CoreInterfaceType InterfaceType { 
+            get {
+                return this.coreInterface.Type;
+            } 
+        }
 
         public bool IsHistorized {
             get {
