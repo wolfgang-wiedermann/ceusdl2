@@ -7,56 +7,20 @@ using KDV.CeusDL.Model.BL;
 namespace KDV.CeusDL.Generator.BL {
     public class CreateBLGenerator : IGenerator
     {
-        private BLModel model;
+        //private BLModel model;
 
         public CreateBLGenerator(CoreModel model) {
-            this.model = new BLModel(model);
+            //this.model = new BLModel(model);
         }
 
         public List<GeneratorResult> GenerateCode() {
             string code = "--\n-- BaseLayer \n--\n";
 
-            code += "-- Def-Interfaces: \n";
-            foreach(var ifa in model.DefInterfaces.OrderBy(i => i.MaxReferenceDepth)) {
-                code += "-- Depth: "+ifa.MaxReferenceDepth+"\n";                
-                code += GenerateDefTable(ifa);
-            }
-
-            code += "-- Dim-Interfaces: \n";
-            foreach(var ifa in model.DimTableInterfaces.OrderBy(i => i.MaxReferenceDepth)) {                
-                code += "-- Depth: "+ifa.MaxReferenceDepth+"\n";       
-                code += $"create table {ifa.FullName} ()\nGO\n\n";
-            }
-
-            code += "-- Fakt-Interfaces: \n";
-            foreach(var ifa in model.FactTableInterfaces.OrderBy(i => i.MaxReferenceDepth)) {                
-                code += "-- Depth: "+ifa.MaxReferenceDepth+"\n";       
-                code += $"create table {ifa.FullName} ()\nGO\n\n";
-            }
+            // TODO ...
 
             var result = new List<GeneratorResult>();
             result.Add(new GeneratorResult("BL_Create.sql", code));
             return result;
-        }
-
-        internal string GenerateDefTable(BLInterface defTable) {
-            string code ="";
-            code += $"create table {defTable.FullName} (";
-            foreach(var attr in defTable.Attributes) {
-                code += GenerateDefAttribute(attr, defTable).Indent("   ");
-            }
-            code += ")\nGO\n\n";
-            return code;
-        }
-
-        internal string GenerateDefAttribute(BLAttribute attr, BLInterface defTable)
-        {
-            string code = $"{attr.Name} {attr.GetTypeDefinition()}";            
-            if(defTable.Attributes.Last() != attr) {
-                code += ", ";
-            }
-            code += "\n";
-            return code;
         }
     }
 }
