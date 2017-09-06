@@ -7,27 +7,98 @@ using KDV.CeusDL.Model.Core;
 namespace KDV.CeusDL.Model.BL {
     public class RefBLAttribute : IBLAttribute
     {
-        public string Name => throw new NotImplementedException();
+        private CoreRefAttribute coreAttribute = null;
 
-        public string FullName => throw new NotImplementedException();
+        #region Public Properties
+        public string ShortName {
+            get {
+                if(!string.IsNullOrEmpty(coreAttribute.Alias)) {
+                    return coreAttribute.Alias;
+                } else {
+                    return $"{coreAttribute.ReferencedInterface.Name}.{coreAttribute.ReferencedAttribute.Name}";
+                }
+            }            
+        }
 
-        public CoreDataType DataType => throw new NotImplementedException();
+        public string Name {
+            get {                                
+                if(string.IsNullOrEmpty(coreAttribute.Alias)) {
+                    return ReferencedAttribute.Name;
+                } else {
+                    return $"{coreAttribute.Alias}_{ReferencedAttribute.Name}";
+                } 
+            }
+        }
 
-        public int Length => throw new NotImplementedException();
+        public string FullName {
+            get {
+                return $"{ParentInterface.Name}.{Name}";
+            }
+        }
 
-        public int Decimals => throw new NotImplementedException();
+        public CoreDataType DataType {
+            get {
+                return ReferencedAttribute.DataType;
+            }
+        }
 
-        public bool IsPrimaryKey => throw new NotImplementedException();
+        public int Length {
+            get {
+                return ReferencedAttribute.Length;
+            }
+        }
 
-        public bool IsIdentity => throw new NotImplementedException();
+        public int Decimals {
+            get {
+                return ReferencedAttribute.Decimals;
+            }
+        }
 
-        public IBLInterface ParentInterface => throw new NotImplementedException();
+        public bool IsPrimaryKey {
+            get {
+                // In der BL sind Attribute aus dem ceusdl-File nie PK
+                return false;
+            }
+        }
 
-        public bool IsPartOfUniqueKey => throw new NotImplementedException();
+        public bool IsPartOfUniqueKey {
+            get {
+                // In der BL wird der Primärschlüssel aus dem Quellsystem (ggf. ergänzt um Mandant und Historienattribut)
+                // in einen Unique-Key umgewandelt.
+                return this.coreAttribute.IsPrimaryKey;
+            }
+        }
+
+        public bool IsIdentity {
+            get {
+                // In der BL sind Attribute aus dem ceusdl-File nie Identity
+                return false;
+            }
+        }
+
+        public IBLInterface ParentInterface { get; private set; }        
+
+        public IBLAttribute ReferencedAttribute { get; private set; } // TODO: im PostProcessing setzen
+        
+        #endregion
+
+        public RefBLAttribute(CoreRefAttribute coreAttribute, IBLInterface parentInterface) {
+            this.coreAttribute = coreAttribute;
+            this.ParentInterface = parentInterface;
+        }
 
         public string GetSqlDataTypeDefinition()
         {
             throw new NotImplementedException();
+        }
+
+        public void PostProcess()
+        {
+            this.ReferencedAttribute = ParentInterface.ParentModel.Interfaces
+                                            .Where(i => i.ShortName == coreAttribute.ReferencedInterface.Name)
+                                            .First()
+                                            .Attributes.Where(a => a.ShortName == coreAttribute.ReferencedAttribute.Name)
+                                                       .First();
         }
     }
 }

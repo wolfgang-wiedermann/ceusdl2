@@ -21,16 +21,14 @@ namespace KDV.CeusDL.Model.BL.Test
             // Auswählen
             var coreIfa = model.Interfaces[0];
             var coreAttr = coreIfa.Attributes[0];
-            var blIfa = new DefaultBLInterface() {
-                Name = $"AP_def_{coreIfa.Name}"
-            };
+            var blIfa = new DefaultBLInterface(coreIfa, null);
 
             // In BaseBLAttribute konvertieren
             BaseBLAttribute attr = new BaseBLAttribute((CoreBaseAttribute)coreAttr, blIfa);
 
             // Inhalt überprüfen
             Assert.AreEqual("Semester_KNZ", attr.Name);
-            Assert.AreEqual("AP_def_Semester.Semester_KNZ", attr.FullName);
+            Assert.AreEqual("def_Semester.Semester_KNZ", attr.FullName);
             Assert.AreEqual(CoreDataType.VARCHAR, attr.DataType);
             Assert.AreEqual(50, attr.Length);
             Assert.AreEqual(0, attr.Decimals);

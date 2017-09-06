@@ -5,14 +5,28 @@ using KDV.CeusDL.Model.Core;
 
 namespace KDV.CeusDL.Model.BL {
     public class DefaultBLInterface : IBLInterface
-    {
+    {   
+        #region Private Attributes
+        private CoreInterface coreInterface = null;
+
+        #endregion
+        #region Public Properties
+
         public string ShortName { get; set; }
 
         public string Name { get; set; }
 
-        public string FullName => throw new NotImplementedException();
+        public string FullName {
+            get {
+                if(ParentModel?.Config?.BLDatabase != null) {
+                    return $"{ParentModel.Config.BLDatabase}.dbo.{Name}";
+                } else {
+                    return $"dbo.{Name}";
+                }
+            }
+        }
 
-        public List<IBLAttribute> Attributes => throw new NotImplementedException();
+        public List<IBLAttribute> Attributes { get; private set; }
 
         public CoreInterfaceType InterfaceType {get; set; }
 
@@ -25,5 +39,94 @@ namespace KDV.CeusDL.Model.BL {
         public List<IBLAttribute> PrimaryKeyAttributes => throw new NotImplementedException();
 
         public int MaxReferenceDepth => throw new NotImplementedException();
+
+        public BLModel ParentModel { get; private set; }
+
+        #endregion       
+
+        // Default-Konstruktor nur für Testfälle und andere innerhalb des Namespace
+        // sichtbar machen.
+        [Obsolete]
+        public DefaultBLInterface() {
+        } 
+
+        public DefaultBLInterface(CoreInterface coreInterface, BLModel model) {
+            this.coreInterface = coreInterface;
+            this.ParentModel = model;
+            this.ShortName = coreInterface.Name;
+            this.Name = ConvertName(coreInterface, model?.Config);
+            this.Attributes = new List<IBLAttribute>();
+
+            // ID-Attribut hinzufügen
+            this.Attributes.Add(CustomBLAttribute.GetNewIDAttribute(this));
+
+            foreach(var attr in coreInterface.Attributes) {
+                if(attr is CoreRefAttribute) {
+                    this.Attributes.Add(new RefBLAttribute((CoreRefAttribute) attr, this));
+                } else {
+                    this.Attributes.Add(new BaseBLAttribute((CoreBaseAttribute) attr, this));
+                }
+            }
+
+            // Ggf. Mandant-Attribut hinzufügen
+            if(coreInterface.IsMandant) {
+                this.Attributes.Add(CustomBLAttribute.GetNewMandantAttribute(this));
+            }
+
+            // Technische Hilfsattribute hinzufügen
+            AddTechnicalAttributes();
+        }
+
+        #region Methoden
+
+        private string ConvertName(CoreInterface coreInterface, BLConfig config)
+        {
+            string prefix = "";
+            if(!string.IsNullOrEmpty(config?.Prefix)) {
+                prefix = $"{config.Prefix}_";
+            }
+            if(coreInterface.Type == CoreInterfaceType.DEF_TABLE
+                || coreInterface.Type == CoreInterfaceType.TEMPORAL_TABLE) {                
+                return $"{prefix}def_{coreInterface.Name}";
+            } else if(coreInterface.Type == CoreInterfaceType.DIM_TABLE) {
+                return $"{prefix}BL_D_{coreInterface.Name}";
+            } else if(coreInterface.Type == CoreInterfaceType.DIM_VIEW) {
+                return $"{prefix}BL_D_{coreInterface.Name}";
+            } else if(coreInterface.Type == CoreInterfaceType.FACT_TABLE) {
+                return $"{prefix}BL_F_{coreInterface.Name}";
+            } else {
+                throw new InvalidInterfaceTypeException("Ungültiger Interface-Typ in ConvertName");
+            }
+        }
+
+        private void AddTechnicalAttributes()
+        {
+            if(coreInterface.Type == CoreInterfaceType.DEF_TABLE
+                || coreInterface.Type == CoreInterfaceType.TEMPORAL_TABLE) {
+                this.Attributes.Add(CustomBLAttribute.GetNewTBenutzerAttribute(this));                
+                this.Attributes.Add(CustomBLAttribute.GetNewTSystemAttribute(this));
+                this.Attributes.Add(CustomBLAttribute.GetNewTErstDatAttribute(this));
+                this.Attributes.Add(CustomBLAttribute.GetNewTAendDatAttribute(this));
+            } else if(coreInterface.Type == CoreInterfaceType.DIM_TABLE
+                || coreInterface.Type == CoreInterfaceType.DIM_VIEW
+                || coreInterface.Type == CoreInterfaceType.FACT_TABLE) {
+                this.Attributes.Add(CustomBLAttribute.GetNewTModifikationAttribute(this));
+                this.Attributes.Add(CustomBLAttribute.GetNewTBemerkungAttribute(this));
+                this.Attributes.Add(CustomBLAttribute.GetNewTBenutzerAttribute(this));                
+                this.Attributes.Add(CustomBLAttribute.GetNewTSystemAttribute(this));
+                this.Attributes.Add(CustomBLAttribute.GetNewTErstDatAttribute(this));
+                this.Attributes.Add(CustomBLAttribute.GetNewTAendDatAttribute(this));
+                this.Attributes.Add(CustomBLAttribute.GetNewTLadelaufNRAttribute(this));                            
+            }
+        }
+
+        public void PostProcess()
+        {
+            foreach(var attr in Attributes) {
+                attr.PostProcess();
+            } 
+        }
+
+        #endregion
     }
 }

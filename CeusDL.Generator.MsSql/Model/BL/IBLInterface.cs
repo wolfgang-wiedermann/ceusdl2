@@ -18,5 +18,8 @@ namespace KDV.CeusDL.Model.BL {
         bool IsMandant { get; }
         List<IBLAttribute> PrimaryKeyAttributes { get; }
         int MaxReferenceDepth { get; }
+        BLModel ParentModel { get; }
+
+        void PostProcess();
     }
 }

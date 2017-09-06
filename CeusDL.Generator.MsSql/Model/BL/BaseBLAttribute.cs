@@ -12,6 +12,13 @@ namespace KDV.CeusDL.Model.BL {
         #endregion
 
         #region Public Properties
+
+        public string ShortName {
+            get {
+                return coreAttribute.Name;
+            }            
+        }
+
         public string Name { 
             get {
                 return $"{this.coreAttribute.ParentInterface.Name}_{this.coreAttribute.Name}";
@@ -112,6 +119,11 @@ namespace KDV.CeusDL.Model.BL {
             }         
 
             return code;
+        }
+
+        public void PostProcess()
+        {
+            // Beim BaseBLAttribute gibts im PostProcessing nix zu tun.
         }
     }
 }

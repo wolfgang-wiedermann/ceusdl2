@@ -7,7 +7,8 @@ namespace KDV.CeusDL.Model.BL {
     public interface IBLAttribute {
         #region Properties
 
-        string Name { get; } // Attributname in BL-Syntax        
+        string ShortName { get; } // Attributname in ceusdl-Syntax z. B. KNZ
+        string Name { get; } // Attributname in BL-Syntax z. B. Semester_KNZ      
         string FullName { get; } // Attributname incl. Tabellenname getrennt durch Punkt
         CoreDataType DataType { get; }
         int Length { get; }
@@ -22,6 +23,8 @@ namespace KDV.CeusDL.Model.BL {
 
         // Erstellt den SQL-Code für die Datentyp-Definition.
         string GetSqlDataTypeDefinition(); 
+
+        void PostProcess(); 
 
         #endregion Methods
     }

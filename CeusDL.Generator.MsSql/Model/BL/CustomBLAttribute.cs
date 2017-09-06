@@ -132,6 +132,11 @@ namespace KDV.CeusDL.Model.BL {
         }                  
         #endregion
 
+        public string ShortName {
+            get {
+                return Name;
+            }            
+        }
         public string Name { get; set; }
 
         public string FullName { get; set; }
@@ -167,6 +172,11 @@ namespace KDV.CeusDL.Model.BL {
             }
 
             return result;
-        }        
+        }
+
+        public void PostProcess()
+        {
+            // Beim CustomBLAttribute gibts im PostProcessing nix zu tun.
+        }
     }
 }
