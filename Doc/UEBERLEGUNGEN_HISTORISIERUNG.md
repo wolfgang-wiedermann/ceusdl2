@@ -57,3 +57,17 @@ zu einem solchen Eintrag vorhält.
 __Beispiel: Studiengang__
 
 SP\_BL\_D\_Studiengang (Fortschreibung) -> SP\_BL\_DV\_Studiengang (Versionierung)
+
+Überlegungen zur Historisierung von Faktentabellen
+==================================================
+
+Wenn eine Faktentabelle auf der Basis eines Zeit-Attributs historisiert wird, also die Werte
+jeweils pro Zeiteinheit eingefrohren werden, dann sieht CEUSDL für diese Interfaces vom Typ
+Fact-Table eine Möglichkeit vor, parallel zum historisierten Stand eine sog. Now-Table, die
+nur den Inhalt der aktuellsten Zeiteinheit aus der historisierten Fakten-Tabelle enthält zu
+generieren.
+
+Dieses Vorgehen hat neben klaren Performance-Vorteilen auch eine Vereinfachung der Berichte,
+die aktuelle Werte enthalten in Microstrategy zur Folge.
+
+(Das Feature ist bei CEUS AP schon positiv erprobt worden)

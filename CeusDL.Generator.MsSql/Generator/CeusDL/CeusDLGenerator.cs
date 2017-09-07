@@ -59,12 +59,19 @@ namespace KDV.CeusDL.Generator.CeusDL
                     dirty = true;
                     code += "mandant=\"true\"";
                 }
-                if(ifa.IsHistorized && ifa.IsMandant) {
+                if(dirty) {
                     code += ", ";
                 }                
                 if(ifa.IsHistorized) {
                     dirty = true;
                     code += $"history=\"{ifa.HistoryBy.ParentInterface.Name}.{ifa.HistoryBy.Name}\"";
+                }
+                if(dirty) {
+                    code += ", ";
+                }                
+                if(ifa.IsWithNowTable) {
+                    dirty = true;
+                    code += $"with_nowtable=\"true\"";
                 }
             // Ggf. feinste Zeiteinheit festlegen
             } else if(ifa.IsFinestTime) {

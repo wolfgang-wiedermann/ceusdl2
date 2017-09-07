@@ -9,15 +9,11 @@ namespace KDV.CeusDL.Model.Core {
         public CoreInterfaceType Type {get; private set;}        
 
         public bool IsMandant {get; private set;} 
-        public bool IsFinestTime {get; private set;}       
+        public bool IsFinestTime {get; private set;} 
+        public bool IsWithNowTable {get; private set;}      
         public CoreAttribute HistoryBy {get; private set;}
         public string FormerName { get; private set; }
-
-        public bool IsHistorized {
-            get {
-                return HistoryBy != null;
-            }
-        }
+        public bool IsHistorized { get; private set; }
 
         public List<CoreItemLevelObject> ItemObjects {get; private set;}
         public List<CoreAttribute> Attributes {
@@ -39,21 +35,36 @@ namespace KDV.CeusDL.Model.Core {
             FormerName = null;
             Type = ToInterfaceType(tmp.Type);
             WhitespaceBefore = tmp.WhitespaceBefore;
+            IsHistorized = false;
+            IsWithNowTable = false;            
 
-            if(tmp.Parameters != null && tmp.Parameters.Where(a => a.Name == "mandant" && a.Value == "true").Count() > 0) {
+            // Interface-Parameter ggf. setzen
+            if(tmp.Parameters != null && tmp.Parameters.Where(p => p.Name == "mandant" && p.Value == "true").Count() > 0) {
                 IsMandant = true;
             }
             if(tmp.Parameters != null && tmp.Parameters.Where(p => p.Name == "former_name").Count() > 0) {
                 FormerName = tmp.Parameters.Where(p => p.Name == "former_name").First().Value;
             }
+            if(tmp.Parameters != null && tmp.Parameters.Where(p => p.Name == "with_nowtable" && p.Value == "true").Count() > 0) {
+                IsWithNowTable = true;
+            }
+            if(tmp.Parameters != null && tmp.Parameters.Where(p => p.Name == "history" && !string.IsNullOrEmpty(p.Value)).Count() > 0) {
+                IsHistorized = true;
+            }
 
+            // Prüfung semantischer Regeln der Sprache CEUSDL (ausfiltern ungültiger Parameterkombinationen)
             if(Type == CoreInterfaceType.TEMPORAL_TABLE && IsMandant) {
                 throw new InvalidParameterException($"Fehler in Interface {Name}: Eine TemporalTable kann nicht Mandantabhängig sein");
             }
-
             if(Type == CoreInterfaceType.TEMPORAL_TABLE && tmp.Parameters.Where(p => p.Name == "history").Count() > 0) {
                 throw new InvalidParameterException($"Fehler in Interface {Name}: Eine TemporalTable kann nicht historisiert werden");
-            }            
+            }
+            if(Type != CoreInterfaceType.FACT_TABLE && IsWithNowTable) {
+                throw new InvalidParameterException($"Fehler in Interface {Name}: Now-Tables sind nur für FactTables zulässig");
+            }
+            if(IsWithNowTable && !IsHistorized) {
+                throw new InvalidParameterException($"Fehler in Interface {Name}: Now-Tables sind nur für historisierte Tabellen zulässig");
+            }
 
             if(tmp.Parameters != null && tmp.Parameters.Where(a => a.Name == "finest_time_attribute" && a.Value == "true").Count() > 0) {
                 // Prüfung: InterfaceType muss TemporalTable sein
@@ -95,10 +106,7 @@ namespace KDV.CeusDL.Model.Core {
                     throw new InvalidDataTypeException();
                 }
             }
-            // TODO: Attribute übernehmen...
-            //       aber wie löse ich die Ref-Attribute auf, wenn ich zu dem Zeitpunkt die
-            //       Interfaces noch nicht alle als Core-Interface habe???
-            //       Wichtig ist auch, dass die Reihenfolge der Attribute exakt erhalten bleiben muss!
+            // Info: Ref-Attribute werden im Postprocessing aufgelöst.            
         }
 
         ///
