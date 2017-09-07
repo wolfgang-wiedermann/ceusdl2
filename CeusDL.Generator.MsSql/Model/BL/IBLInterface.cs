@@ -17,6 +17,7 @@ namespace KDV.CeusDL.Model.BL {
         IBLAttribute HistoryAttribute { get; }
         bool IsMandant { get; }
         List<IBLAttribute> PrimaryKeyAttributes { get; }
+        List<IBLAttribute> UniqueKeyAttributes { get; }
         int MaxReferenceDepth { get; }
         BLModel ParentModel { get; }
 

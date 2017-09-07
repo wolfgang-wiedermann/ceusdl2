@@ -34,8 +34,10 @@ namespace KDV.CeusDL.Model.BL {
 
         public BLModel ParentModel { get; private set; }
 
-        #endregion       
-        
+        public List<IBLAttribute> UniqueKeyAttributes => throw new NotImplementedException();
+
+        #endregion
+
         public BLInterfaceMock() {
         } 
 

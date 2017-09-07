@@ -58,7 +58,17 @@ namespace KDV.CeusDL.Model.BL {
             }
         }
 
-        public List<IBLAttribute> PrimaryKeyAttributes => throw new NotImplementedException();
+        public List<IBLAttribute> PrimaryKeyAttributes {
+            get {
+                return this.Attributes.Where(a => a.IsPrimaryKey).ToList<IBLAttribute>();
+            }
+        }
+
+        public List<IBLAttribute> UniqueKeyAttributes {
+            get {
+                return this.Attributes.Where(a => a.IsPartOfUniqueKey).ToList<IBLAttribute>();
+            }
+        }
 
         public int MaxReferenceDepth => throw new NotImplementedException();
 

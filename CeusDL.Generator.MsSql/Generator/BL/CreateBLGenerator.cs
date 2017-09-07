@@ -19,10 +19,22 @@ namespace KDV.CeusDL.Generator.BL {
             // TODO: Das ist so natürlich noch nicht der Weisheit letzter Schluss
             //       Reihenfolge in Zukunft: 1. Def-Interfaces, 2. Dim-Interfaces, 3. Fact-Interfaces
             //       Intern sortiert nach MaxReferenceDepth aufsteigend.
-            foreach(var ifa in model.Interfaces) {
-                if(ifa.InterfaceType == CoreInterfaceType.DEF_TABLE || ifa.InterfaceType == CoreInterfaceType.TEMPORAL_TABLE) {
-                    code += GenerateDefTable(ifa);
-                }
+            foreach(var ifa in model.Interfaces.Where(i => i.InterfaceType == CoreInterfaceType.DEF_TABLE || i.InterfaceType == CoreInterfaceType.TEMPORAL_TABLE)) {
+                code += GenerateDefTable(ifa);                
+            }
+
+            foreach(var ifa in model.Interfaces.Where(i => i.InterfaceType == CoreInterfaceType.DIM_VIEW)) {
+                code += "/*\n";
+                code += GenerateDefTable(ifa).Indent(" * ");                
+                code += " */\n\n";
+            }
+
+            foreach(var ifa in model.Interfaces.Where(i => i.InterfaceType == CoreInterfaceType.DIM_TABLE)) {                
+                code += GenerateDefTable(ifa);                                
+            }
+
+            foreach(var ifa in model.Interfaces.Where(i => i.InterfaceType == CoreInterfaceType.FACT_TABLE)) {                
+                code += GenerateDefTable(ifa);                                
             }
 
             var result = new List<GeneratorResult>();
@@ -32,19 +44,33 @@ namespace KDV.CeusDL.Generator.BL {
 
         private string GenerateDefTable(IBLInterface ifa)
         {
+            // Create Table
             string code = $"create table {ifa.FullName} (\n";
             foreach(var attr in ifa.Attributes) {
-                code += GenerateAttribute(attr).Indent("    ");
+                code += GenerateAttribute(attr, ifa).Indent("    ");
                 code += "\n";
             }
-            code += ")\n\n";
+            code += ");\n\n";
+
+            // Create Unique-Key-Constraint
+            code += $"alter table {ifa.FullName} \n";
+            code += $"add constraint {ifa.Name}_UK unique nonclustered (\n";
+            foreach(var attr in ifa.UniqueKeyAttributes) {
+                code += $"    {attr.Name} ASC";
+                if(ifa.UniqueKeyAttributes.Last() != attr) {
+                    code += ",";
+                }
+                code += "\n";
+            }            
+            code += ");\n\n";
+
             return code;
         }
 
-        private string GenerateAttribute(IBLAttribute attr)
+        private string GenerateAttribute(IBLAttribute attr, IBLInterface ifa)
         {
             string code = $"{attr.Name} {attr.GetSqlDataTypeDefinition()}";
-            if(model.Interfaces.Last() != attr) {
+            if(ifa.Attributes.Last() != attr) {
                 code += ", ";
             }            
             return code;
