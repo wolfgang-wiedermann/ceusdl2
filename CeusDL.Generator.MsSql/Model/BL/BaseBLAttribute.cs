@@ -76,7 +76,17 @@ namespace KDV.CeusDL.Model.BL {
         }
 
         public IBLInterface ParentInterface { get; private set; }
-        
+
+        public int SortId {
+            get {
+                if(this.coreAttribute.IsPrimaryKey) {
+                    return 1;
+                } else {
+                    return 50;
+                }
+            }
+        }
+
         #endregion
 
         public BaseBLAttribute(CoreBaseAttribute coreAttribute, IBLInterface parentInterface) {                        

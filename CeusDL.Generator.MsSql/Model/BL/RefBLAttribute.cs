@@ -79,8 +79,18 @@ namespace KDV.CeusDL.Model.BL {
         public IBLInterface ParentInterface { get; private set; }        
 
         // WICHTIG: Wird erst im PostProcessing gesetzt !!!
-        public IBLAttribute ReferencedAttribute { get; private set; } 
-        
+        public IBLAttribute ReferencedAttribute { get; private set; }
+
+        public int SortId {
+            get {
+                if(this.coreAttribute.IsPrimaryKey) {
+                    return 1;
+                } else {
+                    return 50;
+                }
+            }
+        }
+
         #endregion
 
         public RefBLAttribute(CoreRefAttribute coreAttribute, IBLInterface parentInterface) {

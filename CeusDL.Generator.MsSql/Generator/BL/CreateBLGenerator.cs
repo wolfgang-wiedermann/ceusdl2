@@ -14,34 +14,44 @@ namespace KDV.CeusDL.Generator.BL {
         }
 
         public List<GeneratorResult> GenerateCode() {
+            var result = new List<GeneratorResult>();
+            result.Add(new GeneratorResult("BL_Create.sql", GenerateCreateTables()));
+            result.Add(new GeneratorResult("BL_Create_FKs.sql", GenerateAllForeignKeyConstraints()));
+            return result;
+        }
+
+        private string GenerateCreateTables() {
             string code = "--\n-- BaseLayer \n--\n";
+            
+            if(!string.IsNullOrEmpty(model.Config.BLDatabase)) {
+                code += $"\nuse {model.Config.BLDatabase};\n\n";
+            }
 
             // TODO: Das ist so natürlich noch nicht der Weisheit letzter Schluss
-            //       Reihenfolge in Zukunft: 1. Def-Interfaces, 2. Dim-Interfaces, 3. Fact-Interfaces
-            //       Intern sortiert nach MaxReferenceDepth aufsteigend.
-            foreach(var ifa in model.Interfaces.Where(i => i.InterfaceType == CoreInterfaceType.DEF_TABLE || i.InterfaceType == CoreInterfaceType.TEMPORAL_TABLE)) {
+            //       Reihenfolge in Zukunft: Intern sortiert nach MaxReferenceDepth aufsteigend.
+            foreach(var ifa in model.DefTableInterfaces) {
                 code += GenerateDefTable(ifa);                
             }
 
-            foreach(var ifa in model.Interfaces.Where(i => i.InterfaceType == CoreInterfaceType.DIM_VIEW)) {
+            foreach(var ifa in model.DimViewInterfaces) {
                 code += "/*\n";
                 code += GenerateDefTable(ifa).Indent(" * ");                
                 code += " */\n\n";
             }
 
-            foreach(var ifa in model.Interfaces.Where(i => i.InterfaceType == CoreInterfaceType.DIM_TABLE)) {                
+            foreach(var ifa in model.DimTableInterfaces) {                
                 code += GenerateDefTable(ifa);                                
             }
 
-            foreach(var ifa in model.Interfaces.Where(i => i.InterfaceType == CoreInterfaceType.FACT_TABLE)) {                
+            foreach(var ifa in model.FactTableInterfaces) {                
                 code += GenerateDefTable(ifa);                                
             }
-
-            var result = new List<GeneratorResult>();
-            result.Add(new GeneratorResult("BL_Create.sql", code));
-            return result;
+            
+            return code;
         }
 
+        // Wird derzeit nicht nur für DefTables verwendet sondern für alle!!!
+        // d.h. sollte evtl. umbenannt werden.
         private string GenerateDefTable(IBLInterface ifa)
         {
             // Create Table
@@ -72,6 +82,73 @@ namespace KDV.CeusDL.Generator.BL {
             string code = $"{attr.Name} {attr.GetSqlDataTypeDefinition()}";
             if(ifa.Attributes.Last() != attr) {
                 code += ", ";
+            }            
+            return code;
+        }
+
+        // Alle Foreign-Key-Constraints für die Interfaces des Models generieren
+        private string GenerateAllForeignKeyConstraints()
+        {
+            string code = "-- TODO: Generierung der FK-Constraints umsetzen\n";
+            foreach(var ifa in model.Interfaces.Where(i => i.Attributes.Where(a => a is RefBLAttribute).Count() > 0)) {
+                code += GenerateForeignKeyConstraints(ifa);
+            }
+            return code;
+        }
+
+        // Foreign-Key-Constraints für ein einzelnes Interface generieren
+        private string GenerateForeignKeyConstraints(IBLInterface ifa)
+        {
+            string code = $"-- FKs von {ifa.FullName}\n--\n\n";
+            // Nur die Ref-Attribute durchlaufen
+            foreach(var attr in ifa.Attributes.Where(a => a is RefBLAttribute)) {
+                var refAttr = (RefBLAttribute)attr;                
+                // Wir legen keine FKs für Beziehungen zwischen Faktentabellen an, das bremst zu viel
+                // außerdem legen wir auch keine FKs zu DimViews an.
+                if(refAttr.ReferencedAttribute.ParentInterface.InterfaceType != CoreInterfaceType.FACT_TABLE
+                    && refAttr.ReferencedAttribute.ParentInterface.InterfaceType != CoreInterfaceType.DIM_VIEW) {
+                    code += GenerateSingleForeignKeyConstraint(refAttr);
+                }
+            }
+            code += "\n";
+            return code;
+        }
+
+        // Einzelnes Foreign-Key-Constraint anlegen
+        private string GenerateSingleForeignKeyConstraint(RefBLAttribute attr)
+        {                        
+            string code = $"alter table {attr.ParentInterface.FullName}\n";
+            code += $"add constraint {attr.ParentInterface.Name}_{attr.Name}_FK\n";
+            // TODO: Wenn das Ganze mit Mandant ist dann kommt hier der Mandant mit rein, 
+            //       und bei Historisierung zusätzlich noch das Historisierungsattribut ... 
+            //       (wenn auf beiden Seiten unterstützt!)
+            if(attr.ParentInterface.IsMandant && attr.ReferencedAttribute.ParentInterface.IsMandant) {
+                var attrNames = new List<string>();
+                attrNames.Add("Mandant_KNZ");
+                attrNames.Add(attr.Name);                                
+
+                code += "foreign key (";
+                foreach(var attrName in attrNames) {
+                    code += attrName;
+                    if(attrName != attrNames.Last()) {
+                        code += ", ";
+                    }
+                }
+
+                code += ")\n"; 
+                
+                var attrNames2 = attr.ReferencedAttribute.ParentInterface.UniqueKeyAttributes.Select(a => a.Name);
+                code += $"references {attr.ReferencedAttribute.ParentInterface.Name} (";                
+                foreach(var attrName in attrNames2) {
+                    code += attrName;
+                    if(attrName != attrNames2.Last()) {
+                        code += ", ";
+                    }
+                }                
+                code += ");\n\n";
+            } else {
+                code += $"foreign key ({attr.Name})\n"; 
+                code += $"references {attr.ReferencedAttribute.ParentInterface.Name} ({attr.ReferencedAttribute.Name});\n\n";
             }            
             return code;
         }

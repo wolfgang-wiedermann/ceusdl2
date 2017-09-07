@@ -110,6 +110,7 @@ namespace CeusDL2
 
             // BL generieren
             ExecuteStep(new CreateBLGenerator(model), GENERATED_SQL);
+            ExecuteStep(new DropBLGenerator(model), GENERATED_SQL);
             // TODO: BL, BT und AL generieren
         }
 

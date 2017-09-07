@@ -17,6 +17,7 @@ namespace KDV.CeusDL.Model.BL {
         bool IsIdentity { get; }
         bool IsPartOfUniqueKey { get; } // Markiert den Original-PK aus dem Quellsystem!
         IBLInterface ParentInterface { get; }
+        int SortId { get; } // Sortier-ID z. B. für den UniqueKey
 
         #endregion Properties
         #region Methods

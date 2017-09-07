@@ -8,6 +8,39 @@ namespace KDV.CeusDL.Model.BL {
     public class BLModel
     {
         public List<IBLInterface> Interfaces { get; private set; }
+
+        public List<IBLInterface> DefTableInterfaces { 
+            get {
+                return Interfaces
+                    .Where(i => i.InterfaceType == CoreInterfaceType.DEF_TABLE || i.InterfaceType == CoreInterfaceType.TEMPORAL_TABLE)
+                    .ToList<IBLInterface>();
+            } 
+        }
+
+        public List<IBLInterface> DimTableInterfaces { 
+            get {
+                return Interfaces
+                    .Where(i => i.InterfaceType == CoreInterfaceType.DIM_TABLE)
+                    .ToList<IBLInterface>();
+            } 
+        }
+
+        public List<IBLInterface> DimViewInterfaces { 
+            get {
+                return Interfaces
+                    .Where(i => i.InterfaceType == CoreInterfaceType.DIM_VIEW)
+                    .ToList<IBLInterface>();
+            } 
+        }
+
+        public List<IBLInterface> FactTableInterfaces { 
+            get {
+                return Interfaces
+                    .Where(i => i.InterfaceType == CoreInterfaceType.FACT_TABLE)
+                    .ToList<IBLInterface>();
+            } 
+        }
+
         public BLConfig Config { get; private set; }
 
         public BLModel(CoreModel coreModel) {

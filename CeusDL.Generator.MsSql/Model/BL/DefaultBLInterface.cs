@@ -66,7 +66,10 @@ namespace KDV.CeusDL.Model.BL {
 
         public List<IBLAttribute> UniqueKeyAttributes {
             get {
-                return this.Attributes.Where(a => a.IsPartOfUniqueKey).ToList<IBLAttribute>();
+                return this.Attributes
+                    .Where(a => a.IsPartOfUniqueKey)
+                    .OrderBy(a => a.SortId)
+                    .ToList<IBLAttribute>();
             }
         }
 
