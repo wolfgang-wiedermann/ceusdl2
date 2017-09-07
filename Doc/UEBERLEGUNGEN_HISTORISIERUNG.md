@@ -9,8 +9,10 @@ Zeiteinheiten mit definierten 1-n-Abhängigkeiten geben darf.
 Beispiel für mehrere Zeiteinheiten:
 -----------------------------------
 
+```
 Bewerbung -> Faktentabelle     -> mit tagesbezogener Historie
 Fakultaet -> Dimensionstabelle -> mit semesterbezogener Historie
+```
 
 Hier ist die Herausforderung, im SQL bei der Entscheidung "geändert (ja/nein)" -> "historisieren"
 den in der Datenlieferung enthaltenen Tag in ein Semester aufzulösen. Das ist jetzt am
@@ -32,8 +34,10 @@ diese Mehrdeutigkeiten ggf. wieder nach einem immer gleichen Muster auflöst)
 Beispiel für mit einer Zeiteinheit:
 -----------------------------------
 
+```
 Bewerbung -> Faktentabelle     -> mit tagesbezogener Historie
 Fakultaet -> Dimensionstabelle -> mit tagesbezogener Historie
+```
 
 Vorteil, hier ist keine rekursive Auflösung der feinsten Zeiteinheit
 in möglicherweise gröbere erforderlich.
