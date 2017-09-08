@@ -3,7 +3,7 @@
 //
 
 // Sollte nicht DimTable sondern DimTable heißen...
-interface StudiengangHisInOne : DimTable(mandant="true") {
+interface StudiengangHisInOne : DimTable(mandant="true", history="true") {
     // Standard-Attributfelder
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");

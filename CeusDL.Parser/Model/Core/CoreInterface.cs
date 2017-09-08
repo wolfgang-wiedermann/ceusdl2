@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using KDV.CeusDL.Parser.TmpModel;
@@ -29,8 +30,7 @@ namespace KDV.CeusDL.Model.Core {
 
         public CoreInterface(TmpInterface tmp, CoreModel model) {
             coreModel = model;
-            BaseData = tmp;
-            HistoryBy = null;
+            BaseData = tmp;            
             Name = tmp.Name;                        
             FormerName = null;
             Type = ToInterfaceType(tmp.Type);
@@ -48,7 +48,7 @@ namespace KDV.CeusDL.Model.Core {
             if(tmp.Parameters != null && tmp.Parameters.Where(p => p.Name == "with_nowtable" && p.Value == "true").Count() > 0) {
                 IsWithNowTable = true;
             }
-            if(tmp.Parameters != null && tmp.Parameters.Where(p => p.Name == "history" && !string.IsNullOrEmpty(p.Value)).Count() > 0) {
+            if(tmp.Parameters != null && tmp.Parameters.Where(p => p.Name == "history" && p.Value == "true").Count() > 0) {
                 IsHistorized = true;
             }
 
@@ -130,17 +130,32 @@ namespace KDV.CeusDL.Model.Core {
         }
 
         internal void PostProcess() {
-            if(BaseData.Parameters != null && BaseData.Parameters.Where(a => a.Name == "history").Count() > 0) {
-                var history = BaseData.Parameters.Where(a => a.Name == "history").First();
-                HistoryBy = coreModel.GetAttributeByName(history.Value);
-
-                // Prüfen ob das gefundene Historienattribut auch aus einer TemporalTable stammt!
-                if(HistoryBy.ParentInterface.Type != CoreInterfaceType.TEMPORAL_TABLE) {
-                    throw new InvalidParameterException($"Fehler in Interface {Name}: Historisierung ist nur auf der Basis von TemporalTables möglich");
-                }
-            }
             foreach(var attr in Attributes) {
                 attr.PostProcess();
+            }
+
+            // Bei historisierten Fakt-Tabellen wird das Ref-Attribut, das auf das finest_time_attribute zeigt
+            // und kein Alias hat als Basis-Attribut für die Historisierung ausgewählt.
+            // bei allen anderen bleibt der Wert von HistoryBy == null
+            if(IsHistorized && this.Type == CoreInterfaceType.FACT_TABLE) {                
+                var historyByInterface = coreModel.Interfaces.Where(i => i.IsFinestTime).First();
+
+                try {
+                    HistoryBy = Attributes
+                        .Where(a => a is CoreRefAttribute)
+                        .Select(a => (CoreRefAttribute)a)
+                        .Where(a => a?.ReferencedInterface?.Name == historyByInterface.Name && string.IsNullOrEmpty(a.Alias))
+                        .First();
+                } catch(Exception ex) {
+                    throw new InvalidParameterException("Fehler in Interface {Name}: Historisierung ist nur Möglich, "
+                        +"wenn das finest_time_attribute aus dem historisierten Interface referenziert wird (ohne Alias!). "
+                        +$"{ex.Message}");
+                }
+
+                // Prüfen ob das gefundene Historienattribut auch aus einer TemporalTable stammt!
+                if(historyByInterface.Type != CoreInterfaceType.TEMPORAL_TABLE) {
+                    throw new InvalidParameterException($"Fehler in Interface {Name}: Historisierung ist nur auf der Basis von TemporalTables möglich");
+                }
             }
         }
     }

@@ -135,7 +135,7 @@ interface JaNein : DefTable {
 // Fakten-Tabellen
 //
 
-interface Bewerber : FactTable(mandant="true", history="Tag.KNZ", with_nowtable="true") {    
+interface Bewerber : FactTable(mandant="true", history="true", with_nowtable="true") {    
     // Attribute
     base Bewerbernummer:varchar(len="20", primary_key="true");
     ref Tag.KNZ(primary_key="true");
@@ -171,7 +171,7 @@ interface Bewerber : FactTable(mandant="true", history="Tag.KNZ", with_nowtable=
     fact Alter_F:int(calculated="true"); // Beispiel für ein erstes Calculated-Fakt
 }
 
-interface Antrag : FactTable(mandant="true", history="Tag.KNZ", with_nowtable="true") {
+interface Antrag : FactTable(mandant="true", history="true", with_nowtable="true") {
     // Attribute
     base Antragsnummer:varchar(len="20", primary_key="true");    
     ref Tag.KNZ(primary_key="true"); 

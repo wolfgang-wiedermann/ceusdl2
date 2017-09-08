@@ -310,7 +310,7 @@ interface JaNein : DefTable {
 //
 
 interface Bewerber : FactTable(mandant="true", 
-                               history="Tag.KNZ", 
+                               history="true", 
                                with_nowtable="true") 
 {
     // Attribute
@@ -345,7 +345,7 @@ interface Bewerber : FactTable(mandant="true",
     fact HZBNote_F:decimal(len="3,2");
 }
 
-interface Antrag : FactTable(mandant="true", history="Tag.KNZ", with_nowtable="true") {
+interface Antrag : FactTable(mandant="true", history="true", with_nowtable="true") {
     // Attribute
     base Antragsnummer:varchar(len="20", primary_key="true");    
     ref Tag.KNZ(primary_key="true"); 

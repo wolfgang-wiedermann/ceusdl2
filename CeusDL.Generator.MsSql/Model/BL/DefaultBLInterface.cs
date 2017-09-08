@@ -77,6 +77,8 @@ namespace KDV.CeusDL.Model.BL {
             get {
                 IBLInterface ifa = this;
                 if(ifa.Attributes.Where(a => a is RefBLAttribute).Count() > 0) {
+                    // TODO: Achtung, das ist schöner Code, berücksichtigt aber nicht
+                    //       das Problem einer möglichen Endlos-Rekursion durch zyklische Referenzen
                     return ifa.Attributes
                         .Where(a => a is RefBLAttribute)
                         .Select(a => ((RefBLAttribute)a).ReferencedAttribute.ParentInterface)

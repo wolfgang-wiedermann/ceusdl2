@@ -27,34 +27,33 @@ namespace KDV.CeusDL.Generator.BL {
                 code += $"\nuse {model.Config.BLDatabase};\n\n";
             }
 
-            // TODO: Das ist so natürlich noch nicht der Weisheit letzter Schluss
-            //       Reihenfolge in Zukunft: Intern sortiert nach MaxReferenceDepth aufsteigend.
             foreach(var ifa in model.DefTableInterfaces.OrderBy(i => i.MaxReferenceDepth)) {
-                code += GenerateDefTable(ifa);                
+                code += GenerateBLTable(ifa);
+                code += GenerateUniqueKeyConstraint(ifa);             
             }
 
             foreach(var ifa in model.DimViewInterfaces.OrderBy(i => i.MaxReferenceDepth)) {
                 code += "/*\n";
-                code += GenerateDefTable(ifa).Indent(" * ");                
+                code += GenerateBLTable(ifa).Indent(" * ");                
                 code += " */\n\n";
             }
 
             foreach(var ifa in model.DimTableInterfaces.OrderBy(i => i.MaxReferenceDepth)) {                
-                code += GenerateDefTable(ifa);  
+                code += GenerateBLTable(ifa);  
+                code += GenerateUniqueKeyConstraint(ifa);
                 //TODO: code += GenerateDimView(ifa);                              
             }
 
             foreach(var ifa in model.FactTableInterfaces.OrderBy(i => i.MaxReferenceDepth)) {                
-                code += GenerateDefTable(ifa);                                
+                code += GenerateBLTable(ifa);
+                code += GenerateUniqueKeyConstraint(ifa);                     
                 //TODO: code += GenerateFactView(ifa);
             }
             
             return code;
         }
 
-        // Wird derzeit nicht nur für DefTables verwendet sondern für alle!!!
-        // d.h. sollte evtl. umbenannt werden.
-        private string GenerateDefTable(IBLInterface ifa)
+        private string GenerateBLTable(IBLInterface ifa)
         {
             // Create Table
             string code = $"create table {ifa.FullName} (\n";
@@ -63,9 +62,12 @@ namespace KDV.CeusDL.Generator.BL {
                 code += "\n";
             }
             code += ");\n\n";
+            return code;
+        }
 
+        private string GenerateUniqueKeyConstraint(IBLInterface ifa) {
             // Create Unique-Key-Constraint
-            code += $"alter table {ifa.FullName} \n";
+            var code = $"alter table {ifa.FullName} \n";
             code += $"add constraint {ifa.Name}_UK unique nonclustered (\n";
             foreach(var attr in ifa.UniqueKeyAttributes) {
                 code += $"    {attr.Name} ASC";
@@ -75,7 +77,6 @@ namespace KDV.CeusDL.Generator.BL {
                 code += "\n";
             }            
             code += ");\n\n";
-
             return code;
         }
 
@@ -91,7 +92,12 @@ namespace KDV.CeusDL.Generator.BL {
         // Alle Foreign-Key-Constraints für die Interfaces des Models generieren
         private string GenerateAllForeignKeyConstraints()
         {
-            string code = "-- TODO: Generierung der FK-Constraints umsetzen\n";
+            string code = "--\n-- FK-Constraints\n--\n";
+
+            if(!string.IsNullOrEmpty(model.Config.BLDatabase)) {
+                code += $"\nuse {model.Config.BLDatabase};\n\n";
+            }
+            
             foreach(var ifa in model.Interfaces.Where(i => i.Attributes.Where(a => a is RefBLAttribute).Count() > 0)) {
                 code += GenerateForeignKeyConstraints(ifa);
             }

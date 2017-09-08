@@ -64,7 +64,7 @@ namespace KDV.CeusDL.Generator.CeusDL
                 }                
                 if(ifa.IsHistorized) {
                     dirty = true;
-                    code += $"history=\"{ifa.HistoryBy.ParentInterface.Name}.{ifa.HistoryBy.Name}\"";
+                    code += "history=\"true\"";
                 }
                 if(dirty) {
                     code += ", ";

@@ -37,7 +37,7 @@ namespace KDV.CeusDL.Model.BL {
                 ParentInterface = parentInterface,
                 SortId = 1
             };            
-        }
+        }    
 
         ///
         /// Generiert ein neues T_Modifikation-Attribut
@@ -127,6 +127,25 @@ namespace KDV.CeusDL.Model.BL {
         }
 
         ///
+        /// Generiert ein neues T_Gueltig_Bis-Attribut
+        ///
+        public static IBLAttribute GetNewTGueltigBisAttribute(IBLInterface parentInterface, IBLInterface timeInterface) {
+            // 1. Das Primärschlüssel-Attribut (z. B. KNZ) aus dem FinestTimeInterface ermitteln.
+            var timeAttribute = timeInterface.UniqueKeyAttributes.Where(a => a.Name != "Mandant_KNZ").First();
+            // 2. Custom-Attribut bauen.
+            return new CustomBLAttribute() {
+                Name = "T_Gueltig_Bis_Dat",
+                FullName = $"{parentInterface.Name}.T_Gueltig_Bis_Dat",
+                DataType = timeAttribute.DataType,
+                Length = timeAttribute.Length,
+                Decimals = timeAttribute.Decimals,
+                IsPartOfUniqueKey = true,              
+                ParentInterface = parentInterface,
+                SortId = 106
+            };            
+        }
+
+        ///
         /// Generiert ein neues T_Ladelauf_NR-Attribut
         ///
         public static IBLAttribute GetNewTLadelaufNRAttribute(IBLInterface parentInterface) {
@@ -136,7 +155,7 @@ namespace KDV.CeusDL.Model.BL {
                 DataType = CoreDataType.INT,                
                 IsNotNull = true,
                 ParentInterface = parentInterface,
-                SortId = 106
+                SortId = 107
             };            
         }                  
         #endregion
