@@ -83,7 +83,7 @@ namespace KDV.CeusDL.Model.BL
         public void PostProcess()
         {            
             foreach(var attr in this.Attributes) {
-                attr.PostProcess();
+                attr.PostProcess();                
             }
         }
 
@@ -127,7 +127,8 @@ namespace KDV.CeusDL.Model.BL
             this.Attributes.Add(CustomBLAttribute.GetNewTBemerkungAttribute(this));
             this.Attributes.Add(CustomBLAttribute.GetNewTBenutzerAttribute(this));                
             this.Attributes.Add(CustomBLAttribute.GetNewTSystemAttribute(this));                    
-            this.Attributes.Add(CustomBLAttribute.GetNewTGueltigBisAttribute(this, this.ParentModel.FinestTimeAttribute));
+            this.HistoryAttribute = CustomBLAttribute.GetNewTGueltigBisAttribute(this, this.ParentModel.FinestTimeAttribute);
+            this.Attributes.Add(this.HistoryAttribute);            
             this.Attributes.Add(CustomBLAttribute.GetNewTErstDatAttribute(this));
             this.Attributes.Add(CustomBLAttribute.GetNewTAendDatAttribute(this));
             this.Attributes.Add(CustomBLAttribute.GetNewTLadelaufNRAttribute(this));   
