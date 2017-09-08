@@ -71,3 +71,8 @@ Dieses Vorgehen hat neben klaren Performance-Vorteilen auch eine Vereinfachung d
 die aktuelle Werte enthalten in Microstrategy zur Folge.
 
 (Das Feature ist bei CEUS AP schon positiv erprobt worden)
+
+__Wichtig:__ im Gegensatz zum Prototypen sollte in dieser Implementierung die Tabellenstruktur
+der Now-Table wirklich 1:1 gleich zur historisierten Tabelle sein (nur die Fakten sollten mit \_NOW\_ gekennzeichnet sein). 
+D.h. die Tabelle sollte auch das Zeit-Attribut enthalten, denn nur so kann man in den
+Berichten auch vernünftig anzeigen, von welchem Zeitpunkt die "aktuellen" Daten denn sind.
