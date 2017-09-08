@@ -68,7 +68,7 @@ Interface-Attribute
 Interfaces bestehen intern aus Attributen (siehe folgendes Beispiel):
 
 ```
-interface Antrag : FactTable(mandant="true", history="Tag.KNZ") {
+interface Antrag : FactTable(mandant="true", history="true") {
     // Attribute
     base Antragsnummer:varchar(primary_key="true", len="20");   
     ref  Tag.KNZ(primary_key="true");

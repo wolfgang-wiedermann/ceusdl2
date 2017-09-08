@@ -45,18 +45,25 @@ in möglicherweise gröbere erforderlich.
 Grundsätzliche Überlegungen zur Datenmodellseitigen Umsetzung der Historisierung
 ================================================================================
 
+Grundsätzlich können nur DimTable und FactTable historisiert werden. Die anderen Interface-Typen
+unterstützen keine Historisierung!
+
 In CEUSDL wird generell das Konzept verfolgt, dass es zu jedem historisierten Attribut
 auch eine nicht historisierte Version geben muss, um auch in Microstrategy-Berichten
 immer sauber die Kontinuität von gleichen aber inhaltlich leicht veränderten Entitäten
 darstellen zu können.
 
-D.h. es gibt von einem interface mit history="true" oder history="Tag.KNZ" immer eine Tabelle
+D.h. es gibt von einem interface mit history="true" immer eine Tabelle
 mit logisch aktualisierten Einträgen und eine Tabelle, die alle bisher gültigen Versionen
 zu einem solchen Eintrag vorhält.
 
 __Beispiel: Studiengang__
 
-SP\_BL\_D\_Studiengang (Fortschreibung) -> SP\_BL\_DV\_Studiengang (Versionierung)
+SP\_BL\_D\_Studiengang (Fortschreibung) -> SP\_BL\_D\_Studiengang_VERSION (Versionierung)
+
+Beim Verhalten gibt es hier __unterschiede zwischen DimTable und FactTable__. Während bei DimTables
+das finest\_time\_attribute nicht im Interface referenziert sein darf muss es in FactTables
+ohne Angabe eines Alias als zusätzliches Primärschlüsselattribut enthalten sein.
 
 Überlegungen zur Historisierung von Faktentabellen
 ==================================================
