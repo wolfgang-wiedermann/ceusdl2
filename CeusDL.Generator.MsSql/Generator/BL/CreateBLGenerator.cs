@@ -29,22 +29,24 @@ namespace KDV.CeusDL.Generator.BL {
 
             // TODO: Das ist so natürlich noch nicht der Weisheit letzter Schluss
             //       Reihenfolge in Zukunft: Intern sortiert nach MaxReferenceDepth aufsteigend.
-            foreach(var ifa in model.DefTableInterfaces) {
+            foreach(var ifa in model.DefTableInterfaces.OrderBy(i => i.MaxReferenceDepth)) {
                 code += GenerateDefTable(ifa);                
             }
 
-            foreach(var ifa in model.DimViewInterfaces) {
+            foreach(var ifa in model.DimViewInterfaces.OrderBy(i => i.MaxReferenceDepth)) {
                 code += "/*\n";
                 code += GenerateDefTable(ifa).Indent(" * ");                
                 code += " */\n\n";
             }
 
-            foreach(var ifa in model.DimTableInterfaces) {                
-                code += GenerateDefTable(ifa);                                
+            foreach(var ifa in model.DimTableInterfaces.OrderBy(i => i.MaxReferenceDepth)) {                
+                code += GenerateDefTable(ifa);  
+                //TODO: code += GenerateDimView(ifa);                              
             }
 
-            foreach(var ifa in model.FactTableInterfaces) {                
+            foreach(var ifa in model.FactTableInterfaces.OrderBy(i => i.MaxReferenceDepth)) {                
                 code += GenerateDefTable(ifa);                                
+                //TODO: code += GenerateFactView(ifa);
             }
             
             return code;

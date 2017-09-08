@@ -73,7 +73,19 @@ namespace KDV.CeusDL.Model.BL {
             }
         }
 
-        public int MaxReferenceDepth => throw new NotImplementedException();
+        public int MaxReferenceDepth {
+            get {
+                IBLInterface ifa = this;
+                if(ifa.Attributes.Where(a => a is RefBLAttribute).Count() > 0) {
+                    return ifa.Attributes
+                        .Where(a => a is RefBLAttribute)
+                        .Select(a => ((RefBLAttribute)a).ReferencedAttribute.ParentInterface)
+                        .Max(a => a.MaxReferenceDepth)+1;
+                } else {
+                    return 0;
+                }
+            }
+        }
 
         public BLModel ParentModel { get; private set; }
 
