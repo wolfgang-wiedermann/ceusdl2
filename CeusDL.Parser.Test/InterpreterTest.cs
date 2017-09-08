@@ -44,7 +44,7 @@ namespace KDV.CeusDL.Parser.Test {
             if(!b.IsHistorized) {
                 throw new Exception("ERROR: Das Interfaces Bewerber ist definitiv nach Tag.KNZ historisiert.");
             }
-            if(!b.HistoryBy.ParentInterface.Name.Equals("Tag")) {
+            if(!((CoreRefAttribute)b.HistoryBy).ReferencedInterface.Name.Equals("Tag")) {
                 throw new Exception("ERROR: Das Interfaces Bewerber ist definitiv nach Tag.KNZ historisiert.");
             }
             
