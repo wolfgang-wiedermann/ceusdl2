@@ -61,5 +61,45 @@ namespace KDV.CeusDL.Model.BL.Test
             Assert.IsFalse(attr.IsIdentity);
             Assert.IsFalse(attr.IsPrimaryKey);        
         }
+
+        [TestMethod]
+        public void TestDefaultBLInterface_ILInterface()
+        {
+            // Daten einlesen...
+            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo2.1.ceusdl";
+            var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
+            var p = new FileParser(data);
+            var result = p.Parse();            
+            var model = new CoreModel(result);
+
+            // Auswählen
+            var coreIfa = model.Interfaces[0];
+            var coreAttr = coreIfa.Attributes[0];
+
+            // in DefaultBLInterface konvertieren
+            var blIfa = new DefaultBLInterface(coreIfa, null);
+            Assert.IsNotNull(blIfa.GetILInterface());
+            Assert.AreEqual("AP_IL_StudiengangHisInOne", blIfa.GetILInterface().Name);
+            
+            IBLAttribute attr = blIfa.Attributes[0];
+
+            // Inhalt des 0. Attributs überprüfen
+            Assert.AreEqual("StudiengangHisInOne_ID", attr.Name);
+            Assert.IsNull(attr.GetILAttribute());
+
+            attr = blIfa.Attributes[1];
+
+            // Inhalt des 1. Attributs überprüfen
+            Assert.AreEqual("StudiengangHisInOne_KNZ", attr.Name);
+            Assert.IsNotNull(attr.GetILAttribute());
+            Assert.AreEqual("StudiengangHisInOne_KNZ", attr.GetILAttribute().Name);
+            
+            attr = blIfa.Attributes[2];
+
+            // Inhalt des 2. Attributs überprüfen
+            Assert.AreEqual("StudiengangHisInOne_KURZBEZ", attr.Name);
+            Assert.IsNotNull(attr.GetILAttribute());            
+            Assert.AreEqual("StudiengangHisInOne_KURZBEZ", attr.GetILAttribute().Name);
+        }
     }
 }

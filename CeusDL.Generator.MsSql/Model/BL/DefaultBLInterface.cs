@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 
 using KDV.CeusDL.Model.Core;
+using KDV.CeusDL.Model.IL;
 
 namespace KDV.CeusDL.Model.BL {
     public class DefaultBLInterface : IBLInterface
     {   
         #region Private Attributes
         internal CoreInterface coreInterface = null;
+        internal IL.ILInterface ilInterface = null;
 
         #endregion
         #region Public Properties
@@ -168,6 +170,14 @@ namespace KDV.CeusDL.Model.BL {
             foreach(var attr in Attributes) {
                 attr.PostProcess();
             } 
+        }
+
+        public ILInterface GetILInterface()
+        {
+            if(ilInterface == null) {
+                ilInterface = new IL.ILInterface(this.coreInterface, this.coreInterface.CoreModel);
+            }
+            return ilInterface;
         }
 
         #endregion

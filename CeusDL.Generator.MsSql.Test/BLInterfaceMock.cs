@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using KDV.CeusDL.Model.Core;
+using KDV.CeusDL.Model.IL;
 
 namespace KDV.CeusDL.Model.BL {
     public class BLInterfaceMock : IBLInterface
@@ -46,6 +47,11 @@ namespace KDV.CeusDL.Model.BL {
             foreach(var attr in Attributes) {
                 attr.PostProcess();
             } 
-        }        
+        }
+
+        public ILInterface GetILInterface()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -24,6 +24,13 @@ namespace KDV.CeusDL.Model.Core {
                                   .ToList<CoreAttribute>();
             }
         }
+
+        public CoreModel CoreModel { 
+            get { 
+                return this.coreModel; 
+            }
+        }
+
         protected CoreModel coreModel;
         protected TmpInterface BaseData {get;set;}
         public string WhitespaceBefore { get; set; }

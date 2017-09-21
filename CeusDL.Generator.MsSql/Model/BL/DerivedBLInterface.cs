@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using KDV.CeusDL.Model.Core;
+using KDV.CeusDL.Model.IL;
 
 namespace KDV.CeusDL.Model.BL
 {
@@ -132,6 +133,11 @@ namespace KDV.CeusDL.Model.BL
             this.Attributes.Add(CustomBLAttribute.GetNewTErstDatAttribute(this));
             this.Attributes.Add(CustomBLAttribute.GetNewTAendDatAttribute(this));
             this.Attributes.Add(CustomBLAttribute.GetNewTLadelaufNRAttribute(this));   
+        }
+
+        public ILInterface GetILInterface()
+        {
+            return DefaultInterface.GetILInterface();
         }
 
         #endregion

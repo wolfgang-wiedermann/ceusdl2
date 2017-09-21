@@ -18,13 +18,16 @@ namespace KDV.CeusDL.Model.BL {
         bool IsPartOfUniqueKey { get; } // Markiert den Original-PK aus dem Quellsystem!
         bool IsTechnicalAttribute { get; }
         IBLInterface ParentInterface { get; }
-        int SortId { get; } // Sortier-ID z. B. für den UniqueKey
+        int SortId { get; } // Sortier-ID z. B. für den UniqueKey        
 
         #endregion Properties
         #region Methods
 
         // Erstellt den SQL-Code für die Datentyp-Definition.
         string GetSqlDataTypeDefinition(); 
+
+        // TODO: Ist das mit dem Get hier ein gutes Konzept???
+        KDV.CeusDL.Model.IL.ILAttribute GetILAttribute();
 
         void PostProcess(); 
 

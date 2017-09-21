@@ -21,6 +21,9 @@ namespace KDV.CeusDL.Model.BL {
         int MaxReferenceDepth { get; }
         BLModel ParentModel { get; }
 
-        void PostProcess();
+        // TODO: Ist das mit dem Get hier ein gutes Konzept???
+        KDV.CeusDL.Model.IL.ILInterface GetILInterface();
+
+        void PostProcess();        
     }
 }

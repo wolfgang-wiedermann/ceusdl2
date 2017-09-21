@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using KDV.CeusDL.Model.Core;
+using KDV.CeusDL.Model.IL;
 
 namespace KDV.CeusDL.Model.BL {
     public class CustomBLAttribute : IBLAttribute
@@ -219,6 +220,11 @@ namespace KDV.CeusDL.Model.BL {
         public void PostProcess()
         {
             // Beim CustomBLAttribute gibts im PostProcessing nix zu tun.
+        }
+
+        public ILAttribute GetILAttribute()
+        {
+            return null;
         }
     }
 }

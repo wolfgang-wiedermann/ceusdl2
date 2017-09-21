@@ -30,6 +30,8 @@ namespace KDV.CeusDL.Model.IL {
                 || baseData.Type == CoreInterfaceType.FACT_TABLE;
         }
 
+        // TOOD: der 2. Parameter CoreModel kann jetzt über Property von CoreInterface ermittelt werden
+        //       und ist somit in der Parameterliste überflüssig: => RÜCKBAUEN...
         public ILInterface(CoreInterface ifa, CoreModel model)
         {
             this.baseData = ifa;

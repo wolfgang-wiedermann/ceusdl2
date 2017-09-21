@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 using KDV.CeusDL.Model.Core;
+using KDV.CeusDL.Model.IL;
+using KDV.CeusDL.Model.Exceptions;
 
 namespace KDV.CeusDL.Model.BL {
     public class RefBLAttribute : IBLAttribute
@@ -112,6 +114,25 @@ namespace KDV.CeusDL.Model.BL {
                                             .First()
                                             .Attributes.Where(a => a.ShortName == coreAttribute.ReferencedAttribute.Name)
                                                        .First();
+        }
+
+        public ILAttribute GetILAttribute()
+        {
+            // Zu technischen Attributen gibt es in der IL sowieso keine Entsprechung
+            if(IsTechnicalAttribute) 
+                return null;
+
+            var ilInterface = this.ParentInterface.GetILInterface();
+            var result = ilInterface.Attributes.Where(i => i.Core == this.coreAttribute);
+
+            if(result.Count() > 1) 
+                throw new InvalidCountException();
+
+            if(result.Count() == 1) {
+                return result.First();
+            } else {
+                return null;
+            }
         }
     }
 }
