@@ -14,8 +14,9 @@ namespace KDV.CeusDL.Model.BL {
         int Length { get; }
         int Decimals { get; }
         bool IsPrimaryKey { get; }
-        bool IsIdentity { get; }
+        bool IsIdentity { get; }        
         bool IsPartOfUniqueKey { get; } // Markiert den Original-PK aus dem Quellsystem!
+        bool IsTechnicalAttribute { get; }
         IBLInterface ParentInterface { get; }
         int SortId { get; } // Sortier-ID z. B. für den UniqueKey
 

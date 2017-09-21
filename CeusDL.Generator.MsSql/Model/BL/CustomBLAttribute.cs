@@ -20,6 +20,7 @@ namespace KDV.CeusDL.Model.BL {
                 IsNotNull = true,
                 IsPartOfUniqueKey = true,
                 ParentInterface = parentInterface,
+                IsTechnicalAttribute = false,
                 SortId = 0
             };            
         }
@@ -35,6 +36,7 @@ namespace KDV.CeusDL.Model.BL {
                 IsPrimaryKey = true,
                 IsIdentity = true,
                 ParentInterface = parentInterface,
+                IsTechnicalAttribute = false,
                 SortId = 1
             };            
         }    
@@ -50,6 +52,7 @@ namespace KDV.CeusDL.Model.BL {
                 Length = 10,
                 IsNotNull = true,
                 ParentInterface = parentInterface,
+                IsTechnicalAttribute = true,
                 SortId = 100
             };            
         }
@@ -64,6 +67,7 @@ namespace KDV.CeusDL.Model.BL {
                 DataType = CoreDataType.VARCHAR,                
                 Length = 100,                
                 ParentInterface = parentInterface,
+                IsTechnicalAttribute = true,
                 SortId = 101
             };            
         }
@@ -79,6 +83,7 @@ namespace KDV.CeusDL.Model.BL {
                 Length = 100,
                 IsNotNull = true,
                 ParentInterface = parentInterface,
+                IsTechnicalAttribute = true,
                 SortId = 102
             };            
         }
@@ -94,6 +99,7 @@ namespace KDV.CeusDL.Model.BL {
                 Length = 10,
                 IsNotNull = true,
                 ParentInterface = parentInterface,
+                IsTechnicalAttribute = true,
                 SortId = 103
             };            
         }  
@@ -108,6 +114,7 @@ namespace KDV.CeusDL.Model.BL {
                 DataType = CoreDataType.DATETIME,                
                 IsNotNull = true,
                 ParentInterface = parentInterface,
+                IsTechnicalAttribute = true,
                 SortId = 104
             };            
         }    
@@ -122,6 +129,7 @@ namespace KDV.CeusDL.Model.BL {
                 DataType = CoreDataType.DATETIME,                
                 IsNotNull = true,
                 ParentInterface = parentInterface,
+                IsTechnicalAttribute = true,
                 SortId = 105
             };            
         }
@@ -141,6 +149,7 @@ namespace KDV.CeusDL.Model.BL {
                 Decimals = timeAttribute.Decimals,
                 IsPartOfUniqueKey = true,              
                 ParentInterface = parentInterface,
+                IsTechnicalAttribute = true,
                 SortId = 106
             };            
         }
@@ -155,6 +164,7 @@ namespace KDV.CeusDL.Model.BL {
                 DataType = CoreDataType.INT,                
                 IsNotNull = true,
                 ParentInterface = parentInterface,
+                IsTechnicalAttribute = true,
                 SortId = 107
             };            
         }                  
@@ -186,6 +196,8 @@ namespace KDV.CeusDL.Model.BL {
         public IBLInterface ParentInterface { get; set; }
 
         public int SortId { get; set; }
+
+        public bool IsTechnicalAttribute { get; set; }
 
         public string GetSqlDataTypeDefinition()
         {

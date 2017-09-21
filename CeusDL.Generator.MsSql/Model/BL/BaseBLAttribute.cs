@@ -87,6 +87,8 @@ namespace KDV.CeusDL.Model.BL {
             }
         }
 
+        public bool IsTechnicalAttribute => false;
+
         #endregion
 
         public BaseBLAttribute(CoreBaseAttribute coreAttribute, IBLInterface parentInterface) {                        
