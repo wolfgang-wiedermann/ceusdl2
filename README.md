@@ -5,7 +5,7 @@ Die Sprache CEUSDL ist dafür vorgesehen Data-Warehouse-Systeme auf der Basis re
 effizient umzusetzen und über den gesamten Lebenzyklus konsistent zu betreiben, weiterzuentwickeln und
 zu verwalten.
 
-Eine systematische Spezifikation der Sprache finden Sie unter https://kdv-gitlab.hs-regensburg.de/ceus/ceusdl2/blob/master/Doc/README.md
+Eine systematische Spezifikation der Sprache finden Sie unter https://github.com/wolfgang-wiedermann/ceusdl2/tree/master/Doc
 
 Die Sprache CEUSDL unterstützt derzeit die folgenden Konstrukte auf oberster Ebene:
 
