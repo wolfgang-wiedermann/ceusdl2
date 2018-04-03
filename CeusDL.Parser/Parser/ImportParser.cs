@@ -66,6 +66,7 @@ namespace KDV.CeusDL.Parser
                     var p = new FileParser(innerData);
                     var innerResult = p.Parse();
                     result.Content = innerResult;
+                    Data.Back(1); // Bei direkt aufeinander folgenden Import-Zeilen hatte ich sonst mport!
                 } else {
                     throw new InvalidTokenException($"Ungültiges Token {buf}", Data);
                 }

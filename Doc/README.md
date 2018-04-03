@@ -93,11 +93,11 @@ Dabei können die Attribute als folgende Attribut-Typen auftreten:
 
 * __base-Attribut:__ Basis-Attribut, das Daten eines bestimmten Typs beinhaltet und ggf. Primärschlüssel eines Interfaces sein kann.
 * __ref-Attribut:__ Das Referenz-Attribut dient dazu, Beziehungen zwischen den Interfaces zu definieren. Sollten zwischen zwei Interfaces mehrere Beziehungen existieren, so müssen diese mittels Alias (siehe as, z. B. bei ref JaNein.KNZ as Zulassung) unterscheidbar gemacht werden.
-* __fact-Attribut:__ Das Fakt-Attribut darf nur in Interfaces vom Typ FactTable verwendet werden und dient dazu, die Attribute zu kennzeichnen, die im Warehouse-System später als Fakten Verwendung finden. Die Syntax des Fakt-Attributs ist gleich der des Basis-Attributs.
+* __fact-Attribut:__ Das Fakt-Attribut darf nur in Interfaces vom Typ FactTable verwendet werden und dient dazu, die Attribute zu kennzeichnen, die im Warehouse-System später als Fakten Verwendung finden. Die Syntax des Fakt-Attributs ist gleich der des Basis-Attributs. (__TODO:__ Parserfehler werfen, wenn fact in anderen Interface-Typen verwendet wird)
 
 Kennzeichnung berechneter Attribute
 
-In DimTables und FactTables werden die Attribute im Regelfall aus der Datenlieferung befüllt. Enthält die Datenlieferung oder der Datenbestand der BL aber bereits Felder, aus denen der Wert eines weiteren Attributs berechnet werden kann, so ist es oft wünschenswert, dieses Attribut aus der Datenlieferung ausklammern zu können um es im Rahmen des Ladevorgangs dynamisch zu berechnen. Für diesen Zweck sieht die CEUSDL die Kennzeichnung berechneter Attribute durch den Parameter __calculated="true"__ vor. Die Verwendung von calculated="true" ist im übrigen ___auch für ref-Attribute___ möglich.
+In DimTables und FactTables werden die Attribute im Regelfall aus der Datenlieferung befüllt. Enthält die Datenlieferung oder der Datenbestand der BL aber bereits Felder, aus denen der Wert eines weiteren Attributs berechnet werden kann, so ist es oft wünschenswert, dieses Attribut aus der Datenlieferung ausklammern zu können um es im Rahmen des Ladevorgangs dynamisch zu berechnen. Für diesen Zweck sieht die CEUSDL die Kennzeichnung berechneter Attribute durch den Parameter __calculated="true"__ vor. Die Verwendung von calculated="true" ist im übrigen ___auch für ref-Attribute___ möglich. (__TODO:__ wie sieht das bei ref syntaktisch aus? ref Alter.KNZ(calculated="true"); in Anlehung and primary_key="true" wäre wohl optimal und durch den Parser bereits erledigt, braucht dann nur noch in den AST)
 
 Beispiel: (Die Datenlieferung enthält bereits ein Feld Geburtsdatum)
 
@@ -105,9 +105,14 @@ Beispiel: (Die Datenlieferung enthält bereits ein Feld Geburtsdatum)
     base Alter:int(calculated="true");
     // oder
     fact Alter_F:int(calculated="true");
+    // oder
+    ref Alter.KNZ(calculated="true"); // Setzt eine DefTable oder DimTable Alter mit Attribut Alter.KNZ voraus
 ```
 
 ```
+// Früher angedachter Alternativansatz, der aber weniger Präzise auswertbar
+// ist als der Ansatz oben (insb. weil damit keine Unterscheidung zwischen calc-Fakt und calc-Base-Attributen)
+// möglich ist.
 interface Blub : FactTable(mandant="true") {
     // Also was ist besser
     base Geburtsdatum:date;
@@ -169,6 +174,7 @@ Block-Kommentar
 */
 ```
 
-Die Stellen, an denen Kommentare in CEUSDL eingebracht werden können sind klar festgelegt. Kommentare können auf oberster Ebene, also auf Ebene des Config-Blocks und der Interfaces
-und zwischen den Attributen im Interface-Body eingebracht werden. Kommentare innerhalb der Parameterlisten sind nicht zulässig.
+Die Stellen, an denen Kommentare in CEUSDL eingebracht werden können sind klar festgelegt. Kommentare können auf oberster Ebene, also auf Ebene des 
+Config-Blocks und der Interfaces und zwischen den Attributen im Interface-Body eingebracht werden. Kommentare innerhalb der Parameterlisten sind 
+nicht zulässig.
 

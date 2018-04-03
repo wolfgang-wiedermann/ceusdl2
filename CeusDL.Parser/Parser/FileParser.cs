@@ -97,6 +97,8 @@ namespace KDV.CeusDL.Parser
                     var comment = commentParser.Parse(whitespaceBuf);                    
                     result.AddComment(comment);                    
                     whitespaceBuf = "";
+                } else {
+                    throw new InvalidTokenException($"Ungültiges Schlüsselwort {buf} gefunden", Data);
                 }
                 state = INITIAL;
                 buf = "";
