@@ -27,6 +27,12 @@ namespace KDV.CeusDL.Generator.BL {
                 code += $"\nuse {model.Config.BLDatabase};\n\n";
             }
 
+            if(model.FinestTimeAttribute != null) {
+                code += "\n";
+                code += GenerateGetCurrentTimeForHistory();
+                code += "\n";
+            }
+
             foreach(var ifa in model.DefTableInterfaces.OrderBy(i => i.MaxReferenceDepth)) {
                 code += GenerateBLTable(ifa);
                 code += GenerateUniqueKeyConstraint(ifa);             
@@ -183,8 +189,11 @@ namespace KDV.CeusDL.Generator.BL {
                 }
             }
 
-            // T_Modifikation berechnen
-            // TODO: Berücksichtigung von _VERSION fehlt noch!
+            if(ifa.IsMandant) {
+                code += "il.Mandant_KNZ,\n".Indent("    ");
+            }
+
+            // T_Modifikation berechnen            
             var pk = ifa.PrimaryKeyAttributes?.First();            
             if(pk == null) 
                 throw new InvalidParameterException($"{ifa.FullName} has no PrimaryKey-Attributes");
@@ -209,7 +218,7 @@ namespace KDV.CeusDL.Generator.BL {
             code += "end as T_Modifikation\n".Indent("    ");
 
             // Join generieren ...
-            code += $"\nfrom {ifa.GetILInterface().FullName} as il \n";
+            code += $"from {ifa.GetILInterface().FullName} as il \n";
             code += $"left outer join {ifa.FullName} as bl\n".Indent("    ");
             foreach(var attr in ifa.UniqueKeyAttributes) {
                 if(attr == ifa.UniqueKeyAttributes.First()) {
@@ -224,6 +233,32 @@ namespace KDV.CeusDL.Generator.BL {
 
         private string GenerateHistorizedDimView(IBLInterface ifa) {
             string code = "-- TODO: Historisierte View generieren\n\n";
+            return code;
+        }
+
+        private string GenerateGetCurrentTimeForHistory() {
+            var finestTimeAttribute = this.model.FinestTimeAttribute.GetILInterface().PrimaryKeyAttributes.First();
+            string type = finestTimeAttribute.DataType + finestTimeAttribute.DataTypeParameters.Replace("not null", "");
+            var code = "--\n-- Funktion zur Bestimmung des aktuellen Zeitpunkts für die Historisierung\n--\n";
+            code += "go\ncreate or alter function dbo.GetCurrentTimeForHistory() \n";
+            code += $"returns {type}\n";
+            code += "begin\n";
+            code += $"declare @value {type};\n{GenerateGetCurrentTimeForHistorySql()}return @value;\n".Indent("    ");
+            code += "end;\ngo\n";
+            return code;
+        }
+
+        private string GenerateGetCurrentTimeForHistorySql() {
+            var finestTimeAttribute = this.model.FinestTimeAttribute.GetILInterface().PrimaryKeyAttributes.First();
+            var relevantTables = this.model.FactTableInterfaces.Where(f => f.IsHistorized);
+            string code = $"select @value = max({finestTimeAttribute.Name}) from (\n";
+            foreach(var table in relevantTables) {
+                code += $"select max({finestTimeAttribute.Name}) as {finestTimeAttribute.Name} from {table.GetILInterface().FullName}\n";
+                if(table != relevantTables.Last()) {
+                    code += "union\n";
+                }
+            }
+            code += ") as a;\n";
             return code;
         }
     }

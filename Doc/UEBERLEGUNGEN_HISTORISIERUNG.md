@@ -65,6 +65,25 @@ Beim Verhalten gibt es hier __unterschiede zwischen DimTable und FactTable__. W�
 das finest\_time\_attribute nicht im Interface referenziert sein darf muss es in FactTables
 ohne Angabe eines Alias als zusätzliches Primärschlüsselattribut enthalten sein.
 
+Ein offenes Problem ist noch die Frage, woher der Wert bezogen wird, der bei historisierten Dimensionswerten dem Feld T_Gueltig_Bis_Dat, das dann dem Typ des finest_time_attribute entspricht.
+
+Grundidee ist z. B. gültig ab jetzt -> aber was ist jetzt und woher weiß das der ETL-Prozess?
+
+Mögliche Ansätze sind z. B. max(finest_time_attribute) from Faktentabellen oder
+min(finest_time_attribute) from Faktentabellen in il (ggf. nach Mandant). Das ist aber glaub ich nicht sicher in jedem Fall der richtige Wert! Die Datenlieferung bräuchte also sowas wie einen mitgelieferten Gültigkeitszeitstempel, an dem sich die Historisierung orientieren könnte.
+
+Man könnte z. B. den folgenden Subselect einsetzen oder in eine Funktion verpackt immer mitgenerieren.
+
+```sql
+use FH_AP_BaseLayer
+
+select max(a.Tag_KNZ) 
+from FH_AP_InterfaceLayer.dbo.AP_IL_Antrag as a
+where a.Mandant_KNZ = '7260' -- where kann weggelassen werden, da in IL sowieso nur die Daten der aktuell zu ladenden HS sind! 
+-- vgl. select distinct Mandant_KNZ from [FH_AP_InterfaceLayer].[dbo].[AP_IL_Antrag]
+-- im AP Echtsystem...
+``` 
+
 Überlegungen zur Historisierung von Faktentabellen
 ==================================================
 
