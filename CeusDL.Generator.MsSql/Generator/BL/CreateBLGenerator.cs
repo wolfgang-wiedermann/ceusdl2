@@ -47,7 +47,7 @@ namespace KDV.CeusDL.Generator.BL {
             foreach(var ifa in model.DimTableInterfaces.OrderBy(i => i.MaxReferenceDepth)) {                
                 code += GenerateBLTable(ifa);  
                 code += GenerateUniqueKeyConstraint(ifa);
-                if(ifa.IsHistorized) {
+                if(ifa is DerivedBLInterface) {
                     code += GenerateHistorizedDimView(ifa);                    
                 } else {
                     code += GenerateDimView(ifa);                              
@@ -172,7 +172,7 @@ namespace KDV.CeusDL.Generator.BL {
         }
 
         private string GenerateDimView(IBLInterface ifa) {            
-            if(ifa.IsHistorized)
+            if(ifa is DerivedBLInterface)
                 throw new InvalidInterfaceTypeException("LOGICAL_ERROR: Die Methode GenerateDimView in CreateBLGenerator.cs ist nur für nicht historisierte DimTables vorgesehen");
 
             string code = $"go\ncreate view {ifa.Name}_VW as\n";
@@ -236,21 +236,36 @@ namespace KDV.CeusDL.Generator.BL {
             return code;
         }
 
+        /**
+         * Hinweis: create or alter function funktioniert mit SqlServer 2012 noch nicht
+         *          mit dem 2017er auf meinem Notebook gehts aber.
+         * ggf. hilft auch sowas:
+         * IF OBJECT_ID (N'dbo.ufnGetInventoryStock', N'FN') IS NOT NULL  
+         *      DROP FUNCTION ufnGetInventoryStock;  
+         * GO  
+         */
         private string GenerateGetCurrentTimeForHistory() {
             var finestTimeAttribute = this.model.FinestTimeAttribute.GetILInterface().PrimaryKeyAttributes.First();
             string type = finestTimeAttribute.DataType + finestTimeAttribute.DataTypeParameters.Replace("not null", "");
+
             var code = "--\n-- Funktion zur Bestimmung des aktuellen Zeitpunkts für die Historisierung\n--\n";
             code += "go\ncreate or alter function dbo.GetCurrentTimeForHistory() \n";
             code += $"returns {type}\n";
             code += "begin\n";
             code += $"declare @value {type};\n{GenerateGetCurrentTimeForHistorySql()}return @value;\n".Indent("    ");
             code += "end;\ngo\n";
+
             return code;
         }
 
+        /**
+         * diese Funktion generiert nur den inneren SQL-Block für GenerateGetCurrentTimeForHistory,
+         * in der dann die tatsächliche TSQL-Funktion aufgebaut wird.
+         */
         private string GenerateGetCurrentTimeForHistorySql() {
             var finestTimeAttribute = this.model.FinestTimeAttribute.GetILInterface().PrimaryKeyAttributes.First();
             var relevantTables = this.model.FactTableInterfaces.Where(f => f.IsHistorized);
+
             string code = $"select @value = max({finestTimeAttribute.Name}) from (\n";
             foreach(var table in relevantTables) {
                 code += $"select max({finestTimeAttribute.Name}) as {finestTimeAttribute.Name} from {table.GetILInterface().FullName}\n";
@@ -259,6 +274,7 @@ namespace KDV.CeusDL.Generator.BL {
                 }
             }
             code += ") as a;\n";
+
             return code;
         }
     }
