@@ -106,9 +106,13 @@ namespace KDV.CeusDL.Model.BL
 
         private void ConvertAttributes() {            
             this.Attributes = new List<IBLAttribute>();
+            this.PrimaryKeyAttributes = new List<IBLAttribute>();
 
             // ID-Attribut hinzufügen
-            this.Attributes.Add(CustomBLAttribute.GetNewIDAttribute(this));
+            var pk = CustomBLAttribute.GetNewIDAttribute(this);
+            this.Attributes.Add(pk);
+            this.PrimaryKeyAttributes.Add(pk);
+
 
             foreach(var attr in coreInterface.Attributes) {
                 if(attr is CoreRefAttribute) {

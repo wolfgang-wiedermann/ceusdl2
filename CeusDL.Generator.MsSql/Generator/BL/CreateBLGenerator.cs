@@ -41,7 +41,11 @@ namespace KDV.CeusDL.Generator.BL {
             foreach(var ifa in model.DimTableInterfaces.OrderBy(i => i.MaxReferenceDepth)) {                
                 code += GenerateBLTable(ifa);  
                 code += GenerateUniqueKeyConstraint(ifa);
-                //TODO: code += GenerateDimView(ifa);                              
+                if(ifa.IsHistorized) {
+                    code += GenerateHistorizedDimView(ifa);                    
+                } else {
+                    code += GenerateDimView(ifa);                              
+                }
             }
 
             foreach(var ifa in model.FactTableInterfaces.OrderBy(i => i.MaxReferenceDepth)) {                
@@ -158,6 +162,68 @@ namespace KDV.CeusDL.Generator.BL {
                 code += $"foreign key ({attr.Name})\n"; 
                 code += $"references {attr.ReferencedAttribute.ParentInterface.Name} ({attr.ReferencedAttribute.Name});\n\n";
             }            
+            return code;
+        }
+
+        private string GenerateDimView(IBLInterface ifa) {            
+            if(ifa.IsHistorized)
+                throw new InvalidInterfaceTypeException("LOGICAL_ERROR: Die Methode GenerateDimView in CreateBLGenerator.cs ist nur für nicht historisierte DimTables vorgesehen");
+
+            string code = $"go\ncreate view {ifa.Name}_VW as\n";
+            code += $"select\n";
+            foreach(var attr in ifa.Attributes) {
+                if(!attr.IsTechnicalAttribute) {
+                    var il = attr.GetILAttribute();
+
+                    if(il != null) {                        
+                        code += $"il.{il.Name} as {attr.Name},\n".Indent("    ");                
+                    } else if(attr.IsPrimaryKey) {
+                        code += $"bl.{attr.Name},\n".Indent("    ");                        
+                    }                    
+                }
+            }
+
+            // T_Modifikation berechnen
+            // TODO: Berücksichtigung von _VERSION fehlt noch!
+            var pk = ifa.PrimaryKeyAttributes?.First();            
+            if(pk == null) 
+                throw new InvalidParameterException($"{ifa.FullName} has no PrimaryKey-Attributes");
+
+            code += $"case\n".Indent("    ");
+            code += $"when bl.{pk.Name} is null then 'I'\n".Indent("        ");            
+
+            var historyCheckAttrs = ifa.Attributes
+                                .Where(a => !a.IsPrimaryKey 
+                                       && !a.IsIdentity 
+                                       && !a.IsPartOfUniqueKey 
+                                       && !a.IsTechnicalAttribute);
+
+            foreach(var attr in historyCheckAttrs) {
+                if(historyCheckAttrs.First() == attr) {
+                    code += $"when bl.{attr.Name} <> il.{attr.GetILAttribute().Name}\n".Indent("        ");                    
+                } else {
+                    code += $"  or bl.{attr.Name} <> il.{attr.GetILAttribute().Name}\n".Indent("        ");
+                }
+            }
+            code += "then 'U'\nelse 'X'\n".Indent("        ");
+            code += "end as T_Modifikation\n".Indent("    ");
+
+            // Join generieren ...
+            code += $"\nfrom {ifa.GetILInterface().FullName} as il \n";
+            code += $"left outer join {ifa.FullName} as bl\n".Indent("    ");
+            foreach(var attr in ifa.UniqueKeyAttributes) {
+                if(attr == ifa.UniqueKeyAttributes.First()) {
+                    code += $"  on il.{attr.Name} = bl.{attr.Name}\n".Indent("    "); // TODO: sollte eigentlich attr.GetILAttribute().Name sein, geht aber bei Mandant_KNZ nicht!
+                } else {
+                    code += $" and il.{attr.Name} = bl.{attr.Name}\n".Indent("    ");
+                }
+            }            
+            code += ";\ngo\n\n";
+            return code;
+        }
+
+        private string GenerateHistorizedDimView(IBLInterface ifa) {
+            string code = "-- TODO: Historisierte View generieren\n\n";
             return code;
         }
     }
