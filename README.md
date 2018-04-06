@@ -3,7 +3,11 @@
 
 Die Sprache CEUSDL ist dafür vorgesehen Data-Warehouse-Systeme auf der Basis relationaler Datenbanksysteme
 effizient umzusetzen und über den gesamten Lebenzyklus konsistent zu betreiben, weiterzuentwickeln und
-zu verwalten.
+zu verwalten. 
+
+Mittelfristig existiert das Ziel z. B. eine Generierung von Code zur Vorverarbeitung der Daten
+außerhalb relationaler Datenbanken (vgl. z. B. Experiment https://github.com/ww-lessons/cuda_join für eine Beschleunigung der Vorverarbeitung
+durch den Einsatz von NVidia GPUs) und die alternative Verwendung spaltenorientierter NoSQL-Datenbanken anzubieten.
 
 Eine systematische Spezifikation der Sprache finden Sie unter https://github.com/wolfgang-wiedermann/ceusdl2/tree/master/Doc
 
@@ -114,6 +118,5 @@ Kommentare können in CEUSDL ähnlich wie in C-artigen Sprachen als Zeilenkommen
  */
 ```
 
-Die Stellen, an denen Kommentare in CEUSDL eingebracht werden können sind klar festgelegt. Kommentare können auf oberster Ebene, also auf Ebene des Config-Blocks und der Interfaces
-und zwischen den Attributen im Interface-Body eingebracht werden. Kommentare innerhalb der Parameterlisten sind nicht zulässig.
+Die Stellen, an denen Kommentare in CEUSDL eingebracht werden können sind klar festgelegt. Kommentare können auf oberster Ebene, also auf Ebene des Config-Blocks und der Interfaces und zwischen den Attributen im Interface-Body eingebracht werden. Kommentare innerhalb der Parameterlisten sind nicht zulässig.
 
