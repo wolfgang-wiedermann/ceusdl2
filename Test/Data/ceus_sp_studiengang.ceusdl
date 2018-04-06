@@ -1,0 +1,46 @@
+/*
+ * CEUS Studenten und Prüfungen - Dimmension Studiengang etc. 
+ */
+
+interface Studiengang : DimTable(mandant="true", history="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    ref Studienfach.KNZ;
+    ref Studienabschluss.KNZ;
+    ref Studientyp.KNZ;
+    ref Studienganglevel.KNZ;
+}
+
+interface POVersion : DimTable(mandant="true", history="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    ref Studiengang.KNZ;
+    // ref Regelstudienzeit.KNZ;
+}
+
+interface Studienfach : DimTable(mandant="true", history="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    // TODO: StudienfachLand ...
+}
+
+interface Studienabschluss : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+interface Studienganglevel : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+interface Studientyp : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}

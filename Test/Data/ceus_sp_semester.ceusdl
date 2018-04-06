@@ -1,0 +1,24 @@
+/*
+ * CEUS Studenten und Prüfungen - Semester und Zeit-Attribute etc. 
+ */
+
+interface Semester : TemporalTable(finest_time_attribute="true") { 
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    ref Jahr.KNZ as Studienjahr;
+    ref Jahr.KNZ as Pruefungsjahr;
+    ref SemesterTyp.KNZ;
+}
+
+interface Jahr : TemporalTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+interface SemesterTyp : DimTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}

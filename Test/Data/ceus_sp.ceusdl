@@ -1,0 +1,22 @@
+/*
+ * Ein Versuch CEUS Studenten und Prüfungen in CEUSDL2 entwickelt
+ */
+
+config {
+    prefix="SP";
+    il_database="FH_SP_InterfaceLayer";
+    bl_database="FH_SP_BaseLayer";
+    bt_database="FH_SP_BaseLayer";
+    al_database="FH_SP_Warehouse"; 
+}
+
+/*
+ * Imports von Dimmensionen
+ */
+import "ceus_sp_semester.ceusdl"
+import "ceus_sp_studiengang.ceusdl"
+
+/*
+ * Imports von Faktentabellen
+ */
+import "ceus_sp_fakten.ceusdl"

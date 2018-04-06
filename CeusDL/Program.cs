@@ -28,7 +28,7 @@ namespace CeusDL2
                 // Dieser Code wird bei F5 in Visual Studio ausgeführt
                 string rootFolder = "."; 
                 PrepareEnvironment(rootFolder);
-                ExecuteCompilation(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\split_main.ceusdl");
+                ExecuteCompilation(@"/Users/wiw39784/develop/dotnet/ceusdl2/Test/Data/ceus_sp.ceusdl");
             } else {
                 // Dieser Code wird beim Aufruf über Commandline ausgeführt
                 var cla = new CommandLineApplication();                
