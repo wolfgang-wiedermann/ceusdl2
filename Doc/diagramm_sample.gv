@@ -1,0 +1,58 @@
+graph G
+{
+    graph [pad="0.5", nodesep="0.5", ranksep="2"]
+    node [shape=none]
+    rankdir=LR;
+
+    labelloc=t 
+    label="Diagramm der BaseLayer"
+
+Book[label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><b>Book:DimTable</b></td></tr>
+<tr><td port="KNZ">KNZ:varchar(50)</td></tr>
+<tr><td>KURZBEZ:varchar(100)</td></tr>
+<tr><td>LANGBEZ:varchar(500)</td></tr>
+</table>>];
+
+Day[label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><b>Day:DimTable</b></td></tr>
+<tr><td port="KNZ">KNZ:varchar(50)</td></tr>
+<tr><td>KURZBEZ:varchar(100)</td></tr>
+<tr><td>LANGBEZ:varchar(500)</td></tr>
+<tr><td port="MonthKNZ">Month.KNZ:varchar(50)</td></tr>
+</table>>];
+
+Month[label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><b>Month:DimTable</b></td></tr>
+<tr><td port="KNZ">KNZ:varchar(50)</td></tr>
+<tr><td>KURZBEZ:varchar(100)</td></tr>
+<tr><td>LANGBEZ:varchar(500)</td></tr>
+</table>>];
+
+District[label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><b>District:DimTable</b></td></tr>
+<tr><td port="KNZ">KNZ:varchar(50)</td></tr>
+<tr><td>KURZBEZ:varchar(100)</td></tr>
+<tr><td>LANGBEZ:varchar(500)</td></tr>
+</table>>];
+
+Order[label=<
+<table border="0" cellborder="1" cellspacing="0">
+<tr><td><b>Order:FactTable</b></td></tr>
+<tr><td port="BookKNZ">Book.KNZ:varchar(50)</td></tr>
+<tr><td port="PurchaseDayKNZ">PurchaseDay.KNZ:varchar(50)</td></tr>
+<tr><td port="DeliveryDayKNZ">PurchaseDay.KNZ:varchar(50)</td></tr>
+<tr><td port="DistrictKNZ">District.KNZ:varchar(50)</td></tr>
+<tr><td>Amount_F:decimal(10,2)</td></tr>
+</table>>];
+
+Month:KNZ -- Day:MonthKNZ
+Book:KNZ -- Order:BookKNZ[label = "Book", len=2];
+Day:KNZ -- Order:PurchaseDayKNZ[label = "DayOfPurchase", len=2];
+Day:KNZ -- Order:DeliveryDayKNZ[label = "DayOfDelivery", len=2];
+District:KNZ -- Order:DistrictKNZ[label = "ShopDistrict", len=2];
+}

@@ -20,6 +20,7 @@ namespace CeusDL2
         static string GENERATED_SQL;
         static string GENERATED_CEUSDL;
         static string GENERATED_CODE;
+        static string GENERATED_GRAPHVIZ;
 
         static void Main(string[] args)
         {            
@@ -69,6 +70,7 @@ namespace CeusDL2
             var generatedSQL = Path.Combine(generated, "SQL");
             var generatedCeusDL = Path.Combine(generated, "CeusDL");            
             var generatedCode = Path.Combine(generated, "CSharp");
+            var generatedGraphviz = Path.Combine(generated, "Graphviz");
 
             if(!Directory.Exists(generated)) {
                 Directory.CreateDirectory(generated);   
@@ -89,9 +91,14 @@ namespace CeusDL2
                 Directory.CreateDirectory(generatedCode);   
             }
 
+            if(!Directory.Exists(generatedGraphviz)) {
+                Directory.CreateDirectory(generatedGraphviz);   
+            }
+
             GENERATED_SQL = generatedSQL;
             GENERATED_CEUSDL = generatedCeusDL;
             GENERATED_CODE = generatedCode;
+            GENERATED_GRAPHVIZ = generatedGraphviz;
         }
 
         static void ExecuteCompilation(string srcFile) {
@@ -112,6 +119,8 @@ namespace CeusDL2
             ExecuteStep(new CreateBLGenerator(model), GENERATED_SQL);
             ExecuteStep(new DropBLGenerator(model), GENERATED_SQL);
             // TODO: BL, BT und AL generieren
+
+            ExecuteStep(new GraphvizBLGenerator(model), GENERATED_GRAPHVIZ);
         }
 
         static void ExecuteStep(IGenerator generator, string baseFolder) {
