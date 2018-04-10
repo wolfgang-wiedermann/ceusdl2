@@ -113,7 +113,8 @@ namespace CeusDL2
             // IL generieren.
             ExecuteStep(new CreateILGenerator(model), GENERATED_SQL);            
             ExecuteStep(new DropILGenerator(model), GENERATED_SQL);
-            ExecuteStep(new LoadILGenerator(model), GENERATED_CODE);            
+            ExecuteStep(new LoadILGenerator(model), GENERATED_CODE);
+            ExecuteStep(new GraphvizILGenerator(model), GENERATED_GRAPHVIZ);
 
             // BL generieren
             ExecuteStep(new CreateBLGenerator(model), GENERATED_SQL);
