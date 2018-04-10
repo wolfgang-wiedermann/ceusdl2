@@ -9,8 +9,12 @@ namespace KDV.CeusDL.Model.BL {
         string ShortName { get; }
         // Vollstäniger Tabellenname in BL (z. B. AP_BL_F_Antrag)
         string Name { get; }
-        // Voll qualifizierter Tabellennambe in BL (z. B. FH_AP_BaseLayer.dbo.AP_BL_F_Antrag)
+        // Voll qualifizierter Tabellenname in BL (z. B. FH_AP_BaseLayer.dbo.AP_BL_F_Antrag)
         string FullName { get; }        
+        // Vollständiger ViewName in BL (z. B. AP_BL_F_Antrag_VW)
+        string ViewName { get; }
+        // Voll qualifizierter ViewName in BL (z. B.FH_AP_BaseLayer.dbo.AP_BL_F_Antrag_VW)
+        string FullViewName { get; }
         List<IBLAttribute> Attributes { get; }
         CoreInterfaceType InterfaceType { get; }
         bool IsHistorized { get; }

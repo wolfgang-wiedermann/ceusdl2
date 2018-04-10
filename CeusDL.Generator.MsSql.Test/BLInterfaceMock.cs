@@ -37,6 +37,10 @@ namespace KDV.CeusDL.Model.BL {
 
         public List<IBLAttribute> UniqueKeyAttributes => throw new NotImplementedException();
 
+        public string ViewName => throw new NotImplementedException();
+
+        public string FullViewName => throw new NotImplementedException();
+
         #endregion
 
         public BLInterfaceMock() {

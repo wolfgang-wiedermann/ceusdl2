@@ -93,7 +93,11 @@ namespace KDV.CeusDL.Model.BL {
 
         public BLModel ParentModel { get; private set; }
 
-        #endregion       
+        public string ViewName => Name+"_VW";
+
+        public string FullViewName => FullName+"_VW";
+
+        #endregion
 
         public DefaultBLInterface(CoreInterface coreInterface, BLModel model) {
             this.coreInterface = coreInterface;

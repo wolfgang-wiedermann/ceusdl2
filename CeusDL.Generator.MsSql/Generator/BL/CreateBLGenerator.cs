@@ -13,6 +13,10 @@ namespace KDV.CeusDL.Generator.BL {
             this.model = new BLModel(model);
         }
 
+        public CreateBLGenerator(BLModel model) {
+            this.model = model;
+        }
+
         public List<GeneratorResult> GenerateCode() {
             var result = new List<GeneratorResult>();
             result.Add(new GeneratorResult("BL_Create.sql", GenerateCreateTables()));
@@ -48,9 +52,9 @@ namespace KDV.CeusDL.Generator.BL {
                 code += GenerateBLTable(ifa);  
                 code += GenerateUniqueKeyConstraint(ifa);
                 if(ifa is DerivedBLInterface) {
-                    code += GenerateHistorizedDimView(ifa);                    
+                    code += GenerateHistorizedDimTableView(ifa);                    
                 } else {
-                    code += GenerateDimView(ifa);                              
+                    code += GenerateDimTableView(ifa);                              
                 }
             }
 
@@ -171,16 +175,15 @@ namespace KDV.CeusDL.Generator.BL {
             return code;
         }
 
-        private string GenerateDimView(IBLInterface ifa) {            
-            if(ifa is DerivedBLInterface)
-                throw new InvalidInterfaceTypeException("LOGICAL_ERROR: Die Methode GenerateDimView in CreateBLGenerator.cs ist nur für nicht historisierte DimTables vorgesehen");
-
-            string code = $"go\ncreate view {ifa.Name}_VW as\n";
+        ///
+        /// Generiert den Standard-Kopf für DimTableViews in der BL
+        ///
+        private string GenerateDefaultDimTableViewTop(IBLInterface ifa) {
+            string code = $"go\ncreate view {ifa.ViewName} as\n";
             code += $"select\n";
             foreach(var attr in ifa.Attributes) {
                 if(!attr.IsTechnicalAttribute) {
                     var il = attr.GetILAttribute();
-
                     if(il != null) {                        
                         code += $"il.{il.Name} as {attr.Name},\n".Indent("    ");                
                     } else if(attr.IsPrimaryKey) {
@@ -192,8 +195,16 @@ namespace KDV.CeusDL.Generator.BL {
             if(ifa.IsMandant) {
                 code += "il.Mandant_KNZ,\n".Indent("    ");
             }
+            return code;
+        }
 
-            // T_Modifikation berechnen            
+        ///
+        /// Generiert den SQL-Code für die Berechnung von T_Modifikation in
+        /// Views zu nicht historisierten DimTables
+        ///
+        private string GenerateTModificationNoHistory(IBLInterface ifa) {
+            string code = "";
+                      
             var pk = ifa.PrimaryKeyAttributes?.First();            
             if(pk == null) 
                 throw new InvalidParameterException($"{ifa.FullName} has no PrimaryKey-Attributes");
@@ -217,12 +228,31 @@ namespace KDV.CeusDL.Generator.BL {
             code += "then 'U'\nelse 'X'\n".Indent("        ");
             code += "end as T_Modifikation\n".Indent("    ");
 
-            // Join generieren ...
+            return code;
+        }
+
+        ///
+        /// Generiert die IL -> BL View für eine DimTable
+        ///
+        private string GenerateDimTableView(IBLInterface ifa) {            
+            if(ifa is DerivedBLInterface)
+                throw new InvalidInterfaceTypeException("LOGICAL_ERROR: Die Methode GenerateDimView in CreateBLGenerator.cs ist nur "
+                    +"für nicht historisierte DimTables vorgesehen");
+
+            string code = $"go\n";
+
+            // Kopf von create view generieren
+            code += GenerateDefaultDimTableViewTop(ifa);
+            // T_Modifikation berechnen  
+            code += GenerateTModificationNoHistory(ifa);
+
+            // Join für nicht historisierte DimTables generieren ...
             code += $"from {ifa.GetILInterface().FullName} as il \n";
             code += $"left outer join {ifa.FullName} as bl\n".Indent("    ");
             foreach(var attr in ifa.UniqueKeyAttributes) {
                 if(attr == ifa.UniqueKeyAttributes.First()) {
-                    code += $"  on il.{attr.Name} = bl.{attr.Name}\n".Indent("    "); // TODO: sollte eigentlich attr.GetILAttribute().Name sein, geht aber bei Mandant_KNZ nicht!
+                    // TODO: il.{attr.Name} sollte eigentlich attr.GetILAttribute().Name sein, geht aber bei Mandant_KNZ nicht!
+                    code += $"  on il.{attr.Name} = bl.{attr.Name}\n".Indent("    "); 
                 } else {
                     code += $" and il.{attr.Name} = bl.{attr.Name}\n".Indent("    ");
                 }
@@ -231,7 +261,7 @@ namespace KDV.CeusDL.Generator.BL {
             return code;
         }
 
-        private string GenerateHistorizedDimView(IBLInterface ifa) {
+        private string GenerateHistorizedDimTableView(IBLInterface ifa) {
             string code = "-- TODO: Historisierte View generieren\n\n";
             return code;
         }

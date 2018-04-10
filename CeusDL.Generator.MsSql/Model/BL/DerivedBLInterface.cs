@@ -79,6 +79,10 @@ namespace KDV.CeusDL.Model.BL
 
         public BLModel ParentModel { get; private set; }
 
+        public string ViewName => Name+"_VW";
+
+        public string FullViewName => FullName+"_VW";
+
         #endregion
 
         public void PostProcess()
