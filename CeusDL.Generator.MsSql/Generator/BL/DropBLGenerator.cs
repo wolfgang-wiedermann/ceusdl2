@@ -40,8 +40,8 @@ namespace KDV.CeusDL.Generator.BL {
             foreach(var ifa in model.Interfaces.Where(i => i.InterfaceType != CoreInterfaceType.DIM_VIEW)) {
                 code += $"-- Tabelle und View zu {ifa.ShortName} entfernen\n";
                 // View löschen
-                code += $"IF OBJECT_ID(N'{ifa.Name}_VW', N'V') IS NOT NULL\n";
-                code += $"DROP VIEW {ifa.Name}_VW\n";
+                code += $"IF OBJECT_ID(N'{ifa.ViewName}', N'V') IS NOT NULL\n";
+                code += $"DROP VIEW {ifa.ViewName}\n";
                 code += "go\n\n";
                 // Tabelle löschen
                 code += $"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{ifa.Name}]') AND type in (N'U'))\n";
