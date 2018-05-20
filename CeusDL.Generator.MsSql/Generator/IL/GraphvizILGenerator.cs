@@ -47,13 +47,11 @@ namespace KDV.CeusDL.Generator.IL {
         {
             string code = "# Beziehungen \n";
             foreach(var r in ifa.Attributes.Where(a => a.Core is CoreRefAttribute)) {
-                // TODO: Das hier funktioniert evtl. mit aliases noch nicht richtig!?
                 var core = ((CoreRefAttribute)r.Core);
                 if(core.ReferencedInterface.Type != CoreInterfaceType.DEF_TABLE 
                     && core.ReferencedInterface.Type != CoreInterfaceType.TEMPORAL_TABLE
                     && core.ReferencedInterface.Type != CoreInterfaceType.DIM_VIEW) {
-                    //code += $"{ifa.ShortName}:{r.Name} -- {core.ReferencedInterface.Name}:{core.ReferencedAttribute.Name}\n";
-                    code += $"{ifa.Core.Name}:{r.Core.Name} -- {core.ReferencedInterface.Name}:{core.ReferencedAttribute.Name}\n";
+                        code += $"{ifa.Core.Name}:{r.Core.Name} -- {core.ReferencedInterface.Name}:{core.ReferencedAttribute.Name}\n";
                 }
             }
             return code;
@@ -63,7 +61,7 @@ namespace KDV.CeusDL.Generator.IL {
         {
             string code = $"{ifa.Core.Name}[label=<\n";
             code += "<table border=\"0\" cellborder=\"1\" cellspacing=\"0\">\n";
-            code += $"<tr><td><b>{ifa.Name}:{ifa.Core.Type}</b></td></tr>\n";
+            code += $"<tr><td><b>{ifa.Name}:{ToText(ifa.Core.Type)}</b></td></tr>\n";
 
             foreach(var attr in ifa.Attributes) {
                 if(attr.Core is CoreBaseAttribute) {
@@ -75,6 +73,14 @@ namespace KDV.CeusDL.Generator.IL {
 
             code += "</table>>];\n\n";
             return code;
+        }
+
+        private string ToText(CoreInterfaceType type) {
+            switch(type) {
+                case CoreInterfaceType.DIM_TABLE: return "DimTable";
+                case CoreInterfaceType.FACT_TABLE: return "FactTable";
+                default: return "Unknown";
+            }
         }
     }
 }
