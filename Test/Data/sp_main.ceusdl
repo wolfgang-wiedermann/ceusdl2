@@ -1,0 +1,33 @@
+/*
+ * Beispiel zur Umsetzung einer neuen Studenten und Prüfungen Domäne 
+ */
+
+config {
+    prefix="SP";
+    il_database="FH_SP_InterfaceLayer";
+    bl_database="FH_SP_BaseLayer";
+    bt_database="FH_SP_BaseLayer";
+    al_database="FH_SP_Warehouse";     
+    etl_db_server="CEUS-ETL";
+}
+
+import "sp_part_datum.ceusdl"
+import "sp_part_geografie.ceusdl"
+
+interface Student : FactTable(mandant="true") {
+    base Matrikelnummer:varchar(len="50", primary_key="true");
+    
+    ref Monat.KNZ as Geburtsmonat;
+    ref Kreis.KNZ as HZBKreis;
+    ref Land.KNZ as Staatsangehoerigkeit;
+    ref Kreis.KNZ as HeimatKreis;
+
+    fact Anzahl_F:int(calculated="true");
+}
+
+interface Studienverlauf : FactTable(mandant="true") {
+    ref Student.Matrikelnummer(primary_key="true");
+    ref Semester.KNZ(primary_key="true");
+
+    fact Anzahl_F:int(calculated="true");
+}

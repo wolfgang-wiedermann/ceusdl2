@@ -63,7 +63,7 @@ namespace KDV.CeusDL.Generator.IL {
             code += "<table border=\"0\" cellborder=\"1\" cellspacing=\"0\">\n";
             code += $"<tr><td><b>{ifa.Name}:{ToText(ifa.Core.Type)}</b></td></tr>\n";
 
-            foreach(var attr in ifa.Attributes) {
+            foreach(var attr in ifa.Attributes.Where(a => !a.IsCalcualted)) {
                 if(attr.Core is CoreBaseAttribute) {
                     code += $"<tr><td port=\"{attr.Core.Name}\">{attr.Name}:{attr.DataType}</td></tr>\n";
                 } else {                                 
