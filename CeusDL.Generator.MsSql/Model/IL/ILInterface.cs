@@ -10,6 +10,12 @@ namespace KDV.CeusDL.Model.IL {
 
         public string Name { get; private set; }
 
+        public CoreInterface Core { 
+            get {
+                return baseData;
+            }
+        }
+
         public string ShortName {get; private set;}
         public string FullName {get => string.IsNullOrEmpty(coreModel.Config.ILDatabase)?Name:$"{coreModel.Config.ILDatabase}.dbo.{Name}";}
 

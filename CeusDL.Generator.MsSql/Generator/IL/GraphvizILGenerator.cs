@@ -1,4 +1,4 @@
-// TODO: BL als GraphViz Graphen abbilden...
+// TODO: IL als GraphViz Graphen abbilden...
 // Coole Anleitung siehe https://spin.atomicobject.com/2017/11/15/table-rel-diagrams-graphviz/
 // In VisualStudio Code verwende ich https://github.com/EFanZh/Graphviz-Preview
 using System;
@@ -52,7 +52,8 @@ namespace KDV.CeusDL.Generator.IL {
                 if(core.ReferencedInterface.Type != CoreInterfaceType.DEF_TABLE 
                     && core.ReferencedInterface.Type != CoreInterfaceType.TEMPORAL_TABLE
                     && core.ReferencedInterface.Type != CoreInterfaceType.DIM_VIEW) {
-                    code += $"{ifa.ShortName}:{r.Name} -- {core.ReferencedInterface.Name}:{core.ReferencedAttribute.Name}\n";
+                    //code += $"{ifa.ShortName}:{r.Name} -- {core.ReferencedInterface.Name}:{core.ReferencedAttribute.Name}\n";
+                    code += $"{ifa.Core.Name}:{r.Core.Name} -- {core.ReferencedInterface.Name}:{core.ReferencedAttribute.Name}\n";
                 }
             }
             return code;
@@ -60,12 +61,16 @@ namespace KDV.CeusDL.Generator.IL {
 
         private string GenerateInterface(ILInterface ifa)
         {
-            string code = $"{ifa.ShortName}[label=<\n";
+            string code = $"{ifa.Core.Name}[label=<\n";
             code += "<table border=\"0\" cellborder=\"1\" cellspacing=\"0\">\n";
-            code += $"<tr><td><b>{ifa.Name}:{ifa.Name}</b></td></tr>\n";
+            code += $"<tr><td><b>{ifa.Name}:{ifa.Core.Type}</b></td></tr>\n";
 
-            foreach(var attr in ifa.Attributes) {                                    
-                code += $"<tr><td port=\"{attr.Name}\">{attr.Name}:{attr.DataType}</td></tr>\n";
+            foreach(var attr in ifa.Attributes) {
+                if(attr.Core is CoreBaseAttribute) {
+                    code += $"<tr><td port=\"{attr.Core.Name}\">{attr.Name}:{attr.DataType}</td></tr>\n";
+                } else {                                 
+                    code += $"<tr><td port=\"{attr.Name}\">{attr.Name}:{attr.DataType}</td></tr>\n";
+                }
             }
 
             code += "</table>>];\n\n";
