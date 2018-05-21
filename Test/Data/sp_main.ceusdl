@@ -13,6 +13,7 @@ config {
 
 import "sp_part_datum.ceusdl"
 import "sp_part_geografie.ceusdl"
+import "sp_part_studiengang.ceusdl"
 
 interface Student : FactTable(mandant="true") {
     base Matrikelnummer:varchar(len="50", primary_key="true");
@@ -28,6 +29,9 @@ interface Student : FactTable(mandant="true") {
 interface Studienverlauf : FactTable(mandant="true") {
     ref Student.Matrikelnummer(primary_key="true");
     ref Semester.KNZ(primary_key="true");
+    ref Pruefungsordnung.KNZ;
+    ref Studientyp.KNZ; // Das hänge ich hier in den Verlaufssatz, auch wenns bei H1 im Studiengang hängt...
+                        // wir müssen ja auch zu PRIMUSS kompatibel bleiben.
 
     fact Anzahl_F:int(calculated="true");
 }

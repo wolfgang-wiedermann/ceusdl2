@@ -1,0 +1,73 @@
+//
+// Studiengangsattribute
+//
+
+interface Pruefungsordnung : DimTable(mandant="true", history="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    ref Studiengang.KNZ;    
+}
+
+interface Studiengang : DimTable(mandant="true", history="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    ref Studienfach.KNZ;
+    ref Studienabschluss.KNZ;
+    ref Fakultaet.KNZ;
+}
+
+interface Studienfach : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");    
+    ref StudienfachBayern.KNZ;
+}
+
+interface Studienabschluss : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="50");    
+}
+
+interface Fakultaet : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+//
+// Def-Tabellen
+//
+
+interface StudienfachBayern : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="50");
+    ref StudienfachBund.KNZ;  
+}
+
+interface StudienfachBund : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="50");
+    ref Studienfeld.KNZ;    
+}
+
+interface Studienfeld : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="50");    
+}
+
+interface Studientyp : DefTable {
+    // Standard-Attributfelder
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}

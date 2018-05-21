@@ -63,9 +63,9 @@ namespace KDV.CeusDL.Generator.IL {
             code += "<table border=\"0\" cellborder=\"1\" cellspacing=\"0\">\n";
             code += $"<tr><td><b>{ifa.Name}:{ToText(ifa.Core.Type)}</b></td></tr>\n";
 
-            foreach(var attr in ifa.Attributes.Where(a => !a.IsCalcualted)) {
+            foreach(var attr in ifa.Attributes) {
                 if(attr.Core is CoreBaseAttribute) {
-                    code += $"<tr><td port=\"{attr.Core.Name}\">{attr.Name}:{attr.DataType}</td></tr>\n";
+                    code += $"<tr><td port=\"{attr.Core.Name}\">{attr.Name}:{attr.DataType}{GetCalculated((CoreBaseAttribute)attr.Core)}</td></tr>\n";
                 } else {                                 
                     code += $"<tr><td port=\"{attr.Name}\">{attr.Name}:{attr.DataType}</td></tr>\n";
                 }
@@ -81,6 +81,13 @@ namespace KDV.CeusDL.Generator.IL {
                 case CoreInterfaceType.FACT_TABLE: return "FactTable";
                 default: return "Unknown";
             }
+        }
+
+        private string GetCalculated(CoreBaseAttribute attr) {
+            if(attr.IsCalculated) {
+                return " (Calculated)";
+            }
+            return "";
         }
     }
 }
