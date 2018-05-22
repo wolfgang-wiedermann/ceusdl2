@@ -127,3 +127,10 @@ interface Antrag : FactTable(mandant="true", history="true") {
 
 __Nebenbedingung:__ Ich sollte das so umsetzen, dass wenn eine FactTable history="true" hat darin
 auch genau ein Zeit-Attribut history="true" haben muss. Damit ist die Definition dann immer eindeutig.
+
+Andererseits kann man auch argumentieren, dass das Attribut vom Typ Tag.KNZ (finest_time_attribute...)
+das primary_key="true" hat, bereits dadurch sauber gekennzeichnet ist!
+
+Zudem sollte ich __finest_time_attribute__ in __history_unit__ umbenennen, da wir z. B. bei SP den Fall haben,
+dass Datumswerte als Attribute verwendet werden, die Historisierung aber auf Semester basiert... (also
+viel grober).
