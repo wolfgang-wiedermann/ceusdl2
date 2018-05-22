@@ -102,3 +102,27 @@ __Wichtig:__ im Gegensatz zum Prototypen sollte in dieser Implementierung die Ta
 der Now-Table wirklich 1:1 gleich zur historisierten Tabelle sein (nur die Fakten sollten mit \_NOW\_ gekennzeichnet sein). 
 D.h. die Tabelle sollte auch das Zeit-Attribut enthalten, denn nur so kann man in den
 Berichten auch vernünftig anzeigen, von welchem Zeitpunkt die "aktuellen" Daten denn sind.
+
+Neue Idee zur Syntax der Historisierung von Faktentabellen
+==========================================================
+
+```
+interface Antrag : FactTable(mandant="true", history="true") {
+    // Schlüssel-Attribute
+    base Antragsnummer:varchar(primary_key="true", len="20");
+    // Da es mehrere Attribute Tag.KNZ mit unterschiedlichen Aliases in
+    // einer Fakt-Tabelle geben kann wird das für die Historisierung zu verwendende
+    // mit history="true" gekennzeichnet.
+    ref Tag.KNZ(primary_key="true", history="true"); 
+
+    // Sonstige Attribute
+    ref  Bewerber.Bewerbernummer;
+    ref  StudiengangHisInOne.KNZ;
+    ref  Antragsstatus.KNZ;
+    ref  Antragsfachstatus.KNZ;
+    // ...
+}
+```
+
+__Nebenbedingung:__ Ich sollte das so umsetzen, dass wenn eine FactTable history="true" hat darin
+auch genau ein Zeit-Attribut history="true" haben muss. Damit ist die Definition dann immer eindeutig.
