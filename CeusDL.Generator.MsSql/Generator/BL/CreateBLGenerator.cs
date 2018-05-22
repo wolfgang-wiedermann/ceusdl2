@@ -232,6 +232,39 @@ namespace KDV.CeusDL.Generator.BL {
         }
 
         ///
+        /// Generiert den SQL-Code für die Berechnung von T_Modifikation in
+        /// Views zu nicht historisierten DimTables
+        ///
+        private string GenerateTModificationWithHistory(IBLInterface ifa) {
+            string code = "";
+                      
+            var pk = ifa.PrimaryKeyAttributes?.First();            
+            if(pk == null) 
+                throw new InvalidParameterException($"{ifa.FullName} has no PrimaryKey-Attributes");
+
+            code += $"case\n".Indent("    ");
+            code += $"when bl.{pk.Name} is null then 'I'\n".Indent("        ");            
+
+            var historyCheckAttrs = ifa.Attributes
+                                .Where(a => !a.IsPrimaryKey 
+                                       && !a.IsIdentity 
+                                       && !a.IsPartOfUniqueKey 
+                                       && !a.IsTechnicalAttribute);
+
+            foreach(var attr in historyCheckAttrs) {
+                if(historyCheckAttrs.First() == attr) {
+                    code += $"when bl.{attr.Name} <> il.{attr.GetILAttribute().Name}\n".Indent("        ");                    
+                } else {
+                    code += $"  or bl.{attr.Name} <> il.{attr.GetILAttribute().Name}\n".Indent("        ");
+                }
+            }
+            code += "then 'U' -- TODO: Muss das dann nicht I heißen? \nelse 'X'\n".Indent("        ");
+            code += "end as T_Modifikation\n".Indent("    ");
+
+            return code;
+        }
+
+        ///
         /// Generiert die IL -> BL View für eine DimTable
         ///
         private string GenerateDimTableView(IBLInterface ifa) {            
@@ -239,7 +272,7 @@ namespace KDV.CeusDL.Generator.BL {
                 throw new InvalidInterfaceTypeException("LOGICAL_ERROR: Die Methode GenerateDimView in CreateBLGenerator.cs ist nur "
                     +"für nicht historisierte DimTables vorgesehen");
 
-            string code = $"go\n";
+            string code = "\n";
 
             // Kopf von create view generieren
             code += GenerateDefaultDimTableViewTop(ifa);
@@ -261,8 +294,33 @@ namespace KDV.CeusDL.Generator.BL {
             return code;
         }
 
+        ///
+        /// Generieren einer Views für eine historisierte DimTable (_VERSION_VW)
+        ///
         private string GenerateHistorizedDimTableView(IBLInterface ifa) {
-            string code = "-- TODO: Historisierte View generieren\n\n";
+            string code = $"-- View für historisierte DimTable {ifa.Name}\n";    
+            code += "-- !!! DAS KONZEPT HIER IST NOCH EIN EINZIGER BUG !!!\n";
+            code += GenerateDefaultDimTableViewTop(ifa);
+            // TODO: ...
+            code += GenerateTModificationWithHistory(ifa);
+            // TODO: ...
+
+            // Join für historisierte DimTables generieren ...
+            code += $"from {ifa.GetILInterface().FullName} as il \n";
+            code += $"left outer join {ifa.FullName} as bl\n".Indent("    ");
+            foreach(var attr in ifa.UniqueKeyAttributes.Where(a => a != ifa.HistoryAttribute)) {
+                if(attr == ifa.UniqueKeyAttributes.First()) {
+                    // TODO: il.{attr.Name} sollte eigentlich attr.GetILAttribute().Name sein, geht aber bei Mandant_KNZ nicht!
+                    code += $"  on il.{attr.Name} = bl.{attr.Name}\n".Indent("    "); 
+                } else {
+                    code += $" and il.{attr.Name} = bl.{attr.Name}\n".Indent("    ");
+                }
+            }            
+            // ACHTUNG: so kann ich das nicht stehen lassen, das multipliziert evtl. Sätze!!!
+            code += $" and (bl.{ifa.HistoryAttribute.Name} is null or bl.{ifa.HistoryAttribute.Name} > dbo.GetCurrentTimeForHistory())".Indent("    ");
+            // /Achtung
+            code += ";\ngo\n\n";
+            code += "go\n\n";
             return code;
         }
 

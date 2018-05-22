@@ -1,0 +1,9 @@
+Zwei gute Ideen zu CEUS
+
+1. Tritt ein Fehler beim Laden auf, so sichert der CEUSDL-Ladeprozess die BL weg und spielt die Sicherung von BL vor dem Ladelauf wieder ein. 
+    Fehleranalyse kann dann in dem Snapshot von BL mit dem Fehler (Wegkopierte DB) erfolgen, folgende Ladeläufe laufen sofern ihre Daten OK 
+    sind ohne Fehler durch …
+
+2. Wir machen aus der Exportfunktion h1admin ein generelles Angebot auch für Daten aus CEUS. Um hierfür immer eine konsistente Schnittstelle 
+   zu haben generieren wir neben den normalen Faktentabellen noch eine Faktentabelle nach BigTable Manier, in der alle referenzierten Attribute 
+   mit ID, KNZ, KURZBEZ und LANGBEZ sowie ggf. erforderlichen weiteren Attributfeldern enthalten sind… (Dadurch bleiben die SQLs relativ einfach)
