@@ -6,16 +6,16 @@ interface Kontinent : DimTable(mandant="true") {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
-    base Laengengrad:varchar(len="50");
-    base Breitengrad:varchar(len="50");    
+    base Laengengrad:varchar(len="50", calculated="true");
+    base Breitengrad:varchar(len="50", calculated="true");    
 }
 
 interface Land : DimTable(mandant="true") {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500"); 
-    base Laengengrad:varchar(len="50");
-    base Breitengrad:varchar(len="50");
+    base Laengengrad:varchar(len="50", calculated="true");
+    base Breitengrad:varchar(len="50", calculated="true");
     ref Kontinent.KNZ;   
 }
 
@@ -27,8 +27,8 @@ interface Bundesland : DimTable(mandant="true") {
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
     base AMT_ID:varchar(len="50");
-    base Laengengrad:varchar(len="50");
-    base Breitengrad:varchar(len="50");    
+    base Laengengrad:varchar(len="50", calculated="true");
+    base Breitengrad:varchar(len="50", calculated="true");    
     //ref Land.KNZ;
 }
 
@@ -37,8 +37,8 @@ interface Regierungsbezirk : DimTable(mandant="true") {
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");    
     base AMT_ID:varchar(len="50");
-    base Laengengrad:varchar(len="50");
-    base Breitengrad:varchar(len="50");
+    base Laengengrad:varchar(len="50", calculated="true");
+    base Breitengrad:varchar(len="50", calculated="true");
     ref Bundesland.KNZ;
 }
 
@@ -47,8 +47,8 @@ interface Kreis : DimTable(mandant="true") {
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
     base AMT_ID:varchar(len="50");
-    base Laengengrad:varchar(len="50");
-    base Breitengrad:varchar(len="50");
+    base Laengengrad:varchar(len="50", calculated="true");
+    base Breitengrad:varchar(len="50", calculated="true");
     ref Bundesland.KNZ;
     ref Regierungsbezirk.KNZ;
 }
@@ -58,7 +58,7 @@ interface Ort : DimTable(mandant="true") {
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
     base Postleitzahl:varchar(len="5");    
-    base Laengengrad:varchar(len="50");
-    base Breitengrad:varchar(len="50");
+    base Laengengrad:varchar(len="50", calculated="true");
+    base Breitengrad:varchar(len="50", calculated="true");
     ref Kreis.KNZ;
 }
