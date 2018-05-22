@@ -120,6 +120,7 @@ interface Antrag : FactTable(mandant="true", history="true") {
     ref  StudiengangHisInOne.KNZ;
     ref  Antragsstatus.KNZ;
     ref  Antragsfachstatus.KNZ;
+    ref  Tag.KNZ as Abgabe; // Abgabe_Tag -> Tag der Abgabe der Bewerbung
     // ...
 }
 ```
