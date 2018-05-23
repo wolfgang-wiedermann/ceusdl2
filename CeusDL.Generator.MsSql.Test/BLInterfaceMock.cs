@@ -30,6 +30,7 @@ namespace KDV.CeusDL.Model.BL {
         public bool IsMandant => throw new NotImplementedException();
 
         public List<IBLAttribute> PrimaryKeyAttributes => throw new NotImplementedException();
+        public List<IBLAttribute> UpdateCheckAttributes => throw new NotImplementedException();
 
         public int MaxReferenceDepth => throw new NotImplementedException();
 

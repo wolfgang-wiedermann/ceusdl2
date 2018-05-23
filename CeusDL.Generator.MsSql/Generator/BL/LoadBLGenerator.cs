@@ -55,17 +55,11 @@ namespace KDV.CeusDL.Generator.BL {
         private string GenerateDimTableUpdateNoHist(IBLInterface ifa)
         {
             var idAttribute = ifa.Attributes.Where(a => a.IsIdentity).First();
-            // TODO: evtl. mit entsprechender Stelle im CreateBLGenerator vereinheitlichen und nach BLInterface ziehen
-            var historyCheckAttrs = ifa.Attributes
-                                .Where(a => !a.IsPrimaryKey 
-                                       && !a.IsIdentity 
-                                       && !a.IsPartOfUniqueKey 
-                                       && !a.IsTechnicalAttribute);
 
             StringBuilder sb = new StringBuilder();
             sb.Append($"-- Update for non historized table: {ifa.FullName}\n");
             sb.Append("update t set\n");            
-            foreach(var attr in historyCheckAttrs) {
+            foreach(var attr in ifa.UpdateCheckAttributes) {
                 sb.Append($"t.{attr.Name} = v.{attr.Name},\n".Indent("    "));
             }
             sb.Append("t.T_Modifikation = 'U',\nt.T_Aend_Dat = GETDATE(),\nt.T_Benutzer = SYSTEM_USER\n".Indent("    "));

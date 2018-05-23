@@ -69,6 +69,17 @@ namespace KDV.CeusDL.Model.BL
                     .OrderBy(a => a.SortId)
                     .ToList<IBLAttribute>();
             } 
+        }        
+        public List<IBLAttribute> UpdateCheckAttributes { 
+            get {
+                return this.Attributes
+                    .Where(a => !a.IsPrimaryKey 
+                           && !a.IsIdentity 
+                           && !a.IsPartOfUniqueKey 
+                           && !a.IsTechnicalAttribute)
+                    .OrderBy(a => a.SortId)
+                    .ToList();
+            } 
         }
 
         public int MaxReferenceDepth {

@@ -22,6 +22,10 @@ namespace KDV.CeusDL.Model.BL {
         bool IsMandant { get; }
         List<IBLAttribute> PrimaryKeyAttributes { get; }
         List<IBLAttribute> UniqueKeyAttributes { get; }
+        
+        // Liste der Attribute, für die auf Update-Geprüft werden soll
+        // (für Dimensionstabellen mit und ohne Historisierung)
+        List<IBLAttribute> UpdateCheckAttributes { get; }
         int MaxReferenceDepth { get; }
         BLModel ParentModel { get; }
 

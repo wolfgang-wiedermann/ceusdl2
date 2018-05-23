@@ -75,6 +75,20 @@ namespace KDV.CeusDL.Model.BL {
             }
         }
 
+        // Liste der Attribute, für die auf Update-Geprüft werden soll
+        // (für Dimensionstabellen mit und ohne Historisierung)
+        public List<IBLAttribute> UpdateCheckAttributes { 
+            get {
+                return this.Attributes
+                    .Where(a => !a.IsPrimaryKey 
+                           && !a.IsIdentity 
+                           && !a.IsPartOfUniqueKey 
+                           && !a.IsTechnicalAttribute)
+                    .OrderBy(a => a.SortId)
+                    .ToList();
+            } 
+        }
+
         public int MaxReferenceDepth {
             get {
                 IBLInterface ifa = this;
