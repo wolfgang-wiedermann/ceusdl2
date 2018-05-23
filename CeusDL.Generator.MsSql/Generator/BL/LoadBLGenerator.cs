@@ -30,7 +30,7 @@ namespace KDV.CeusDL.Generator.BL {
 
             // Dimensionen
             foreach(var ifa in model.DimTableInterfaces) {
-                // TODO: passendes Update generieren und vor dem Insert laufen lassen!
+                sb.Append(GenerateDimTableUpdate(ifa));
                 sb.Append(GenerateDimTableInsert(ifa));                
             }            
 
@@ -40,6 +40,49 @@ namespace KDV.CeusDL.Generator.BL {
                 //sb.Append(GenerateFactTableInsert(ifa));
             }
 
+            return sb.ToString();
+        }
+
+        private string GenerateDimTableUpdate(IBLInterface ifa)
+        {
+            if(ifa.IsHistorized && ifa is DerivedBLInterface) {
+                return GenerateDimTableUpdateHist(ifa);
+            } else {
+                return GenerateDimTableUpdateNoHist(ifa);
+            }            
+        }
+
+        private string GenerateDimTableUpdateNoHist(IBLInterface ifa)
+        {
+            var idAttribute = ifa.Attributes.Where(a => a.IsIdentity).First();
+            // TODO: evtl. mit entsprechender Stelle im CreateBLGenerator vereinheitlichen und nach BLInterface ziehen
+            var historyCheckAttrs = ifa.Attributes
+                                .Where(a => !a.IsPrimaryKey 
+                                       && !a.IsIdentity 
+                                       && !a.IsPartOfUniqueKey 
+                                       && !a.IsTechnicalAttribute);
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"-- Update for non historized table: {ifa.FullName}\n");
+            sb.Append("update t set\n");            
+            foreach(var attr in historyCheckAttrs) {
+                sb.Append($"t.{attr.Name} = v.{attr.Name},\n".Indent("    "));
+            }
+            sb.Append("t.T_Modifikation = 'U',\nt.T_Aend_Dat = GETDATE(),\nt.T_Benutzer = SYSTEM_USER\n".Indent("    "));
+            sb.Append($"from {ifa.FullName} t\ninner join {ifa.FullViewName} v\n");
+            sb.Append($"on t.{idAttribute.Name} = v.{idAttribute.Name}\n    and v.T_Modifikation = 'U'\n\n");
+            return sb.ToString();
+        }
+
+        private string GenerateDimTableUpdateHist(IBLInterface ifa)
+        {
+            var idAttribute = ifa.Attributes.Where(a => a.IsIdentity).First();
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"-- Update historized table: {ifa.FullName}\n");
+            sb.Append("update t set t.T_Gueltig_Bis_Dat = dbo.GetCurrentTimeForHistory()\n");
+            sb.Append($"from {ifa.FullName} t\n");
+            sb.Append($"inner join {ifa.FullViewName} v\n");
+            sb.Append($"on t.{idAttribute.Name} = v.{idAttribute.Name} and v.T_Modifikation = 'U'\n\n");
             return sb.ToString();
         }
 

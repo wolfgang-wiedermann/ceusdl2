@@ -212,6 +212,7 @@ namespace KDV.CeusDL.Generator.BL {
             code += $"case\n".Indent("    ");
             code += $"when bl.{pk.Name} is null then 'I'\n".Indent("        ");            
 
+            // TODO: evtl. mit entsprechender Stelle im LoadBLGenerator vereinheitlichen und nach BLInterface ziehen
             var historyCheckAttrs = ifa.Attributes
                                 .Where(a => !a.IsPrimaryKey 
                                        && !a.IsIdentity 
