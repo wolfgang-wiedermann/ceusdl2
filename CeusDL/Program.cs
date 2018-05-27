@@ -21,32 +21,44 @@ namespace CeusDL2
         static string GENERATED_CEUSDL;
         static string GENERATED_CODE;
         static string GENERATED_GRAPHVIZ;
-        static string GENERATED_CSV;
+        static string GENERATED_CSV;        
 
         static void Main(string[] args)
         {            
             // Unterscheidung zwischen IDE und Commandline!
             if(System.Diagnostics.Debugger.IsAttached) {
                 // Dieser Code wird bei F5 in Visual Studio ausgeführt
+                string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\split_main.ceusdl";
+                string dbConnectionFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\connection.txt";
                 string rootFolder = "."; 
                 PrepareEnvironment(rootFolder);
-                ExecuteCompilation(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\split_main.ceusdl");
+                ExecuteCompilation(ceusdlFileName, File.ReadAllText(dbConnectionFileName));
             } else {
                 // Dieser Code wird beim Aufruf über Commandline ausgeführt
                 var cla = new CommandLineApplication();                
                 cla.Name = "ceusdlc";
                 var ceusdlOpt = cla.Option("-c | --ceusdl <ceusdlfile>", "Path to the ceusdl file to compile", CommandOptionType.SingleValue);
                 var dirOpt = cla.Option("-d | --directory <target_directory>", "Path to store the result of compilation.", CommandOptionType.SingleValue);
+                var conOpt = cla.Option("-con | --connection <connectionfile>", "Textfile containing connection string to Database", CommandOptionType.SingleValue);
                 cla.HelpOption("-? | -h | --help");
 
                 cla.OnExecute(() => {
                     string rootFolder = ".";
+                    string conStr = null;
                     if(!ceusdlOpt.HasValue()) {
                         Console.WriteLine("ERROR: you have to specify a ceusdl file to start its compilation, use -c <filename>.ceusdl");
                         return 1;
                     }
                     if(dirOpt.HasValue()) {
                         rootFolder = dirOpt.Value();
+                    }
+                    if(conOpt.HasValue()) {
+                        if(File.Exists(conOpt.Value())) {
+                            conStr = File.ReadAllText(conOpt.Value());
+                        } else {
+                            Console.WriteLine("ERROR: the specified connection file was not found");
+                            return 3; // Datei nicht gefunden
+                        }
                     }
 
                     PrepareEnvironment(rootFolder);
@@ -57,7 +69,7 @@ namespace CeusDL2
                         return 2;
                     }
 
-                    ExecuteCompilation(srcFile);
+                    ExecuteCompilation(srcFile, conStr);
 
                     return 0;
                 });
@@ -108,7 +120,7 @@ namespace CeusDL2
             GENERATED_CSV = generatedCsv;
         }
 
-        static void ExecuteCompilation(string srcFile) {
+        static void ExecuteCompilation(string srcFile, string conStr) {
             var data = new ParsableData(System.IO.File.ReadAllText(srcFile), srcFile);            
             var p = new FileParser(data);
             var result = p.Parse();
@@ -128,7 +140,11 @@ namespace CeusDL2
             ExecuteStep(new CreateBLGenerator(model), GENERATED_SQL);
             ExecuteStep(new DropBLGenerator(model), GENERATED_SQL);            
             ExecuteStep(new GraphvizBLGenerator(model), GENERATED_GRAPHVIZ);
-            ExecuteStep(new LoadBLGenerator(model), GENERATED_SQL);
+            ExecuteStep(new LoadBLGenerator(model), GENERATED_SQL);            
+            if(conStr != null) {
+                // Aktualisierung nur generieren, wenn eine Verbindung zur Datenbank angegeben wurde.
+                ExecuteStep(new UpdateBLGenerator(model, conStr), GENERATED_SQL);
+            }
             // TODO: BL, BT und AL generieren
             
         }

@@ -67,7 +67,7 @@ namespace KDV.CeusDL.Generator.BL {
             return code;
         }
 
-        private string GenerateBLTable(IBLInterface ifa)
+        internal string GenerateBLTable(IBLInterface ifa)
         {
             // Create Table
             string code = $"create table {ifa.FullName} (\n";
