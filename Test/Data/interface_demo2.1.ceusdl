@@ -7,7 +7,7 @@ config {
      etl_db_server="CEUS-ETL";
 }
 
-interface StudiengangHisInOne : DimTable(mandant="true") {
+interface StudiengangHisInOne : DimTable(mandant="true", former_name="Studiengang") {
     // Standard-Attributfelder
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
@@ -18,4 +18,10 @@ interface StudiengangHisInOne : DimTable(mandant="true") {
     // Zusätzliche Attributfelder
     // z. B. Kapazität, Überbuchung, etc. 
     // (erfordert zusätzliche Custom-Tabelle)
+}
+
+interface Semester : TemporalTable(finest_time_attribute="true") {    
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
 }

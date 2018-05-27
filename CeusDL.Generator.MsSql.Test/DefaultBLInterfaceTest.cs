@@ -9,6 +9,57 @@ namespace KDV.CeusDL.Model.BL.Test
     public class DefaultBLInterfaceTest
     {
         [TestMethod]
+        public void TestDefaultBLInterface_FormerName() {
+            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo.1.ceusdl";
+            var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
+            var p = new FileParser(data);
+            var result = p.Parse();            
+            var model = new CoreModel(result);
+            var blModel = new BLModel(model);
+
+            // Auswählen
+            var coreIfa = model.Interfaces[0];
+            var coreAttr = coreIfa.Attributes[0];
+
+            // in DefaultBLInterface konvertieren
+            var blIfa = new DefaultBLInterface(coreIfa, blModel);                       
+            Assert.AreEqual("AP_def_Semester", blIfa.Name);
+            Assert.AreEqual("AP_def_Sem", blIfa.FormerName);
+            Assert.AreEqual("FH_AP_BaseLayer.dbo.AP_def_Sem", blIfa.FullFormerName);
+
+            var blIfa2 = new DefaultBLInterface(coreIfa, null);
+            Assert.AreEqual("def_Semester", blIfa2.Name);
+            Assert.AreEqual("def_Sem", blIfa2.FormerName);
+            Assert.AreEqual("dbo.def_Sem", blIfa2.FullFormerName);
+        }
+
+        [TestMethod]
+        public void TestDerivedBLInterface_FormerName() {
+            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo2.1.ceusdl";
+            var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
+            var p = new FileParser(data);
+            var result = p.Parse();            
+            var model = new CoreModel(result);
+            var blModel = new BLModel(model);
+
+            // Auswählen
+            var coreIfa = model.Interfaces[0];
+            var coreAttr = coreIfa.Attributes[0];
+
+            // in DefaultBLInterface konvertieren
+            var blIfa = new DefaultBLInterface(coreIfa, blModel);                       
+            Assert.AreEqual("AP_BL_D_StudiengangHisInOne", blIfa.Name);
+            Assert.AreEqual("AP_BL_D_Studiengang", blIfa.FormerName);
+            Assert.AreEqual("FH_AP_BaseLayer.dbo.AP_BL_D_Studiengang", blIfa.FullFormerName);
+
+            var blIfa2 = new DerivedBLInterface(blIfa, blModel);
+            Assert.AreEqual("AP_BL_D_StudiengangHisInOne_VERSION", blIfa2.Name);
+            Assert.AreEqual("AP_BL_D_Studiengang_VERSION", blIfa2.FormerName);
+            Assert.AreEqual("FH_AP_BaseLayer.dbo.AP_BL_D_Studiengang_VERSION", blIfa2.FullFormerName);
+        }
+
+
+        [TestMethod]
         public void TestDefaultBLInterface_BySimpleFile()
         {
             // Daten einlesen...
@@ -23,7 +74,7 @@ namespace KDV.CeusDL.Model.BL.Test
             var coreAttr = coreIfa.Attributes[0];
 
             // in DefaultBLInterface konvertieren
-            var blIfa = new DefaultBLInterface(coreIfa, null);
+            var blIfa = new DefaultBLInterface(coreIfa, null);            
             
             IBLAttribute attr = blIfa.Attributes[0];
 
@@ -59,7 +110,7 @@ namespace KDV.CeusDL.Model.BL.Test
             Assert.AreEqual(0, attr.Decimals);
             Assert.IsFalse(attr.IsPartOfUniqueKey);
             Assert.IsFalse(attr.IsIdentity);
-            Assert.IsFalse(attr.IsPrimaryKey);        
+            Assert.IsFalse(attr.IsPrimaryKey);     
         }
 
         [TestMethod]

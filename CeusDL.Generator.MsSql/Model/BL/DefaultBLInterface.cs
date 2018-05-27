@@ -29,6 +29,19 @@ namespace KDV.CeusDL.Model.BL {
             }
         }
 
+        public string FormerName { get; set; }
+
+        public string FullFormerName { 
+            get {
+                if(FormerName == null) return null;
+                if(ParentModel?.Config?.BLDatabase != null) {
+                    return $"{ParentModel.Config.BLDatabase}.dbo.{FormerName}";
+                } else {
+                    return $"dbo.{FormerName}";
+                }
+            }
+        }
+
         public List<IBLAttribute> Attributes { get; private set; }
 
         public CoreInterfaceType InterfaceType { 
@@ -118,6 +131,13 @@ namespace KDV.CeusDL.Model.BL {
             this.ParentModel = model;
             this.ShortName = coreInterface.Name;
             this.Name = ConvertName(coreInterface, model?.Config);
+
+            if(string.IsNullOrEmpty(coreInterface.FormerName)) {
+                this.FormerName = null;
+            } else {
+                this.FormerName = ConvertName(coreInterface.FormerName, coreInterface, model?.Config);
+            }
+
             this.Attributes = new List<IBLAttribute>();
 
             // ID-Attribut hinzufügen
@@ -144,19 +164,23 @@ namespace KDV.CeusDL.Model.BL {
 
         private string ConvertName(CoreInterface coreInterface, BLConfig config)
         {
+            return ConvertName(coreInterface.Name, coreInterface, config);
+        }
+
+        private string ConvertName(string name, CoreInterface coreInterface, BLConfig config) {
             string prefix = "";
             if(!string.IsNullOrEmpty(config?.Prefix)) {
                 prefix = $"{config.Prefix}_";
             }
             if(coreInterface.Type == CoreInterfaceType.DEF_TABLE
                 || coreInterface.Type == CoreInterfaceType.TEMPORAL_TABLE) {                
-                return $"{prefix}def_{coreInterface.Name}";
+                return $"{prefix}def_{name}";
             } else if(coreInterface.Type == CoreInterfaceType.DIM_TABLE) {
-                return $"{prefix}BL_D_{coreInterface.Name}";
+                return $"{prefix}BL_D_{name}";
             } else if(coreInterface.Type == CoreInterfaceType.DIM_VIEW) {
-                return $"{prefix}BL_D_{coreInterface.Name}";
+                return $"{prefix}BL_D_{name}";
             } else if(coreInterface.Type == CoreInterfaceType.FACT_TABLE) {
-                return $"{prefix}BL_F_{coreInterface.Name}";
+                return $"{prefix}BL_F_{name}";
             } else {
                 throw new InvalidInterfaceTypeException("Ungültiger Interface-Typ in ConvertName");
             }

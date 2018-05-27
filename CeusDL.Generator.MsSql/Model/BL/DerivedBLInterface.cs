@@ -18,6 +18,7 @@ namespace KDV.CeusDL.Model.BL
 
             this.ShortName = $"{coreInterface.Name}_VERSION";
             this.Name = ConvertName(coreInterface, parentModel.Config);
+            this.FormerName = ConvertName(coreInterface.FormerName, coreInterface, parentModel.Config);
             ConvertAttributes(); // Laden von this.Attributes 
         }
 
@@ -32,6 +33,18 @@ namespace KDV.CeusDL.Model.BL
                     return $"{ParentModel.Config.BLDatabase}.dbo.{Name}";
                 } else {
                     return $"dbo.{Name}";
+                }
+            }
+        }
+
+        public string FormerName { get; set; }
+        public string FullFormerName {
+            get {
+                if(FormerName == null) return null;
+                if(ParentModel?.Config?.BLDatabase != null) {
+                    return $"{ParentModel.Config.BLDatabase}.dbo.{FormerName}";
+                } else {
+                    return $"dbo.{FormerName}";
                 }
             }
         }
@@ -105,7 +118,10 @@ namespace KDV.CeusDL.Model.BL
 
         #region Private Methods
 
-        private string ConvertName(CoreInterface coreInterface, BLConfig config)
+        private string ConvertName(CoreInterface coreInterface, BLConfig config) {
+            return ConvertName(coreInterface.Name, coreInterface, config);
+        }
+        private string ConvertName(string name, CoreInterface coreInterface, BLConfig config)
         {
             string prefix = "";
             if(!string.IsNullOrEmpty(config?.Prefix)) {
@@ -113,7 +129,7 @@ namespace KDV.CeusDL.Model.BL
             }
 
             if(coreInterface.Type == CoreInterfaceType.DIM_TABLE) {
-                return $"{prefix}BL_D_{coreInterface.Name}_VERSION";            
+                return $"{prefix}BL_D_{name}_VERSION";            
             } else {
                 throw new InvalidInterfaceTypeException("Ungültiger Interface-Typ in ConvertName");
             }
