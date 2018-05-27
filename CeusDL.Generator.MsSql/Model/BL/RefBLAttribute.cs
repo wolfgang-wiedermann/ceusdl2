@@ -38,6 +38,34 @@ namespace KDV.CeusDL.Model.BL {
             }
         }
 
+                public string ShortFormerName => coreAttribute.FormerName;
+        public string FormerName {
+            get {
+                if(this.coreAttribute.FormerName != null) {
+                    if(string.IsNullOrEmpty(coreAttribute.FormerName)) {
+                        return ReferencedAttribute.Name;
+                    } else {
+                        return $"{coreAttribute.FormerName}_{ReferencedAttribute.Name}";
+                    } 
+                } else {
+                    return null;
+                }
+            }
+        }
+        public string FullFormerName { 
+            get {
+                if(FormerName != null && ParentInterface.FormerName != null) {
+                    return $"{ParentInterface.FormerName}.{FormerName}";
+                } else if(FormerName == null && ParentInterface.FormerName != null) {
+                    return $"{ParentInterface.FormerName}.{Name}";
+                } else if(FormerName != null) {
+                    return $"{ParentInterface.Name}.{FormerName}";                    
+                } else {
+                    return null;
+                }
+            }
+        }
+
         public CoreDataType DataType {
             get {
                 return ReferencedAttribute.DataType;

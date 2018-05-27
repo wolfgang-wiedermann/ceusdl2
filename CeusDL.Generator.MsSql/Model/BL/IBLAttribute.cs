@@ -10,6 +10,9 @@ namespace KDV.CeusDL.Model.BL {
         string ShortName { get; } // Attributname in ceusdl-Syntax z. B. KNZ
         string Name { get; } // Attributname in BL-Syntax z. B. Semester_KNZ      
         string FullName { get; } // Attributname incl. Tabellenname getrennt durch Punkt
+        string ShortFormerName { get; } // Früherer Attributname in ceusdl-Syntax lt. former_name="K" => K
+        string FormerName { get; } // Früherer Attributname in BL-Syntax lt. former_name="K" => Semester_K
+        string FullFormerName { get; } // Attributname incl. ggf. früheren Tabellennamen getrennt durch Punkt
         CoreDataType DataType { get; }
         int Length { get; }
         int Decimals { get; }

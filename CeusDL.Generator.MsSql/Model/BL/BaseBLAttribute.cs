@@ -37,6 +37,34 @@ namespace KDV.CeusDL.Model.BL {
             }
         }
 
+        public string ShortFormerName => coreAttribute.FormerName;
+        public string FormerName {
+            get {
+                if(this.coreAttribute.FormerName != null) {
+                    if(coreAttribute.ParentInterface.FormerName != null) {
+                        return $"{this.coreAttribute.ParentInterface.FormerName}_{this.coreAttribute.FormerName}";
+                    } else {
+                        return $"{this.coreAttribute.ParentInterface.Name}_{this.coreAttribute.FormerName}";
+                    }
+                } else {
+                    return null;
+                }
+            }
+        }
+        public string FullFormerName { 
+            get {
+                if(FormerName != null && ParentInterface.FormerName != null) {
+                    return $"{ParentInterface.FormerName}.{FormerName}";
+                } else if(FormerName == null && ParentInterface.FormerName != null) {
+                    return $"{ParentInterface.FormerName}.{Name}";
+                } else if(FormerName != null) {
+                    return $"{ParentInterface.Name}.{FormerName}";                    
+                } else {
+                    return null;
+                }
+            }
+        }
+
         public CoreDataType DataType {
             get {
                 return this.coreAttribute.DataType;

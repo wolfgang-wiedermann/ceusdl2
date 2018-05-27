@@ -6,6 +6,7 @@ using KDV.CeusDL.Model.Core;
 using KDV.CeusDL.Model.IL;
 
 namespace KDV.CeusDL.Model.BL {
+    // TODO: Name ist nicht gut, Custom??? eigentlich wäre Technical wohl besser???
     public class CustomBLAttribute : IBLAttribute
     {
         #region HelperFunctions
@@ -179,6 +180,10 @@ namespace KDV.CeusDL.Model.BL {
         public string Name { get; set; }
 
         public string FullName { get; set; }
+
+        public string ShortFormerName => null;
+        public string FormerName => null;
+        public string FullFormerName => null;
 
         public CoreDataType DataType { get; set; }
 

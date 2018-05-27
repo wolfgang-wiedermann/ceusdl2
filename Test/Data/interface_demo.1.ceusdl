@@ -9,6 +9,6 @@ config {
 
 interface Semester : DefTable(former_name="Sem") {
     base KNZ:varchar(len="50", primary_key="true");
-    base KURZBEZ:varchar(len="100");
+    base KURZBEZ:varchar(len="100", former_name="KurzBezeichnung");
     base LANGBEZ:varchar(len="500");
 }
