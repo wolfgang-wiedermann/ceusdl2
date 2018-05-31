@@ -10,8 +10,10 @@ namespace KDV.CeusDL.Model.BL {
         // Vollstäniger Tabellenname in BL (z. B. AP_BL_F_Antrag)
         string Name { get; }
         // Voll qualifizierter Tabellenname in BL (z. B. FH_AP_BaseLayer.dbo.AP_BL_F_Antrag)
-        string FullName { get; }
-        // Früherer Vollständiger Tabellenname in BL (berechnet aus former_name="")   
+        string FullName { get; }        
+        // Früherer CEUSDL-Interfacename (aus former_name="") vgl. ShortName
+        string ShortFormerName { get; }  
+        // Früherer Vollständiger Tabellenname in BL (berechnet aus former_name="") 
         string FormerName { get; }
         // Früherer voll qualifizierter Tabellenname in BL (berechnet aus former_name="")
         string FullFormerName { get; }

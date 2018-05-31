@@ -43,8 +43,12 @@ namespace KDV.CeusDL.Generator.BL {
 
         public string GenerateUpdateTables() {
             StringBuilder sb = new StringBuilder();
-            // Neue Tabellen hinzufügen
+            // 1. Neue Tabellen hinzufügen
             sb.Append(GenerateCreateNewTables());
+            // 2. Veränderte Tabellen anpassen
+            //    TODO: select into -> drop -> create -> insert into select
+            // 3. Alle BL-Views droppen 
+            // 4. Alle BL-Views neu anlegen
             return sb.ToString();
         }
 
@@ -64,7 +68,7 @@ namespace KDV.CeusDL.Generator.BL {
         private List<IBLInterface> GetMissingTables() {
             List<IBLInterface> temp = new List<IBLInterface>();
             foreach(var i in model.Interfaces.Where(i => i.InterfaceType != CoreInterfaceType.DIM_VIEW)) {
-                if(!(analyzer.TableExists(i.Name) || (i.FormerName != null && analyzer.TableExists(i.FormerName)) )) {                
+                if(!analyzer.TableExistsUnmodified(i) && !analyzer.InterfaceRenamed(i)) {                
                     // Tabelle existiert weder mit ihrem aktuellen noch dem früheren Namen in der Datenbank
                     // => sie fehlt.
                     temp.Add(i);

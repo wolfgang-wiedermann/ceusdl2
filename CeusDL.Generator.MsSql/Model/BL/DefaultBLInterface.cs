@@ -29,6 +29,8 @@ namespace KDV.CeusDL.Model.BL {
             }
         }
 
+        public string ShortFormerName => this.coreInterface.FormerName;
+
         public string FormerName { get; set; }
 
         public string FullFormerName { 

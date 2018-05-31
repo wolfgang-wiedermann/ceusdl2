@@ -46,6 +46,8 @@ namespace KDV.CeusDL.Model.BL {
                     } else {
                         return $"{this.coreAttribute.ParentInterface.Name}_{this.coreAttribute.FormerName}";
                     }
+                } else if(coreAttribute.ParentInterface.FormerName != null) {
+                    return $"{this.coreAttribute.ParentInterface.FormerName}_{this.coreAttribute.Name}";
                 } else {
                     return null;
                 }
@@ -129,39 +131,8 @@ namespace KDV.CeusDL.Model.BL {
         public string GetSqlDataTypeDefinition()
         {
             // TODO: das hier ist noch nicht alles !!!
-            return BaseBLAttribute.GenerateSqlDataTypeDefinition(this);
-        }
-
-        public static string GenerateSqlDataTypeDefinition(IBLAttribute attr) {
-            string code = "";
-
-            switch(attr.DataType) {
-                case CoreDataType.DATE:                    
-                    code = "date";
-                    break;
-                case CoreDataType.DATETIME:
-                    code = "datetime";
-                    break;
-                case CoreDataType.DECIMAL:
-                    code = $"decimal({attr.Length}, {attr.Decimals})";
-                    break;
-                case CoreDataType.INT:
-                    // Sonderfall: ID in Fakttabelle als bigint berücksichtigen...
-                    if(attr?.ParentInterface?.InterfaceType == CoreInterfaceType.FACT_TABLE && attr.IsIdentity) {
-                        code = "bigint";
-                    } else {
-                        code = "int";
-                    }                    
-                    break;
-                case CoreDataType.VARCHAR:
-                    code = $"varchar({attr.Length})";
-                    break;
-                default:
-                    throw new InvalidDataTypeException($"Ungültiger Datentyp: Die SqlDataTypeDefinition für das Attribut {attr.FullName} konnte nicht generiert werden.");
-            }         
-
-            return code;
-        }
+            return BLDataType.GenerateSqlDataTypeDefinition(this);
+        }    
 
         public void PostProcess()
         {

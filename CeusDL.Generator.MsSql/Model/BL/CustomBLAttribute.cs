@@ -15,6 +15,7 @@ namespace KDV.CeusDL.Model.BL {
         ///
         public static IBLAttribute GetNewMandantAttribute(IBLInterface parentInterface) {
             return new CustomBLAttribute() {
+                ShortName = null,
                 Name = "Mandant_KNZ",
                 FullName = $"{parentInterface?.Name}.Mandant_KNZ",
                 DataType = CoreDataType.VARCHAR,
@@ -32,6 +33,7 @@ namespace KDV.CeusDL.Model.BL {
         ///
         public static IBLAttribute GetNewIDAttribute(IBLInterface parentInterface) {
             return new CustomBLAttribute() {
+                ShortName = "ID",
                 Name = $"{parentInterface.ShortName}_ID",
                 FullName = $"{parentInterface.Name}.{parentInterface.ShortName}_ID",
                 DataType = CoreDataType.INT,                
@@ -48,6 +50,7 @@ namespace KDV.CeusDL.Model.BL {
         ///
         public static IBLAttribute GetNewTModifikationAttribute(IBLInterface parentInterface) {
             return new CustomBLAttribute() {
+                ShortName = null,
                 Name = "T_Modifikation",
                 FullName = $"{parentInterface.Name}.T_Modifikation",
                 DataType = CoreDataType.VARCHAR,                
@@ -64,6 +67,7 @@ namespace KDV.CeusDL.Model.BL {
         ///
         public static IBLAttribute GetNewTBemerkungAttribute(IBLInterface parentInterface) {
             return new CustomBLAttribute() {
+                ShortName = null,
                 Name = "T_Bemerkung",
                 FullName = $"{parentInterface.Name}.T_Bemerkung",
                 DataType = CoreDataType.VARCHAR,                
@@ -79,6 +83,7 @@ namespace KDV.CeusDL.Model.BL {
         ///
         public static IBLAttribute GetNewTBenutzerAttribute(IBLInterface parentInterface) {
             return new CustomBLAttribute() {
+                ShortName = null,
                 Name = "T_Benutzer",
                 FullName = $"{parentInterface.Name}.T_Benutzer",
                 DataType = CoreDataType.VARCHAR,                
@@ -95,6 +100,7 @@ namespace KDV.CeusDL.Model.BL {
         ///
         public static IBLAttribute GetNewTSystemAttribute(IBLInterface parentInterface) {
             return new CustomBLAttribute() {
+                ShortName = null,
                 Name = "T_System",
                 FullName = $"{parentInterface.Name}.T_System",
                 DataType = CoreDataType.VARCHAR,                
@@ -111,6 +117,7 @@ namespace KDV.CeusDL.Model.BL {
         ///
         public static IBLAttribute GetNewTErstDatAttribute(IBLInterface parentInterface) {
             return new CustomBLAttribute() {
+                ShortName = null,
                 Name = "T_Erst_Dat",
                 FullName = $"{parentInterface.Name}.T_Erst_Dat",
                 DataType = CoreDataType.DATETIME,                
@@ -126,6 +133,7 @@ namespace KDV.CeusDL.Model.BL {
         ///
         public static IBLAttribute GetNewTAendDatAttribute(IBLInterface parentInterface) {
             return new CustomBLAttribute() {
+                ShortName = null,
                 Name = "T_Aend_Dat",
                 FullName = $"{parentInterface.Name}.T_Aend_Dat",
                 DataType = CoreDataType.DATETIME,                
@@ -144,6 +152,7 @@ namespace KDV.CeusDL.Model.BL {
             var timeAttribute = timeInterface.UniqueKeyAttributes.Where(a => a.Name != "Mandant_KNZ").First();
             // 2. Custom-Attribut bauen.
             return new CustomBLAttribute() {
+                ShortName = null,
                 Name = "T_Gueltig_Bis_Dat",
                 FullName = $"{parentInterface.Name}.T_Gueltig_Bis_Dat",
                 DataType = timeAttribute.DataType,
@@ -161,6 +170,7 @@ namespace KDV.CeusDL.Model.BL {
         ///
         public static IBLAttribute GetNewTLadelaufNRAttribute(IBLInterface parentInterface) {
             return new CustomBLAttribute() {
+                ShortName = null,
                 Name = "T_Ladelauf_NR",
                 FullName = $"{parentInterface.Name}.T_Ladelauf_NR",
                 DataType = CoreDataType.INT,                
@@ -172,18 +182,14 @@ namespace KDV.CeusDL.Model.BL {
         }                  
         #endregion
 
-        public string ShortName {
-            get {
-                return Name;
-            }            
-        }
+        public string ShortName { get ; private set; }
         public string Name { get; set; }
 
         public string FullName { get; set; }
 
-        public string ShortFormerName => null;
-        public string FormerName => null;
-        public string FullFormerName => null;
+        public string ShortFormerName => ShortName;
+        public string FormerName => ParentInterface.FormerName!=null&&ShortName!=null?$"{ParentInterface.ShortFormerName}_{ShortName}":null;
+        public string FullFormerName => ParentInterface.FormerName!=null&&ShortName!=null?$"{ParentInterface.FormerName}.dbo.{FormerName}":null;
 
         public CoreDataType DataType { get; set; }
 
@@ -207,7 +213,7 @@ namespace KDV.CeusDL.Model.BL {
 
         public string GetSqlDataTypeDefinition()
         {
-            string result = BaseBLAttribute.GenerateSqlDataTypeDefinition(this);
+            string result = BLDataType.GenerateSqlDataTypeDefinition(this);
 
             if(IsPrimaryKey) {
                 result += " primary key";

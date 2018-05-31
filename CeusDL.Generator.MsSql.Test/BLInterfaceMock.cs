@@ -19,6 +19,7 @@ namespace KDV.CeusDL.Model.BL {
             }
         }
 
+        public string ShortFormerName => throw new NotImplementedException();
         public string FormerName => throw new NotImplementedException();
         public string FullFormerName => throw new NotImplementedException();
 
