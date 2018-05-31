@@ -52,6 +52,8 @@ namespace KDV.CeusDL.Generator.BL {
             var result = new List<GeneratorResult>();
             result.Add(new GeneratorResult("BL_Drop.sql", code));            
             return result;
-        }        
+        }
+        
+              
     }
 }

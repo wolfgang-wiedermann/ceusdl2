@@ -85,12 +85,12 @@ namespace KDV.CeusDL.Utilities.BL.Test
             // Auswählen
             var ifa = blModel.Interfaces[0];
 
-             using(var con = new SqlConnection("Data Source=localhost;Initial Catalog=FH_AP_BaseLayer;Integrated Security=True;Application Name=\"CEUSDL Tests\"")) {
+            using(var con = new SqlConnection("Data Source=localhost;Initial Catalog=FH_AP_BaseLayer;Integrated Security=True;Application Name=\"CEUSDL Tests\"")) {
                 con.Open();
                 var ana = new ModificationAnalyzer(blModel, con);
                 bool tex = ana.InterfaceRenamed(ifa);
                 Assert.IsTrue(tex);
-             }
+            }
         }
 
         [TestMethod]

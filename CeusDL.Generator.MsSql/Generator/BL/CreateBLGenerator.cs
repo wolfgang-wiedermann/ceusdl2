@@ -48,6 +48,7 @@ namespace KDV.CeusDL.Generator.BL {
                 code += " */\n\n";
             }
 
+            // Diese Logik gibt es 2x, siehe auch UpdateBLGenerator.GenerateCreateViews
             foreach(var ifa in model.DimTableInterfaces.OrderBy(i => i.MaxReferenceDepth)) {                
                 code += GenerateBLTable(ifa);  
                 code += GenerateUniqueKeyConstraint(ifa);
@@ -262,7 +263,7 @@ namespace KDV.CeusDL.Generator.BL {
         ///
         /// Generiert die IL -> BL View für eine DimTable
         ///
-        private string GenerateDimTableView(IBLInterface ifa) {            
+        internal string GenerateDimTableView(IBLInterface ifa) {            
             if(ifa is DerivedBLInterface)
                 throw new InvalidInterfaceTypeException("LOGICAL_ERROR: Die Methode GenerateDimView in CreateBLGenerator.cs ist nur "
                     +"für nicht historisierte DimTables vorgesehen");
@@ -292,7 +293,7 @@ namespace KDV.CeusDL.Generator.BL {
         ///
         /// Generieren einer Views für eine historisierte DimTable (_VERSION_VW)
         ///
-        private string GenerateHistorizedDimTableView(IBLInterface ifa) {
+        internal string GenerateHistorizedDimTableView(IBLInterface ifa) {
             string code = $"-- View für historisierte DimTable {ifa.Name}\n";    
             code += "-- !!! DAS KONZEPT HIER IST NOCH EIN EINZIGER BUG !!!\n";
             code += GenerateDefaultDimTableViewTop(ifa);

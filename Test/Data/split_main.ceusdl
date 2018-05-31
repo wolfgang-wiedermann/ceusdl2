@@ -25,15 +25,15 @@ import "split_part_geografie.ceusdl"
 // Zeit-Attribute
 //
 
-interface Semester : TemporalTable(former_name="SEM") { // Beispiel für Umbenennung beim Interface
+interface Semestr : TemporalTable(former_name="Semester") { // Beispiel für Umbenennung beim Interface
     base KNZ:varchar(len="50", primary_key="true");
-    base KURZBEZ:varchar(len="100", former_name="KBEZ"); // Beispiel für Umbenennung beim base- oder fact-Attribut
+    base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
 }
 
 interface FachSemester : DefTable {
     base KNZ:varchar(len="50", primary_key="true");
-    base KURZBEZ:varchar(len="100"); // Eventuell ist statt einem alter ... auch eine Kennzeichnung des Attributs mit "former KURZBEZEICHNUNG" für Rename ausreichend;
+    base KURZBEZ:varchar(len="100", former_name="KBEZ"); // Eventuell ist statt einem alter ... auch eine Kennzeichnung des Attributs mit "former KURZBEZEICHNUNG" für Rename ausreichend;
     base LANGBEZ:varchar(len="500");
 }
 
@@ -147,7 +147,7 @@ interface Bewerber : FactTable(mandant="true", history="true", with_nowtable="tr
 
     base Alter:int(calculated="true"); // Beispiel für ein erstes Calculated-Attribut
 
-    ref Semester.KNZ;
+    ref Semestr.KNZ;
 
     ref HZBArt.KNZ; // Muss dann höchste HZB werden, denn lt. Andreas kann ein Bewerber mehrere HZBs haben
                     // die höchste HZB kann ich mit min(HZBArt_AMT_ID) ermitteln!

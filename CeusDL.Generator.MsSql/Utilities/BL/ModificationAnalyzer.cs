@@ -44,20 +44,28 @@ namespace KDV.CeusDL.Utilities.BL {
             }
             if(!TableWithNameExists(ifa.FormerName)) {
                 return false;
-            }            
-
-            foreach(var attr in ifa.Attributes.Where(a => !a.IsTechnicalAttribute)) {
-                if(!ColumnExists(ifa.FormerName, attr.FormerName)) {
-                    return false;
-                }
-                // TODO: Typ-Check mit FormerName
-                //if(!ColumnHasCorrectType(attr)) {
-                //    return false;
-                //}
-            }
+            }                       
 
             return true;
         }
+
+        public bool TableExistsModified(IBLInterface ifa) {
+            if(!TableWithNameExists(ifa.Name)) {
+                return false;
+            }
+
+            bool unmodified = true;
+            foreach(var attr in ifa.Attributes) {
+                if(!ColumnExists(ifa.Name, attr.Name)) {
+                    unmodified &= false;
+                }
+                if(!ColumnHasCorrectType(attr)) {
+                    unmodified &= false;
+                }
+            }
+
+            return !unmodified;
+        }        
 
         private bool ColumnHasCorrectType(IBLAttribute attr)
         {
