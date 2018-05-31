@@ -145,6 +145,7 @@ interface Bewerber : FactTable(mandant="true", history="true", with_nowtable="tr
     
     ref Geschlecht.KNZ;
     ref Tag.KNZ as Geburtstag;
+    ref Tag.KNZ as Schulabschluss;
 
     base Alter:int(calculated="true"); // Beispiel für ein erstes Calculated-Attribut
 

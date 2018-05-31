@@ -21,23 +21,6 @@ namespace KDV.CeusDL.Utilities.BL {
         //       des gewünschten Zustands lt. CEUSDL (BLModel) durchführen...
         #region complex operations
 
-        public bool TableExistsUnmodified(IBLInterface ifa) {
-            if(!TableWithNameExists(ifa.Name)) {
-                return false;
-            }
-
-            foreach(var attr in ifa.Attributes) {
-                if(!ColumnExists(ifa.Name, attr.Name)) {
-                    return false;
-                }
-                if(!ColumnHasCorrectType(attr)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         public bool InterfaceRenamed(IBLInterface ifa) {
             if(TableWithNameExists(ifa.Name)) {
                 return false;
@@ -49,6 +32,7 @@ namespace KDV.CeusDL.Utilities.BL {
             return true;
         }
 
+        // TODO:für TableExistsModified brauch ich noch Testfälle
         public bool TableExistsModified(IBLInterface ifa) {
             if(!TableWithNameExists(ifa.Name)) {
                 return false;
@@ -69,6 +53,8 @@ namespace KDV.CeusDL.Utilities.BL {
             return !unmodified;
         }
 
+        // Prüft, ob in der Datenbank noch Spalten vorhanden sind, die im ceusdl-Code
+        // schon entfernt wurden.
         private bool HasRemovedColums(IBLInterface ifa) {
             if(TableWithNameExists(ifa.Name)) {
                 var dbCols = GetColumnNamesFromDb(ifa.Name);
@@ -148,17 +134,14 @@ namespace KDV.CeusDL.Utilities.BL {
         public bool TableRenamed(string name, string formerName) {
             if(TableWithNameExists(name)) {
                 return false;
-            } else if(TableWithNameExists(formerName)) {
-                // TODO: Hier müsste eigentlich auch auf die Felder, die automatisch mit
-                //       dem Interface-Namen beginnen geprüft werden...
-                //       (Das geht aber praktisch nur mit einem Objekt vom Typ IBLInterface)
+            } else if(TableWithNameExists(formerName)) {               
                 return true;
             } else {
                 return false;
             }
         }
 
-        public List<string> GetColumnNamesFromDb(string tableName) {
+        private List<string> GetColumnNamesFromDb(string tableName) {
             if(!con.State.Equals(System.Data.ConnectionState.Open)) {
                 con.Open();
             }

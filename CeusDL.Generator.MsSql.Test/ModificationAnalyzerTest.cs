@@ -14,66 +14,6 @@ namespace KDV.CeusDL.Utilities.BL.Test
     public class ModificationAnalyzerTest
     {
         [TestMethod]
-        public void TestTableExistsUnmodified_Complex_Exists() {
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo.1.ceusdl";
-            var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
-            var p = new FileParser(data);
-            var result = p.Parse();            
-            var model = new CoreModel(result);
-            var blModel = new BLModel(model);
-
-            // Auswählen
-            var ifa = blModel.Interfaces[0];
-
-             using(var con = new SqlConnection("Data Source=localhost;Initial Catalog=FH_AP_BaseLayer;Integrated Security=True;Application Name=\"CEUSDL Tests\"")) {
-                con.Open();
-                var ana = new ModificationAnalyzer(blModel, con);
-                bool tex = ana.TableExistsUnmodified(ifa);
-                Assert.IsTrue(tex);
-             }
-        }
-
-        [TestMethod]
-        public void TestTableExistsUnmodified_Complex_NotExists() {
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo.3.ceusdl";
-            var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
-            var p = new FileParser(data);
-            var result = p.Parse();            
-            var model = new CoreModel(result);
-            var blModel = new BLModel(model);
-
-            // Auswählen
-            var ifa = blModel.Interfaces[0];
-
-             using(var con = new SqlConnection("Data Source=localhost;Initial Catalog=FH_AP_BaseLayer;Integrated Security=True;Application Name=\"CEUSDL Tests\"")) {
-                con.Open();
-                var ana = new ModificationAnalyzer(blModel, con);
-                bool tex = ana.TableExistsUnmodified(ifa);
-                Assert.IsTrue(tex);
-             }
-        }
-
-        [TestMethod]
-        public void TestTableExistsUnmodified_Complex_Modified() {
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo.4.ceusdl";
-            var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
-            var p = new FileParser(data);
-            var result = p.Parse();            
-            var model = new CoreModel(result);
-            var blModel = new BLModel(model);
-
-            // Auswählen
-            var ifa = blModel.Interfaces[0];
-
-             using(var con = new SqlConnection("Data Source=localhost;Initial Catalog=FH_AP_BaseLayer;Integrated Security=True;Application Name=\"CEUSDL Tests\"")) {
-                con.Open();
-                var ana = new ModificationAnalyzer(blModel, con);
-                bool tex = ana.TableExistsUnmodified(ifa);
-                Assert.IsFalse(tex);
-             }
-        }
-
-        [TestMethod]
         public void TestInterfaceRenamed_Complex() {
             var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo.3.ceusdl";
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
