@@ -29,6 +29,7 @@ interface Semester : TemporalTable(former_name="Semestr") { // Beispiel für Umb
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
+    //ref Jahr.KNZ as Bewerbungsjahr;
 }
 
 interface FachSemester : DefTable {

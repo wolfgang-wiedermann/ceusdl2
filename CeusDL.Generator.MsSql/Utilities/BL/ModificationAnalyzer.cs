@@ -64,7 +64,22 @@ namespace KDV.CeusDL.Utilities.BL {
                 }
             }
 
+            unmodified &= !HasRemovedColums(ifa);
+
             return !unmodified;
+        }
+
+        private bool HasRemovedColums(IBLInterface ifa) {
+            if(TableWithNameExists(ifa.Name)) {
+                var dbCols = GetColumnNamesFromDb(ifa.Name);
+                var cdlCols = ifa.Attributes.Select(a => a.Name).ToList<string>();
+                foreach(var dbcol in dbCols) {
+                    if(!cdlCols.Contains(dbcol)) {
+                        return true;
+                    }
+                }
+            }     
+            return false;
         }        
 
         private bool ColumnHasCorrectType(IBLAttribute attr)
@@ -143,19 +158,26 @@ namespace KDV.CeusDL.Utilities.BL {
             }
         }
 
-        public bool IsColumnSameDefinition(IBLAttribute attr) {
-            throw new NotImplementedException("Noch nicht implementiert");
-            /*
+        public List<string> GetColumnNamesFromDb(string tableName) {
+            if(!con.State.Equals(System.Data.ConnectionState.Open)) {
+                con.Open();
+            }
+            List<string> result = new List<string>();
             using(var cmd = con.CreateCommand()) {
-                cmd.CommandText = "select 1 from information_schema.columns where table_name = @table_name and table_schema = 'dbo' and column_name = @column_name";
+                cmd.CommandText = "select column_name from information_schema.columns where table_name = @table_name and table_schema = 'dbo' order by ordinal_position";
                 cmd.Prepare();
-                cmd.Parameters.Add(new SqlParameter("table_name", tableName));
-                cmd.Parameters.Add(new SqlParameter("column_name", columnName));
-                object result = cmd.ExecuteScalar();
-                return result != null;
-            } 
-            */           
+                cmd.Parameters.Add(new SqlParameter("table_name", tableName));                
+
+                using(var rdr = cmd.ExecuteReader()) {
+                    while(rdr.Read()) {
+                        result.Add(rdr.GetString(0));
+                    }
+                }
+
+                return result;
+            }
         }
+
         #endregion simple operations
     }
 }
