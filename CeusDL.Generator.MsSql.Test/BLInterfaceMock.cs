@@ -23,6 +23,8 @@ namespace KDV.CeusDL.Model.BL {
         public string FormerName => throw new NotImplementedException();
         public string FullFormerName => throw new NotImplementedException();
 
+        public string RealFormerName { get; set; }
+
         public List<IBLAttribute> Attributes { get; private set; }
 
         public CoreInterfaceType InterfaceType {get; set; }

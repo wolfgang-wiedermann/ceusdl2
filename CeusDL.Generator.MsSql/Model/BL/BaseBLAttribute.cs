@@ -67,6 +67,8 @@ namespace KDV.CeusDL.Model.BL {
             }
         }
 
+        public string RealFormerName { get; set; }
+
         public CoreDataType DataType {
             get {
                 return this.coreAttribute.DataType;

@@ -51,6 +51,8 @@ namespace KDV.CeusDL.Model.BL
             }
         }
 
+        public string RealFormerName { get; set; }
+
         public List<IBLAttribute> Attributes { get; private set; }
 
         public DefaultBLInterface DefaultInterface { get; private set; }

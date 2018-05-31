@@ -38,7 +38,7 @@ namespace KDV.CeusDL.Model.BL {
             }
         }
 
-                public string ShortFormerName => coreAttribute.FormerName;
+        public string ShortFormerName => coreAttribute.FormerName;
         public string FormerName {
             get {
                 if(this.coreAttribute.FormerName != null) {
@@ -65,6 +65,8 @@ namespace KDV.CeusDL.Model.BL {
                 }
             }
         }
+
+        public string RealFormerName { get; set; }
 
         public CoreDataType DataType {
             get {

@@ -79,7 +79,28 @@ namespace KDV.CeusDL.Generator.BL {
 
         private void GenerateInsertIntoSelect(StringBuilder sb)
         {
-            sb.Append("-- TODO: insert into NEUE_TABELLE select ... from ALTE_TABELLE\n");
+            sb.Append("-- Aktualisierte Tabelle wieder mit den gesicherten Daten befüllen\n");
+            foreach(var ifa in ModifiedTables) {
+                sb.Append($"set identity_insert {ifa.FullName} on;\n");
+                sb.Append($"insert into {ifa.FullName} (\n");
+                foreach(var attr in ifa.Attributes.Where(a => a.RealFormerName != null)) {
+                    sb.Append(attr.Name.Indent("    "));
+                    if(ifa.Attributes.Last() != attr) {
+                        sb.Append(",");
+                    }
+                    sb.Append("\n");
+                }
+                sb.Append(")\nselect \n");
+                foreach(var attr in ifa.Attributes.Where(a => a.RealFormerName != null)) {
+                    sb.Append(attr.RealFormerName.Indent("    "));
+                    if(ifa.Attributes.Last() != attr) {
+                        sb.Append(",");
+                    }
+                    sb.Append("\n");
+                }
+                sb.Append($"from {ifa.RealFormerName}_BAK;\n");
+                sb.Append($"set identity_insert {ifa.FullName} off;\n\n");
+            }
         }
 
         private void GenerateDropModifiedTables(StringBuilder sb)
@@ -169,14 +190,35 @@ namespace KDV.CeusDL.Generator.BL {
 
         private List<IBLInterface> GetModifiedTables() {
             List<IBLInterface> temp = new List<IBLInterface>();
-            foreach(var ifa in model.Interfaces.Where(i => i.InterfaceType != CoreInterfaceType.DIM_VIEW)) {
-                if(analyzer.TableExistsModified(ifa)) {
-                    temp.Add(ifa);
-                } else if(analyzer.InterfaceRenamed(ifa)) {
+            foreach(var ifa in model.Interfaces.Where(i => i.InterfaceType != CoreInterfaceType.DIM_VIEW)) {                
+                if(analyzer.TableExistsModified(ifa) || analyzer.InterfaceRenamed(ifa)) {                   
+                    SetRealFromerNames(ifa); 
                     temp.Add(ifa);
                 }
             }            
             return temp;
+        }
+
+        private void SetRealFromerNames(IBLInterface ifa)
+        {
+            // Realen bisherigen Tabellennamen setzen
+            if(analyzer.TableRenamed(ifa.Name, ifa.FormerName)) {
+                ifa.RealFormerName = ifa.FormerName;
+            } else {
+                ifa.RealFormerName = ifa.Name;
+            }
+
+            // Reale bisherige Spaltennamen setzen
+            foreach(var attr in ifa.Attributes) {
+                if(analyzer.ColumnExists(ifa.RealFormerName, attr.Name)) {
+                    attr.RealFormerName = attr.Name;
+                } else if(analyzer.ColumnExists(ifa.RealFormerName, attr.FormerName)) {
+                    attr.RealFormerName = attr.FormerName;
+                } else {
+                    // Neues Attribut, das keinen bisherigen Namen hat...
+                    attr.RealFormerName = null;
+                }
+            }
         }
     }
 }

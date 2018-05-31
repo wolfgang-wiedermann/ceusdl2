@@ -17,6 +17,8 @@ namespace KDV.CeusDL.Model.BL {
         string FormerName { get; }
         // Früherer voll qualifizierter Tabellenname in BL (berechnet aus former_name="")
         string FullFormerName { get; }
+        // Vollständiger in der Datenbank beim Abgleich ermittelter Tabellenname
+        string RealFormerName { get; set;  }
         // Vollständiger ViewName in BL (z. B. AP_BL_F_Antrag_VW)
         string ViewName { get; }
         // Voll qualifizierter ViewName in BL (z. B.FH_AP_BaseLayer.dbo.AP_BL_F_Antrag_VW)

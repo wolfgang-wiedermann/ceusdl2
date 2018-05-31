@@ -190,6 +190,7 @@ namespace KDV.CeusDL.Model.BL {
         public string ShortFormerName => ShortName;
         public string FormerName => ParentInterface.FormerName!=null&&ShortName!=null?$"{ParentInterface.ShortFormerName}_{ShortName}":null;
         public string FullFormerName => ParentInterface.FormerName!=null&&ShortName!=null?$"{ParentInterface.FormerName}.dbo.{FormerName}":null;
+        public string RealFormerName { get; set; }
 
         public CoreDataType DataType { get; set; }
 

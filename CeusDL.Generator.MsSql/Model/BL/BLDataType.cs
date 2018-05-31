@@ -35,9 +35,7 @@ namespace KDV.CeusDL.Model.BL {
             } 
         }
 
-        public static string GetSqlDataType(IBLAttribute attr) {
-            string code = "";
-
+        public static string GetSqlDataType(IBLAttribute attr) {            
             switch(attr.DataType) {
                 case CoreDataType.DATE:                    
                     return "date";                    
@@ -56,9 +54,7 @@ namespace KDV.CeusDL.Model.BL {
                     return "varchar";                    
                 default:
                     throw new InvalidDataTypeException($"Ungültiger Datentyp: Die SqlDataTypeDefinition für das Attribut {attr.FullName} konnte nicht generiert werden.");
-            }         
-
-            return code;
+            }                     
         }
 
         public static string GenerateSqlDataTypeDefinition(IBLAttribute attr) {

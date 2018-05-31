@@ -13,6 +13,7 @@ namespace KDV.CeusDL.Model.BL {
         string ShortFormerName { get; } // Früherer Attributname in ceusdl-Syntax lt. former_name="K" => K
         string FormerName { get; } // Früherer Attributname in BL-Syntax lt. former_name="K" => Semester_K
         string FullFormerName { get; } // Attributname incl. ggf. früheren Tabellennamen getrennt durch Punkt
+        string RealFormerName { get; set; } // Attributname lt. Datenbankabgleich - benötigt für Insert into Select
         CoreDataType DataType { get; }
         int Length { get; }
         int Decimals { get; }
