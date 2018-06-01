@@ -234,6 +234,28 @@ namespace KDV.CeusDL.Generator.BL {
                     attr.RealFormerName = attr.Name;
                 } else if(analyzer.ColumnExists(ifa.RealFormerName, attr.FormerName)) {
                     attr.RealFormerName = attr.FormerName;
+                } else if(attr is RefBLAttribute) {
+                    // DAS IST NOCH MURKS
+                    var refAttr = (RefBLAttribute)attr;
+                    if(refAttr?.Core?.Alias == null) {
+                        // Mit Alias
+                        if(analyzer.ColumnExists(ifa.RealFormerName, $"{refAttr.Core.Alias}_{refAttr.Core.ReferencedAttribute.FormerName}")) {
+                            attr.RealFormerName = $"{refAttr.Core.Alias}_{refAttr.Core.ReferencedAttribute.FormerName}";
+                        } else if (analyzer.ColumnExists(ifa.RealFormerName, $"{refAttr.Core.Alias}_{refAttr.Core.ReferencedAttribute.Name}")) {
+                            attr.RealFormerName = $"{refAttr.Core.Alias}_{refAttr.Core.ReferencedAttribute.Name}";
+                        } else {
+                            attr.RealFormerName = null;
+                        }
+                    } else {
+                        // Ohne Alias
+                        if(analyzer.ColumnExists(ifa.RealFormerName, refAttr.Core.ReferencedAttribute.FormerName)) {
+                            attr.RealFormerName = refAttr.Core.ReferencedAttribute.FormerName;
+                        } else if (analyzer.ColumnExists(ifa.RealFormerName, refAttr.Core.ReferencedAttribute.Name)) {
+                            attr.RealFormerName = refAttr.Core.ReferencedAttribute.Name;
+                        } else {
+                            attr.RealFormerName = null;
+                        }
+                    }                    
                 } else {
                     // Neues Attribut, das keinen bisherigen Namen hat...
                     attr.RealFormerName = null;

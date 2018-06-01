@@ -12,6 +12,7 @@ namespace KDV.CeusDL.Model.BL {
         private CoreRefAttribute coreAttribute = null;
 
         #region Public Properties
+        public CoreRefAttribute Core => coreAttribute;
         public string ShortName {
             get {
                 if(!string.IsNullOrEmpty(coreAttribute.Alias)) {
@@ -38,15 +39,16 @@ namespace KDV.CeusDL.Model.BL {
             }
         }
 
+        // Short former name ist hier noch mist!!!
         public string ShortFormerName => coreAttribute.FormerName;
         public string FormerName {
             get {
-                if(this.coreAttribute.FormerName != null) {
-                    if(string.IsNullOrEmpty(coreAttribute.FormerName)) {
-                        return ReferencedAttribute.Name;
-                    } else {
-                        return $"{coreAttribute.FormerName}_{ReferencedAttribute.Name}";
-                    } 
+                if(String.IsNullOrEmpty(Core.Alias) && String.IsNullOrEmpty(Core.FormerName)) {
+                    return ReferencedAttribute.FormerName;
+                } else if(!String.IsNullOrEmpty(Core.Alias) && String.IsNullOrEmpty(Core.FormerName)) {
+                    return $"{coreAttribute.Alias}_{ReferencedAttribute.FormerName}";
+                } else if(!String.IsNullOrEmpty(Core.FormerName)) {
+                    return $"{coreAttribute.FormerName}_{ReferencedAttribute.FormerName}";
                 } else {
                     return null;
                 }
@@ -54,9 +56,9 @@ namespace KDV.CeusDL.Model.BL {
         }
         public string FullFormerName { 
             get {
-                if(FormerName != null && ParentInterface.FormerName != null) {
+                if(ParentInterface.FormerName != null && FormerName != null) {
                     return $"{ParentInterface.FormerName}.{FormerName}";
-                } else if(FormerName == null && ParentInterface.FormerName != null) {
+                } else if(ParentInterface.FormerName != null && FormerName == null) {
                     return $"{ParentInterface.FormerName}.{Name}";
                 } else if(FormerName != null) {
                     return $"{ParentInterface.Name}.{FormerName}";                    
