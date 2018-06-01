@@ -21,9 +21,9 @@ namespace KDV.CeusDL.Model.BL {
 
         public string ShortFormerName => throw new NotImplementedException();
         public string FormerName => throw new NotImplementedException();
-        public string FullFormerName => throw new NotImplementedException();
-
+        public string FullFormerName => throw new NotImplementedException();        
         public string RealFormerName { get; set; }
+        public string DatabaseName => throw new NotImplementedException();
 
         public List<IBLAttribute> Attributes { get; private set; }
 

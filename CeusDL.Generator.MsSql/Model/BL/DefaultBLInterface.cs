@@ -46,6 +46,8 @@ namespace KDV.CeusDL.Model.BL {
 
         public string RealFormerName { get; set; }
 
+        public string DatabaseName => ParentModel.Config.BLDatabase;
+
         public List<IBLAttribute> Attributes { get; private set; }
 
         public CoreInterfaceType InterfaceType { 

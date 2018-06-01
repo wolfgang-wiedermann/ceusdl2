@@ -53,6 +53,43 @@ namespace KDV.CeusDL.Utilities.BL {
             return !unmodified;
         }
 
+        public List<string> ListDeletedInterfaceNames(BLModel model) {
+            var tablesDB = FindAllBLAndDefTablesInDB(model);
+            var tablesCEUSDL = model.Interfaces
+                                .Select(i => i.Name)
+                                .Union(model.Interfaces.Select(i => i.FormerName))
+                                .ToList<string>();
+
+            return tablesDB.Where(t => !tablesCEUSDL.Contains(t)).ToList<string>();
+        }
+
+        // Ermittelt alle BL und Def-Tabellen in der BL-Datenbank
+        // (das schließt gleich auch die _BAK Tabellen mit ein!)
+        public List<string> FindAllBLAndDefTablesInDB(BLModel model) {
+            List<string> result = new List<string>();
+            if(!con.State.Equals(System.Data.ConnectionState.Open)) {
+                con.Open();
+            }
+            using(var cmd = con.CreateCommand()) {
+                cmd.CommandText = "select table_name from FH_AP_BaseLayer.information_schema.tables ";
+                cmd.CommandText += "where table_catalog = @table_catalog and table_schema = 'dbo' ";
+                cmd.CommandText += "and (table_name like @name_filter1 or table_name like @name_filter2) and table_type = 'BASE TABLE'";
+
+                cmd.Prepare();
+
+                cmd.Parameters.Add(new SqlParameter("table_catalog", model.Config.BLDatabase));
+                cmd.Parameters.Add(new SqlParameter("name_filter1", $"{model.Config.Prefix}_BL_%"));
+                cmd.Parameters.Add(new SqlParameter("name_filter2", $"{model.Config.Prefix}_def_%"));
+
+                using(var rdr = cmd.ExecuteReader()) {
+                    while(rdr.Read()) {
+                        result.Add(rdr.GetString(0));
+                    }
+                }
+            }
+            return result;
+        }
+
         // Prüft, ob in der Datenbank noch Spalten vorhanden sind, die im ceusdl-Code
         // schon entfernt wurden.
         private bool HasRemovedColums(IBLInterface ifa) {

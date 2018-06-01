@@ -16,14 +16,19 @@ namespace KDV.CeusDL.Generator.BL {
         private CreateBLGenerator createGenerator;        
         public List<IBLInterface> MissingTables { get; private set; }
         public List<IBLInterface> ModifiedTables { get; private set; }
+        public List<string> DeletedTables { get; private set; }
 
-
+        ///
+        /// @param model => CoreModel
+        /// @param conStr => Connectionstring zu einer BaseLayer-Datenbank
+        ///
         public UpdateBLGenerator(CoreModel model, string conStr) {
             this.model = new BLModel(model);
             this.createGenerator = new CreateBLGenerator(this.model);            
             this.analyzer = new ModificationAnalyzer(this.model, GetConnection(conStr));            
             // Hier noch keinen Analysecode aufrufen, der gehört nach GenerateCode
         }
+
         ///
         /// @param model => BaseLayer Model
         /// @param conStr => Connectionstring zu einer BaseLayer-Datenbank
@@ -37,7 +42,8 @@ namespace KDV.CeusDL.Generator.BL {
 
         public List<GeneratorResult> GenerateCode() {            
             this.MissingTables = GetMissingTables();
-            this.ModifiedTables = GetModifiedTables();            
+            this.ModifiedTables = GetModifiedTables();
+            this.DeletedTables = analyzer.ListDeletedInterfaceNames(this.model);    
             var result = new List<GeneratorResult>();
             result.Add(new GeneratorResult("BL_Update.sql", GenerateUpdateTables()));            
             return result;
@@ -47,13 +53,14 @@ namespace KDV.CeusDL.Generator.BL {
             StringBuilder sb = new StringBuilder();
             // 1. Neue Tabellen hinzufügen
             sb.Append(GenerateCreateNewTables());
-            // 2. Veränderte Tabellen anpassen
-            //    TODO: select into -> drop -> create -> insert into select
+            // 2. Veränderte Tabellen anpassen: select into -> drop -> create -> insert into select
             sb.Append(GenerateModifyTables());
             // 3. Alle BL-Views droppen
             sb.Append(GenerateDropViews());
             // 4. Alle BL-Views neu anlegen
             sb.Append(GenerateCreateViews());
+            // 5. Tabellen, die nicht mehr als ceusdl Interface definiert sind löschen
+            sb.Append(GenerateDeleteObsoleteTables());
             return sb.ToString();
         }
 
@@ -107,13 +114,8 @@ namespace KDV.CeusDL.Generator.BL {
         {
             sb.Append("\n/*\n * Alte Versionen der veränderten Tabellen löschen\n */\n");
             foreach(var ifa in ModifiedTables) {
-                if(analyzer.InterfaceRenamed(ifa)) {
-                    sb.Append($"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{ifa.FormerName}]') AND type in (N'U'))\n");
-                    sb.Append($"drop table {ifa.FormerName}\n");
-                } else {
-                    sb.Append($"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{ifa.Name}]') AND type in (N'U'))\n");
-                    sb.Append($"drop table {ifa.FullName}\n");
-                }
+                sb.Append($"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{ifa.RealFormerName}]') AND type in (N'U'))\n");
+                sb.Append($"drop table {ifa.RealFormerName}\n");                
                 sb.Append("go\n\n");
             }
         }
@@ -129,12 +131,8 @@ namespace KDV.CeusDL.Generator.BL {
         private void GenerateSelectInto(StringBuilder sb)
         {
             sb.Append("\n/*\n * Veränderte Tabellen sichern\n */\n");
-            foreach(var ifa in ModifiedTables) {
-                if(analyzer.InterfaceRenamed(ifa)) {
-                    sb.Append($"select * into {ifa.FullFormerName}_BAK from {ifa.FullFormerName};\n\n");
-                } else {
-                    sb.Append($"select * into {ifa.FullName}_BAK from {ifa.FullName};\n\n");
-                }
+            foreach(var ifa in ModifiedTables) {                
+                sb.Append($"select * into {ifa.DatabaseName}.dbo.{ifa.RealFormerName}_BAK from {ifa.DatabaseName}.dbo.{ifa.RealFormerName};\n\n");              
             }
         }
 
@@ -169,6 +167,18 @@ namespace KDV.CeusDL.Generator.BL {
             }
             //TODO: loop über model.FactTableInterfaces...
             //TODO: code += GenerateFactView(ifa);
+            return sb.ToString();
+        }
+
+        private string GenerateDeleteObsoleteTables()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("/*\n * Löschen der Tabellen, deren Interfaces nicht mehr im ceusdl-Code enthalten sind.\n */\n");
+            foreach(var table in DeletedTables) {
+                sb.Append($"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{table}]') AND type in (N'U'))\n");
+                sb.Append($"drop table {table}\n");                
+                sb.Append("go\n\n");
+            }
             return sb.ToString();
         }
 

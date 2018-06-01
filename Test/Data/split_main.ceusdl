@@ -132,11 +132,19 @@ interface JaNein : DefTable {
     base LANGBEZ:varchar(len="500"); 
 }
 
+/*
+interface Sternzeichen : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500"); 
+}
+*/
+
 //
 // Fakten-Tabellen
 //
 
-interface Bewerber : FactTable(mandant="true", history="true", with_nowtable="true") {    
+interface Bewerber : FactTable(mandant="true", history="true", with_nowtable="true", former_name="Bewerberin") {    
     // Attribute
     base Bewerbernummer:varchar(len="20", primary_key="true");
     ref Tag.KNZ(primary_key="true");
@@ -145,6 +153,8 @@ interface Bewerber : FactTable(mandant="true", history="true", with_nowtable="tr
     
     ref Geschlecht.KNZ;
     ref Tag.KNZ as Geburtstag;
+    //ref Sternzeichen.KNZ as Sternzeichen;
+    ref Tag.KNZ as Einschulung;
     ref Tag.KNZ as Schulabschluss;
 
     base Alter:int(calculated="true"); // Beispiel für ein erstes Calculated-Attribut
@@ -178,7 +188,7 @@ interface Antrag : FactTable(mandant="true", history="true", with_nowtable="true
     base Antragsnummer:varchar(len="20", primary_key="true");    
     ref Tag.KNZ(primary_key="true"); 
 
-    ref Bewerber.Bewerbernummer;
+    ref Bewerber.Bewerbernummer(former_name="Bewerberin");
 
     ref StudiengangHisInOne.KNZ;
     ref Antragsstatus.KNZ;

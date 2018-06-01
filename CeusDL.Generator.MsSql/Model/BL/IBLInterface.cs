@@ -23,6 +23,7 @@ namespace KDV.CeusDL.Model.BL {
         string ViewName { get; }
         // Voll qualifizierter ViewName in BL (z. B.FH_AP_BaseLayer.dbo.AP_BL_F_Antrag_VW)
         string FullViewName { get; }
+        string DatabaseName { get; }
         List<IBLAttribute> Attributes { get; }
         CoreInterfaceType InterfaceType { get; }
         bool IsHistorized { get; }
