@@ -51,17 +51,27 @@ namespace KDV.CeusDL.Generator.BL {
 
         public string GenerateUpdateTables() {
             StringBuilder sb = new StringBuilder();
-            // 1. Neue Tabellen hinzufügen
-            sb.Append(GenerateCreateNewTables());
-            // 2. Veränderte Tabellen anpassen: select into -> drop -> create -> insert into select
-            sb.Append(GenerateModifyTables());
-            // 3. Alle BL-Views droppen
-            sb.Append(GenerateDropViews());
-            // 4. Alle BL-Views neu anlegen
-            sb.Append(GenerateCreateViews());
-            // 5. Tabellen, die nicht mehr als ceusdl Interface definiert sind löschen
+            // 0. Use-Direktive generieren
+            sb.Append(GenerateUse());
+            // 1. Tabellen, die nicht mehr als ceusdl Interface definiert sind löschen
             sb.Append(GenerateDeleteObsoleteTables());
+            // 2. Neue Tabellen hinzufügen
+            sb.Append(GenerateCreateNewTables());
+            // 3. Veränderte Tabellen anpassen: select into -> drop -> create -> insert into select
+            sb.Append(GenerateModifyTables());
+            // 4. Alle BL-Views droppen
+            sb.Append(GenerateDropViews());
+            // 5. Alle BL-Views neu anlegen
+            sb.Append(GenerateCreateViews());            
             return sb.ToString();
+        }
+
+        private string GenerateUse() {
+            string code = "";
+            if(!string.IsNullOrEmpty(model.Config.BLDatabase)) {
+                code += $"\nuse {model.Config.BLDatabase};\n\n";
+            }
+            return code;
         }
 
         private string GenerateCreateNewTables() {
