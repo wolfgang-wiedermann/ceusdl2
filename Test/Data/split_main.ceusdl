@@ -136,7 +136,10 @@ interface Sternzeichen : DefTable(former_name="Sternz") {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
-    base INTQUOT:decimal(len="4,1"); // Intelligenzquotient ;-)
+    ref Tag.KNZ(former_name="Von") as Start;
+    ref Tag.KNZ(former_name="Bis") as Ende;
+    base VON:date(calculated="true");  
+    base BIS:date(calculated="true");
 }
 
 //

@@ -247,9 +247,9 @@ namespace KDV.CeusDL.Generator.BL {
                     attr.RealFormerName = attr.Name;
                 } else if(analyzer.ColumnExists(ifa.RealFormerName, attr.FormerName)) {
                     attr.RealFormerName = attr.FormerName;
-                } else if(attr is RefBLAttribute) {
-                    // DAS IST NOCH MURKS
+                } else if(attr is RefBLAttribute) {                    
                     var refAttr = (RefBLAttribute)attr;
+                    // FRAGE: Was ist mit: ein alias fällt weg und wird als former_name vermerkt?
                     if(refAttr?.Core?.Alias == null) {
                         // Mit Alias
                         if(analyzer.ColumnExists(ifa.RealFormerName, $"{refAttr.Core.Alias}_{refAttr.Core.ReferencedAttribute.FormerName}")) {

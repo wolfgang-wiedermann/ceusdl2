@@ -47,8 +47,10 @@ namespace KDV.CeusDL.Model.BL {
                     return ReferencedAttribute.FormerName;
                 } else if(!String.IsNullOrEmpty(Core.Alias) && String.IsNullOrEmpty(Core.FormerName)) {
                     return $"{coreAttribute.Alias}_{ReferencedAttribute.FormerName}";
-                } else if(!String.IsNullOrEmpty(Core.FormerName)) {
+                } else if(!String.IsNullOrEmpty(Core.FormerName) && !String.IsNullOrEmpty(ReferencedAttribute.FormerName)) {
                     return $"{coreAttribute.FormerName}_{ReferencedAttribute.FormerName}";
+                } else if(!String.IsNullOrEmpty(Core.FormerName) && String.IsNullOrEmpty(ReferencedAttribute.FormerName)) {
+                    return $"{coreAttribute.FormerName}_{ReferencedAttribute.Name}";
                 } else {
                     return null;
                 }
