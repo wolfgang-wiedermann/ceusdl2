@@ -109,7 +109,7 @@ namespace KDV.CeusDL.Generator.BL {
                 }
                 sb.Append(")\nselect \n");
                 foreach(var attr in ifa.Attributes.Where(a => a.RealFormerName != null)) {
-                    sb.Append(attr.RealFormerName.Indent("    "));
+                    sb.Append(WrapWithCast(attr, attr.RealFormerName).Indent("    "));
                     if(ifa.Attributes.Last() != attr) {
                         sb.Append(",");
                     }
@@ -217,6 +217,19 @@ namespace KDV.CeusDL.Generator.BL {
                 }
             }            
             return temp;
+        }
+
+        private string WrapWithCast(IBLAttribute attr, string name) {
+            switch(attr.DataType) {
+                case CoreDataType.VARCHAR:
+                    return $"cast ({name} as varchar({attr.Length})) as {name}";
+                case CoreDataType.DECIMAL:
+                    return $"cast ({name} as decimal({attr.Length}, {attr.Decimals})) as {name}";
+                default:
+                    // TODO: Prüfen ob das für die anderen Typen auch relevant ist und wie ich 
+                    //       das dann am besten umsetze.
+                    return name;
+            }
         }
 
         private void SetRealFromerNames(IBLInterface ifa)

@@ -132,10 +132,11 @@ interface JaNein : DefTable {
     base LANGBEZ:varchar(len="500"); 
 }
 
-interface Sternz : DefTable(former_name="Sternzeichen") {
+interface Sternzeichen : DefTable(former_name="Sternz") {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
-    base LANGBEZ:varchar(len="500"); 
+    base LANGBEZ:varchar(len="500");
+    base INTQUOT:decimal(len="4,1"); // Intelligenzquotient ;-)
 }
 
 //
@@ -151,7 +152,7 @@ interface Bewerber : FactTable(mandant="true", history="true", with_nowtable="tr
     
     ref Geschlecht.KNZ;
     ref Tag.KNZ as Geburtstag;
-    ref Sternz.KNZ;
+    ref Sternzeichen.KNZ;
     ref Tag.KNZ as Einschulung;
     ref Tag.KNZ as Schulabschluss;
 

@@ -119,7 +119,11 @@ namespace KDV.CeusDL.Utilities.BL {
                         cmd.CommandText += "and character_maximum_length = @max_len";
                         openParams.Add(new SqlParameter("max_len", attr.Length));
                         break;
-                    // TODO: für Decimal noch nachtragen ..
+                    case CoreDataType.DECIMAL:
+                        cmd.CommandText += "and numeric_precision = @max_len and numeric_scale = @scale";
+                        openParams.Add(new SqlParameter("max_len", attr.Length));
+                        openParams.Add(new SqlParameter("scale", attr.Decimals));
+                        break;
                 }
                 cmd.Prepare();
                 cmd.Parameters.Add(new SqlParameter("table_name", attr.ParentInterface.Name));
