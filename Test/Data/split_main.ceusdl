@@ -139,7 +139,7 @@ interface Sternzeichen : DefTable(former_name="Sternz") {
     ref Tag.KNZ(former_name="Start") as Von;
     ref Tag.KNZ(former_name="Ende") as Bis;
     //ref Land.KNZ(former_name="Herkunft");
-    ref Land.KNZ as Herkunft;
+    //ref Land.KNZ as Herkunft;
     base VON:date(calculated="true");  
     base BIS:date(calculated="true");
 }

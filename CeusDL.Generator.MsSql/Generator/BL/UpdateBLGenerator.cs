@@ -96,7 +96,7 @@ namespace KDV.CeusDL.Generator.BL {
 
         private void GenerateInsertIntoSelect(StringBuilder sb)
         {
-            sb.Append("-- Aktualisierte Tabelle wieder mit den gesicherten Daten befüllen\n");
+            sb.Append("/*\n * Aktualisierte Tabelle wieder mit den gesicherten Daten befüllen\n */\n");
             foreach(var ifa in ModifiedTables) {
                 sb.Append($"set identity_insert {ifa.FullName} on;\n");
                 sb.Append($"insert into {ifa.FullName} (\n");
