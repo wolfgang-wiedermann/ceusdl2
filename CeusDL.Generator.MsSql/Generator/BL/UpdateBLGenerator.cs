@@ -248,27 +248,63 @@ namespace KDV.CeusDL.Generator.BL {
                 } else if(analyzer.ColumnExists(ifa.RealFormerName, attr.FormerName)) {
                     attr.RealFormerName = attr.FormerName;
                 } else if(attr is RefBLAttribute) {                    
-                    var refAttr = (RefBLAttribute)attr;
-                    // FRAGE: Was ist mit: ein alias fällt weg und wird als former_name vermerkt?
-                    if(refAttr?.Core?.Alias == null) {
-                        // Mit Alias
-                        if(analyzer.ColumnExists(ifa.RealFormerName, $"{refAttr.Core.Alias}_{refAttr.Core.ReferencedAttribute.FormerName}")) {
+                    var refAttr = (RefBLAttribute)attr;                    
+                    if(refAttr?.Core?.FormerName != null && refAttr?.Core?.Alias != null) {
+                        // Felder FormerName und Alias des Attributs sind gefüllt
+                        if(analyzer.ColumnExists(ifa.RealFormerName, $"{refAttr.Core.FormerName}_{refAttr.Core.ReferencedAttribute.FormerName}")) {
+                            // Die Namensänderung des ReferencedAttribute und des Alias wurden noch nicht in der DB aktualisiert
+                            attr.RealFormerName = $"{refAttr.Core.FormerName}_{refAttr.Core.ReferencedAttribute.FormerName}";
+                        } else if(analyzer.ColumnExists(ifa.RealFormerName, $"{refAttr.Core.Alias}_{refAttr.Core.ReferencedAttribute.FormerName}")) {
+                            // Alias wurde bereits in der Datenbank aktualisiert, die Namensänderung des ReferencedAttribute aber nicht
                             attr.RealFormerName = $"{refAttr.Core.Alias}_{refAttr.Core.ReferencedAttribute.FormerName}";
-                        } else if (analyzer.ColumnExists(ifa.RealFormerName, $"{refAttr.Core.Alias}_{refAttr.Core.ReferencedAttribute.Name}")) {
+                        } else if(analyzer.ColumnExists(ifa.RealFormerName, $"{refAttr.Core.FormerName}_{refAttr.Core.ReferencedAttribute.Name}")) {
+                            // Die Namensänderung des ReferencedAttribute wurde bereits in der DB aktualisiert, das Alias aber noch nicht
+                            attr.RealFormerName = $"{refAttr.Core.FormerName}_{refAttr.Core.ReferencedAttribute.Name}";
+                        } else if(analyzer.ColumnExists(ifa.RealFormerName, $"{refAttr.Core.Alias}_{refAttr.Core.ReferencedAttribute.Name}")) {
+                            // Alias und ReferencedAttribute wurden bereits aktualisiert
                             attr.RealFormerName = $"{refAttr.Core.Alias}_{refAttr.Core.ReferencedAttribute.Name}";
                         } else {
+                            // Das Attribut hat es entweder vorher nicht gegeben oder es ist aus anderen Gründen nicht in der DB
+                            attr.RealFormerName = null;
+                        }
+                    } else if(refAttr?.Core?.FormerName == null && refAttr?.Core?.Alias != null) {
+                        // Nur ein Alias ist definiert, kein FormerName
+                        if(analyzer.ColumnExists(ifa.RealFormerName, $"{refAttr.Core.Alias}_{refAttr.ReferencedAttribute.FormerName}")) {
+                            // Alias wurde bereits in der Datenbank aktualisiert, die Namensänderung des ReferencedAttribute aber nicht
+                            attr.RealFormerName = $"{refAttr.Core.Alias}_{refAttr.ReferencedAttribute.FormerName}";
+                        } else if(analyzer.ColumnExists(ifa.RealFormerName, $"{refAttr.Core.Alias}_{refAttr.ReferencedAttribute.Name}")) {
+                            // Alias und ReferencedAttribute wurden bereits aktualisiert
+                            attr.RealFormerName = $"{refAttr.Core.Alias}_{refAttr.ReferencedAttribute.Name}";                        
+                        } else {
+                            // Das Attribut hat es entweder vorher nicht gegeben oder es ist aus anderen Gründen nicht in der DB
+                            attr.RealFormerName = null;
+                        }
+                    } else if(refAttr?.Core?.FormerName != null && refAttr?.Core?.Alias == null) {
+                        // Nur ein FormerName ist definiert aber kein Alias
+                        if(analyzer.ColumnExists(ifa.RealFormerName, $"{refAttr.Core.FormerName}_{refAttr.Core.ReferencedAttribute.FormerName}")) {
+                            // Die Namensänderung des ReferencedAttribute und des Alias wurden noch nicht in der DB aktualisiert
+                            attr.RealFormerName = $"{refAttr.Core.FormerName}_{refAttr.Core.ReferencedAttribute.FormerName}";
+                        } else if(analyzer.ColumnExists(ifa.RealFormerName, $"{refAttr.Core.FormerName}_{refAttr.Core.ReferencedAttribute.Name}")) {
+                            // Die Namensänderung des ReferencedAttribute wurde bereits in der DB aktualisiert, das Alias aber noch nicht
+                            attr.RealFormerName = $"{refAttr.Core.FormerName}_{refAttr.Core.ReferencedAttribute.Name}";
+                        } else if(analyzer.ColumnExists(ifa.RealFormerName, refAttr.Core.ReferencedAttribute.Name)) {
+                            // Die Spalte hatte früher ein Alias, jetzt aber nichtmehr, Änderung bereits in der DB umgesetzt.
+                            // Achtung: darf nur in diesem Sonderfall so gezogen werden!
+                            attr.RealFormerName = refAttr.Core.ReferencedAttribute.Name;
+                        } else {
+                            // Das Attribut hat es entweder vorher nicht gegeben oder es ist aus anderen Gründen nicht in der DB
                             attr.RealFormerName = null;
                         }
                     } else {
-                        // Ohne Alias
-                        if(analyzer.ColumnExists(ifa.RealFormerName, refAttr.Core.ReferencedAttribute.FormerName)) {
-                            attr.RealFormerName = refAttr.Core.ReferencedAttribute.FormerName;
-                        } else if (analyzer.ColumnExists(ifa.RealFormerName, refAttr.Core.ReferencedAttribute.Name)) {
+                        // Weder FormerName noch Alias sind definiert
+                        if(analyzer.ColumnExists(ifa.RealFormerName, refAttr.Core.ReferencedAttribute.Name)) {                            
+                            // Achtung: darf nur in diesem Sonderfall so gezogen werden!
                             attr.RealFormerName = refAttr.Core.ReferencedAttribute.Name;
                         } else {
+                            // Das Attribut hat es entweder vorher nicht gegeben oder es ist aus anderen Gründen nicht in der DB
                             attr.RealFormerName = null;
                         }
-                    }                    
+                    }                                     
                 } else {
                     // Neues Attribut, das keinen bisherigen Namen hat...
                     attr.RealFormerName = null;
