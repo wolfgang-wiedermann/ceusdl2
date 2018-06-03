@@ -80,7 +80,7 @@ namespace KDV.CeusDL.Generator.BL {
             return code;
         }
 
-        private string GenerateUniqueKeyConstraint(IBLInterface ifa) {
+        internal string GenerateUniqueKeyConstraint(IBLInterface ifa) {
             // Create Unique-Key-Constraint
             var code = $"alter table {ifa.FullName} \n";
             code += $"add constraint {ifa.Name}_UK unique nonclustered (\n";
@@ -120,7 +120,7 @@ namespace KDV.CeusDL.Generator.BL {
         }
 
         // Foreign-Key-Constraints für ein einzelnes Interface generieren
-        private string GenerateForeignKeyConstraints(IBLInterface ifa)
+        internal string GenerateForeignKeyConstraints(IBLInterface ifa)
         {
             string code = $"-- FKs von {ifa.FullName}\n--\n\n";
             // Nur die Ref-Attribute durchlaufen
@@ -138,7 +138,7 @@ namespace KDV.CeusDL.Generator.BL {
         }
 
         // Einzelnes Foreign-Key-Constraint anlegen
-        private string GenerateSingleForeignKeyConstraint(RefBLAttribute attr)
+        internal string GenerateSingleForeignKeyConstraint(RefBLAttribute attr)
         {                        
             string code = $"alter table {attr.ParentInterface.FullName}\n";
             code += $"add constraint {attr.ParentInterface.Name}_{attr.Name}_FK\n";

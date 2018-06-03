@@ -46,6 +46,9 @@ namespace KDV.CeusDL.Utilities.BL {
                 if(!ColumnHasCorrectType(attr)) {
                     unmodified &= false;
                 }
+                if(!ConstraintExists(ifa.Name, $"{ifa.Name}_UK", ifa.UniqueKeyAttributes.Select(a => a.Name).ToList())) {
+                    unmodified &= false;
+                }
             }
 
             unmodified &= !HasRemovedColums(ifa);
@@ -170,7 +173,37 @@ namespace KDV.CeusDL.Utilities.BL {
                 object result = cmd.ExecuteScalar();
                 return result != null;
             }            
-        }        
+        }
+
+        public bool ConstraintExists(string tableName, string constraintName, List<string> fields) {
+            if(tableName == null || constraintName == null || fields == null) {
+                return false;
+            }
+            if(!con.State.Equals(System.Data.ConnectionState.Open)) {
+                con.Open();
+            }
+            using(var cmd = con.CreateCommand()) {
+                cmd.CommandText = "select count(*) from information_schema.CONSTRAINT_COLUMN_USAGE "
+                    +"where table_name = @table_name "
+                    +"and constraint_name = @constraint_name "
+                    +"and column_name in (";                
+                for(int i = 0; i < fields.Count; i++) {                    
+                    cmd.CommandText += $"@field{i}";
+                    if(i != fields.Count-1) {
+                        cmd.CommandText += ", ";
+                    }
+                }
+                cmd.CommandText += ")";                
+                cmd.Prepare();
+                cmd.Parameters.Add(new SqlParameter("table_name", tableName));
+                cmd.Parameters.Add(new SqlParameter("constraint_name", constraintName));
+                for(int i = 0; i < fields.Count; i++) {
+                    cmd.Parameters.Add(new SqlParameter($"field{i}", fields[i]));
+                }
+                object result = cmd.ExecuteScalar();
+                return result != null && ((int)result) == fields.Count;
+            }
+        }
 
         public bool TableRenamed(string name, string formerName) {
             if(TableWithNameExists(name)) {

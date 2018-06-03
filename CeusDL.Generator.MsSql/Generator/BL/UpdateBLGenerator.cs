@@ -59,6 +59,8 @@ namespace KDV.CeusDL.Generator.BL {
             sb.Append(GenerateCreateNewTables());
             // 3. Veränderte Tabellen anpassen: select into -> drop -> create -> insert into select
             sb.Append(GenerateModifyTables());
+            // 4. Constraints anlegen
+            sb.Append(GenerateConstraints());
             // 4. Alle BL-Views droppen
             sb.Append(GenerateDropViews());
             // 5. Alle BL-Views neu anlegen
@@ -78,7 +80,7 @@ namespace KDV.CeusDL.Generator.BL {
             StringBuilder sb = new StringBuilder();
             sb.Append("/*\n * Generieren fehlender Tabellen\n */\n");
             foreach(var i in MissingTables) {
-                sb.Append(createGenerator.GenerateBLTable(i));
+                sb.Append(createGenerator.GenerateBLTable(i));                
             }
             return sb.ToString();
         }
@@ -91,6 +93,33 @@ namespace KDV.CeusDL.Generator.BL {
             GenerateDropModifiedTables(sb);
             GenerateCreateModifiedTables(sb);
             GenerateInsertIntoSelect(sb);
+            return sb.ToString();
+        }
+
+        private string GenerateConstraints() {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append("/*\n * Generieren fehlender Unique-Key und Foreign-Key-Constraints\n */\n");
+
+            // Unique Keys generieren
+            foreach(var newIfa in MissingTables) {                
+                sb.Append(createGenerator.GenerateUniqueKeyConstraint(newIfa));                
+            }
+            foreach(var modIfa in ModifiedTables) {
+                sb.Append(createGenerator.GenerateUniqueKeyConstraint(modIfa));
+            }
+
+            // Foreign Keys generieren
+            sb.Append("-- ANMERKUNG: Generierung der FKs funktioniert auch einwandfrei, die Frage ist blos ob ich die FKs wirklich will ;-) \n\n");
+            /*
+            foreach(var newIfa in MissingTables) {
+                sb.Append(createGenerator.GenerateForeignKeyConstraints(newIfa));                
+            }
+            foreach(var modIfa in ModifiedTables) {
+                sb.Append(createGenerator.GenerateForeignKeyConstraints(modIfa));
+            }
+            */
+
             return sb.ToString();
         }
 
@@ -228,6 +257,8 @@ namespace KDV.CeusDL.Generator.BL {
                 default:
                     // TODO: Prüfen ob das für die anderen Typen auch relevant ist und wie ich 
                     //       das dann am besten umsetze.
+                    // => Im Test hat es mit date, datetime und time auch ohne cast funktioniert,
+                    //    ich hab aber nie von date nach varchar oder umgekehrt ausprobiert!
                     return name;
             }
         }
