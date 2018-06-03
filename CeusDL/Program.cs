@@ -20,6 +20,7 @@ namespace CeusDL2
         static string GENERATED_SQL;
         static string GENERATED_CEUSDL;
         static string GENERATED_CODE;
+        static string GENERATED_PYCODE;
         static string GENERATED_GRAPHVIZ;
         static string GENERATED_CSV;        
 
@@ -83,6 +84,7 @@ namespace CeusDL2
             var generatedSQL = Path.Combine(generated, "SQL");
             var generatedCeusDL = Path.Combine(generated, "CeusDL");            
             var generatedCode = Path.Combine(generated, "CSharp");
+            var generatedPyCode = Path.Combine(generated, "Python");
             var generatedGraphviz = Path.Combine(generated, "Graphviz");
             var generatedCsv = Path.Combine(generated, "Csv");
 
@@ -105,6 +107,10 @@ namespace CeusDL2
                 Directory.CreateDirectory(generatedCode);   
             }
 
+            if(!Directory.Exists(generatedPyCode)) {
+                Directory.CreateDirectory(generatedPyCode);   
+            }
+
             if(!Directory.Exists(generatedGraphviz)) {
                 Directory.CreateDirectory(generatedGraphviz);   
             }
@@ -116,6 +122,7 @@ namespace CeusDL2
             GENERATED_SQL = generatedSQL;
             GENERATED_CEUSDL = generatedCeusDL;
             GENERATED_CODE = generatedCode;
+            GENERATED_PYCODE = generatedPyCode;
             GENERATED_GRAPHVIZ = generatedGraphviz;
             GENERATED_CSV = generatedCsv;
         }
@@ -145,6 +152,7 @@ namespace CeusDL2
                 // Aktualisierung nur generieren, wenn eine Verbindung zur Datenbank angegeben wurde.
                 ExecuteStep(new UpdateBLGenerator(model, conStr), GENERATED_SQL);
             }
+            ExecuteStep(new CreateDefDataGenerator(model), GENERATED_PYCODE);
             // TODO: BL, BT und AL generieren
             
         }

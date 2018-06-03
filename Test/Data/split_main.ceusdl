@@ -39,7 +39,6 @@ interface Semester : TemporalTable(former_name="Semestr") { // Beispiel für Umb
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
-    //ref Jahr.KNZ as Bewerbungsjahr;
 }
 
 interface FachSemester : DefTable {
@@ -142,18 +141,6 @@ interface JaNein : DefTable {
     base LANGBEZ:varchar(len="500"); 
 }
 
-interface Sternzeichen : DefTable(former_name="Sternz") {
-    base KNZ:varchar(len="50", primary_key="true");
-    base KURZBEZ:varchar(len="100");
-    base LANGBEZ:varchar(len="500");
-    ref Tag.KNZ(former_name="Start") as Von;
-    ref Tag.KNZ(former_name="Ende") as Bis;
-    //ref Land.KNZ(former_name="Herkunft");
-    //ref Land.KNZ as Herkunft;
-    base VON:date(calculated="true");  
-    base BIS:date(calculated="true");
-}
-
 //
 // Fakten-Tabellen
 //
@@ -167,9 +154,6 @@ interface Bewerber : FactTable(mandant="true", history="true", with_nowtable="tr
     
     ref Geschlecht.KNZ;
     ref Tag.KNZ as Geburtstag;
-    ref Sternzeichen.KNZ;
-    ref Tag.KNZ as Einschulung;
-    ref Tag.KNZ as Schulabschluss;
 
     base Alter:int(calculated="true"); // Beispiel für ein erstes Calculated-Attribut
 
