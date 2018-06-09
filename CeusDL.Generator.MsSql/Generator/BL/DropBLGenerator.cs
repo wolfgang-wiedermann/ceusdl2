@@ -14,6 +14,13 @@ namespace KDV.CeusDL.Generator.BL {
         }
 
         public List<GeneratorResult> GenerateCode() {
+            var result = new List<GeneratorResult>();
+            result.Add(new GeneratorResult("BL_Drop.sql", GenerateDropBLTablesAndViews()));
+            result.Add(new GeneratorResult("BL_Drop_FKs.sql", GenerateDropForeignKeys()));            
+            return result;
+        }
+
+        internal string GenerateDropBLTablesAndViews() {
             string code = "--\n-- BaseLayer-Tabellen aus der Datenbank entfernen\n--\n";
             code += $"use {model.Config.BLDatabase}\nGO\n\n";
 
@@ -49,11 +56,29 @@ namespace KDV.CeusDL.Generator.BL {
                 code += "go\n\n";
             }
 
-            var result = new List<GeneratorResult>();
-            result.Add(new GeneratorResult("BL_Drop.sql", code));            
-            return result;
+            return code;
+        }          
+
+
+        internal string GenerateDropForeignKeys() {
+            string code = "--\n-- Fremdschlüssel der BaseLayer-Tabellen aus der Datenbank entfernen\n--\n";
+            code += $"use {model.Config.BLDatabase}\nGO\n\n";
+
+            foreach(var ifa in model.Interfaces) {
+                foreach(var attr in ifa.Attributes.Where(a => a is RefBLAttribute)) {
+                    var refAttr = (RefBLAttribute)attr;
+                    string constraintName = $"{attr.ParentInterface.Name}_{attr.Name}_FK";
+                    code += "if exists (\n";
+                    code += "select constraint_name from information_schema.referential_constraints \n".Indent("    ");
+                    code += $"where constraint_catalog = '{model.Config.BLDatabase}'\n".Indent("    ");
+                    code += "and constraint_schema = 'dbo'\n".Indent("    ");
+                    code += $"and constraint_name = '{constraintName}'\n".Indent("    ");
+                    code += ")\n";
+                    code += $"alter table {attr.ParentInterface.FullName} drop constraint {constraintName};\n\n";
+                }
+            }
+
+            return code;
         }
-        
-              
     }
 }
