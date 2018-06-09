@@ -53,6 +53,7 @@ namespace KDV.CeusDL.Generator.BL {
             StringBuilder sb = new StringBuilder();
             // 0. Use-Direktive generieren
             sb.Append(GenerateUse());
+            sb.Append(GetBeginTransaction());
             // 1. Tabellen, die nicht mehr als ceusdl Interface definiert sind löschen
             sb.Append(GenerateDeleteObsoleteTables());
             // 2. Neue Tabellen hinzufügen
@@ -60,7 +61,8 @@ namespace KDV.CeusDL.Generator.BL {
             // 3. Veränderte Tabellen anpassen: select into -> drop -> create -> insert into select
             sb.Append(GenerateModifyTables());
             // 4. Constraints anlegen
-            sb.Append(GenerateConstraints());
+            //sb.Append(GenerateConstraints());
+            sb.Append(GetCommitTransaction());
             // 4. Alle BL-Views droppen
             sb.Append(GenerateDropViews());
             // 5. Alle BL-Views neu anlegen
@@ -74,6 +76,16 @@ namespace KDV.CeusDL.Generator.BL {
                 code += $"\nuse {model.Config.BLDatabase};\n\n";
             }
             return code;
+        }
+
+        private string GetCommitTransaction()
+        {
+            return "COMMIT TRANSACTION bl_modification_transaction;\n\n";
+        }
+
+        private string GetBeginTransaction()
+        {
+            return "BEGIN TRANSACTION bl_modification_transaction;\n\n";            
         }
 
         private string GenerateCreateNewTables() {

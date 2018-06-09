@@ -6,7 +6,14 @@ interface Tag : TemporalTable(finest_time_attribute="true") {
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
     ref Woche.KNZ;    
+    ref Wochentag.KNZ;
     ref Monat.KNZ;
+}
+
+interface Wochentag : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
 }
 
 interface Woche : TemporalTable {
@@ -14,6 +21,13 @@ interface Woche : TemporalTable {
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
     ref Jahr.KNZ(former_name="Year");
+    ref Kalenderwoche.KNZ;
+}
+
+interface Kalenderwoche : DefTable(former_name="KalenderWoche") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
 }
 
 interface Monat : TemporalTable {
