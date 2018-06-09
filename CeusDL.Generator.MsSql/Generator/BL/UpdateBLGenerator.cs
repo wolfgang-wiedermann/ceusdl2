@@ -60,8 +60,9 @@ namespace KDV.CeusDL.Generator.BL {
             sb.Append(GenerateCreateNewTables());
             // 3. Veränderte Tabellen anpassen: select into -> drop -> create -> insert into select
             sb.Append(GenerateModifyTables());
-            // 4. Constraints anlegen
-            //sb.Append(GenerateConstraints());
+            // 4. Constraints anlegen (FKs sind derzeit auskommentiert!!!)            
+            // TODO: FKs müssten vor den Änderungen an den Tabellen für die ganze BL gedroppt werden!
+            sb.Append(GenerateConstraints());
             sb.Append(GetCommitTransaction());
             // 4. Alle BL-Views droppen
             sb.Append(GenerateDropViews());
