@@ -18,7 +18,7 @@ namespace KDV.CeusDL.Model.BL {
                 if(!string.IsNullOrEmpty(coreAttribute.Alias)) {
                     return coreAttribute.Alias;
                 } else {
-                    return $"{coreAttribute.ReferencedInterface.Name}.{coreAttribute.ReferencedAttribute.Name}";
+                    return $"{coreAttribute.ReferencedInterface.Name}_{coreAttribute.ReferencedAttribute.Name}";
                 }
             }            
         }

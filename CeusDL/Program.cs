@@ -153,7 +153,8 @@ namespace CeusDL2
                 ExecuteStep(new UpdateBLGenerator(model, conStr), GENERATED_SQL);
             }
             ExecuteStep(new CreateDefDataGenerator(model), GENERATED_PYCODE);
-            // TODO: BL, BT und AL generieren
+
+            // TODO: BT und AL generieren
             
         }
 

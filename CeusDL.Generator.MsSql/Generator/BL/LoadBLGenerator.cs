@@ -35,12 +35,35 @@ namespace KDV.CeusDL.Generator.BL {
             }            
 
             // Fakten
-            foreach(var ifa in model.FactTableInterfaces) {
-                //sb.Append(GenerateFactTableDelete(ifa));
+            foreach(var ifa in model.FactTableInterfaces.OrderBy(i => i.MaxReferenceDepth)) {
+                sb.Append(GenerateFactTableDelete(ifa));
                 //sb.Append(GenerateFactTableInsert(ifa));
             }
 
             return sb.ToString();
+        }
+
+        internal string GenerateFactTableDelete(IBLInterface ifa) {
+            string code = $"-- Löschen der neu zu ladenden Inhalte von {ifa.FullName}\n";
+            code += $"delete from {ifa.FullName} \n";                        
+            code += GenerateFactRelevantTimeSelector(ifa);
+            code += "\n";
+            return code;
+        }
+
+        private string GenerateFactRelevantTimeSelector(IBLInterface ifa) {
+            string code = "";
+            if(ifa.IsHistorized) {
+                var histAttr = ifa.HistoryAttribute;
+                code += $"where {histAttr.Name} in (\n";
+                code += $"select distinct tmp1.{histAttr.GetILAttribute().Name}\n".Indent("    ");
+                code += $"from {ifa.GetILInterface().FullName} as tmp1\n".Indent("    ");
+                if(ifa.IsMandant) {
+                    code += "where tmp1.Mandant_KNZ = Mandant_KNZ\n".Indent("    ");
+                }
+                code += ")\n";
+            }
+            return code;
         }
 
         private string GenerateDimTableUpdate(IBLInterface ifa)

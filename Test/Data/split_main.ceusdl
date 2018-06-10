@@ -28,7 +28,7 @@ interface Steuerungsdaten : DimTable(mandant="true") {
     ref Semester.KNZ as Min; // Beginn des Gültigkeitzeitraum der Lieferung
     ref Semester.KNZ as Max; // Ende des Gültigkeitszeitraums der Lieferung
     base Info:varchar(len="100");
-    ref Tag.KNZ(primary_key="true") as Lieferung; // Tag, an dem die Lieferung erstellt wurde
+    //ref Tag.KNZ(primary_key="true") as Lieferung; // Tag, an dem die Lieferung erstellt wurde
 }
 
 //
