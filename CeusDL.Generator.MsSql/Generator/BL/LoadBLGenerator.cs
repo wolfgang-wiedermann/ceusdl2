@@ -35,12 +35,71 @@ namespace KDV.CeusDL.Generator.BL {
             }            
 
             // Fakten
-            foreach(var ifa in model.FactTableInterfaces.OrderBy(i => i.MaxReferenceDepth)) {
-                sb.Append(GenerateFactTableDelete(ifa));
-                //sb.Append(GenerateFactTableInsert(ifa));
+            foreach(var ifa in model.FactTableInterfaces.OrderByDescending(i => i.MaxReferenceDepth)) {
+                sb.Append(GenerateFactTableDelete(ifa));             
+            }
+            foreach(var ifa in model.FactTableInterfaces.OrderBy(i => i.MaxReferenceDepth)) {                
+                sb.Append(GenerateFactTableInsert(ifa));
             }
 
             return sb.ToString();
+        }
+
+        internal string GenerateFactTableInsert(IBLInterface ifa)
+        {
+            // Guard-Condition
+            if(ifa.InterfaceType != CoreInterfaceType.FACT_TABLE) {
+                throw new InvalidInterfaceTypeException("GenerateFactTableInsert darf nur mit einem FactTableInterface aufgerufen werden");
+            }
+
+            string code = $"-- Laden der Tabelle {ifa.FullName}\n";
+            code += $"insert into {ifa.FullName} (\n";
+            var relevantAttributes = ifa.Attributes.Where(a => !a.IsIdentity).OrderBy(a => a.SortId);
+            foreach(var attr in relevantAttributes) {
+                // Alle Attribute, aber ohne ID
+                code += $"{attr.Name}".Indent("    ");
+                if(attr != relevantAttributes.Last()) {
+                    code += ", \n";
+                }
+            }
+            code += ")\nselect\n";
+            foreach(var attr in relevantAttributes) {
+                if(attr.IsTechnicalAttribute) {                    
+                    switch(attr.Name) {
+                        case "T_Modifikation":
+                            code += "'I'".Indent("    ");
+                            break;
+                        case "T_Bemerkung":
+                            code += "'Insert bei Ladelauf'".Indent("    ");
+                            break;
+                        case "T_Benutzer":
+                            code += "SYSTEM_USER".Indent("    ");
+                            break;
+                        case "T_System":
+                            code += "'SRC'".Indent("    ");
+                            break;
+                        case "T_Erst_Dat":
+                            code += "GETDATE()".Indent("    ");
+                            break;
+                        case "T_Aend_Dat":
+                            code += "GETDATE()".Indent("    ");
+                            break;
+                        case "T_Ladelauf_NR":
+                            // TODO: Echte Ermittlung einer LadelaufNr einbauen:
+                            code += "0".Indent("    ");
+                            break;                        
+                    }
+                } else if(attr.Name == "Mandant_KNZ") {
+                    code += "Mandant_KNZ".Indent("    ");
+                } else {
+                    code += $"{attr.GetILAttribute().Name} as {attr.Name}".Indent("    ");
+                }
+                if(attr != relevantAttributes.Last()) {
+                    code += ", \n";
+                }
+            }
+            code += $"\nfrom {ifa.GetILInterface().FullName}\n\n";
+            return code;
         }
 
         internal string GenerateFactTableDelete(IBLInterface ifa) {
