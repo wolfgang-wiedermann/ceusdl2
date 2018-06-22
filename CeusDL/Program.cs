@@ -142,6 +142,7 @@ namespace CeusDL2
             ExecuteStep(new LoadILGenerator(model), GENERATED_CODE);
             ExecuteStep(new GraphvizILGenerator(model), GENERATED_GRAPHVIZ);
             ExecuteStep(new DummyDataILGenerator(model), GENERATED_CSV);
+            ExecuteStep(new DummyILPythonGenerator(model), GENERATED_PYCODE);
 
             // BL generieren
             ExecuteStep(new CreateBLGenerator(model), GENERATED_SQL);
