@@ -40,11 +40,20 @@ namespace KDV.CeusDL.Generator.IL {
                 if(attr != ifa.NonCalculatedAttributes.Last()) {
                     sb.Append($"line += '\"{{0}}\";'.format({attr.Name})\n".Indent("    "));
                 } else {
-                    sb.Append($"line += '\"{{0}}\"\n'.format({attr.Name})\n".Indent("    "));
+                    sb.Append($"line += '\"{{0}}\"'.format({attr.Name})\n".Indent("    "));
                 }
             }
             sb.Append("return line\n".Indent("    "));
             sb.Append("\n\n");
+
+            sb.Append("print('");
+            foreach(var attr in ifa.NonCalculatedAttributes) {
+                sb.Append($"\"{attr.Name}\"");
+                if(attr != ifa.NonCalculatedAttributes.Last()) {
+                    sb.Append(";");
+                }
+            }
+            sb.Append("')\n# TODO: hier Code einfügen\n\n");
 
             return sb.ToString();
         }
