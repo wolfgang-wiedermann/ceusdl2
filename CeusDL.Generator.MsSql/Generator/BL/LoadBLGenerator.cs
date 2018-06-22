@@ -128,7 +128,7 @@ namespace KDV.CeusDL.Generator.BL {
         private string GenerateDimTableUpdate(IBLInterface ifa)
         {
             if(ifa.IsHistorized && ifa is DerivedBLInterface) {
-                return GenerateDimTableUpdateHist(ifa);
+                return GenerateUpdatesForDimTableWithHistory(ifa);
             } else {
                 return GenerateDimTableUpdateNoHist(ifa);
             }            
@@ -150,16 +150,65 @@ namespace KDV.CeusDL.Generator.BL {
             return sb.ToString();
         }
 
-        private string GenerateDimTableUpdateHist(IBLInterface ifa)
+        private string GenerateUpdatesForDimTableWithHistory(IBLInterface ifa)
         {
-            var idAttribute = ifa.Attributes.Where(a => a.IsIdentity).First();
             StringBuilder sb = new StringBuilder();
-            sb.Append($"-- Update historized table: {ifa.FullName}\n");
-            sb.Append("update t set t.T_Gueltig_Bis_Dat = dbo.GetCurrentTimeForHistory()\n");
+            sb.Append("-- Aktualisierung innerhalb des aktuellen Zeitraums\n");
+            GenerateInTimeUpdateForDimTableWithHistory(ifa, sb);
+            sb.Append("\n");
+            sb.Append("-- Aktualisierung außerhalb des aktuellen Zeitruams = Abschließen eines Dimensionssatzes\n");
+            GeneratePastTimeUpdateForDimTableWithHistory(ifa, sb);
+            sb.Append("\n");
+            return sb.ToString();
+        }
+
+        ///
+        /// Generiert ein Update-Statement, das dann die historisierungsrelevanten
+        /// Attribute des Interfaces aktualisiert, wenn der letzte Historiensatz
+        /// in der gleichen Zeiteinheit angelegt wurde, für die die aktuell
+        /// zu ladenden Daten geliefert wurden.
+        ///
+        private void GenerateInTimeUpdateForDimTableWithHistory(IBLInterface ifa, StringBuilder sb) {
+            var idAttribute = ifa.Attributes.Where(a => a.IsIdentity).First();
+            sb.Append("update t\n");
+            sb.Append("set\n");
+            foreach(var attr in ifa.UpdateCheckAttributes) {
+                sb.Append($"t.{attr.Name} = v.{attr.Name}".Indent("    "));
+                if(attr != ifa.UpdateCheckAttributes.Last()) {
+                    sb.Append(",");
+                }
+                sb.Append("\n");
+            }
             sb.Append($"from {ifa.FullName} t\n");
             sb.Append($"inner join {ifa.FullViewName} v\n");
-            sb.Append($"on t.{idAttribute.Name} = v.{idAttribute.Name} and v.T_Modifikation = 'U'\n\n");
-            return sb.ToString();
+            sb.Append($"on t.{idAttribute.Name} = v.{idAttribute.Name} \nand v.T_Modifikation = 'U'\n".Indent("    "));
+            sb.Append("where exists (\n");
+
+            sb.Append($"select t1.{idAttribute.Name}\nfrom {ifa.FullName} as t1\n".Indent("    "));
+            sb.Append("where ".Indent("    "));
+            foreach(var uk in ifa.UniqueKeyAttributes.Where(a => ifa.HistoryAttribute != a)) {
+                sb.Append($"t1.{uk.Name} = t.{uk.Name} and\n          ");
+            }
+            sb.Append($"t1.{ifa.HistoryAttribute.Name} = dbo.GetCurrentTimeForHistory()\n");
+
+            sb.Append(")\n");
+        }
+
+        ///
+        /// Schließt den bisher aktuellen Dimensionssatz ab
+        /// (Läuft i. d. R. wenn entweder noch kein abgeschlossener Satz
+        ///  zum Unique-Key dieses Dimensionsobjekts existiert, oder der aktuellste
+        ///  abgeschlossene Satz zu einem Zeitpunkt != GetCurrentTimeForHistory 
+        ///  abgeschlossen wurde. Dieser Zusammenhang wird ausschließlich durch
+        ///  vorheriges Ausführen von GenerateInTimeUpdateForDimTableWithHistory sichergestellt.)
+        ///
+        private void GeneratePastTimeUpdateForDimTableWithHistory(IBLInterface ifa, StringBuilder sb) {
+            var idAttribute = ifa.Attributes.Where(a => a.IsIdentity).First();            
+            sb.Append($"-- Update historized table: {ifa.FullName}\n");
+            sb.Append("update t \nset t.T_Gueltig_Bis_Dat = dbo.GetCurrentTimeForHistory()\n");
+            sb.Append($"from {ifa.FullName} t\n");
+            sb.Append($"inner join {ifa.FullViewName} v\n");
+            sb.Append($"on t.{idAttribute.Name} = v.{idAttribute.Name} \nand v.T_Modifikation = 'U'\n\n".Indent("    "));
         }
 
         // 
