@@ -228,6 +228,11 @@ namespace KDV.CeusDL.Model.BL {
             return ilInterface;
         }
 
+        public CoreInterface GetCoreInterface() 
+        {
+            return this.coreInterface;
+        }
+
         #endregion
     }
 }

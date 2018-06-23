@@ -40,6 +40,7 @@ namespace KDV.CeusDL.Model.BL {
 
         // TODO: Ist das mit dem Get hier ein gutes Konzept???
         KDV.CeusDL.Model.IL.ILInterface GetILInterface();
+        KDV.CeusDL.Model.Core.CoreInterface GetCoreInterface();
 
         void PostProcess();        
     }

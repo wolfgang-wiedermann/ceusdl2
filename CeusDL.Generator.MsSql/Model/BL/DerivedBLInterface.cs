@@ -181,6 +181,11 @@ namespace KDV.CeusDL.Model.BL
             return DefaultInterface.GetILInterface();
         }
 
+        public CoreInterface GetCoreInterface() 
+        {
+            return DefaultInterface.GetCoreInterface();
+        }
+
         #endregion
     }
 }

@@ -64,5 +64,10 @@ namespace KDV.CeusDL.Model.BL {
         {
             throw new NotImplementedException();
         }
+
+        public CoreInterface GetCoreInterface() 
+        {
+            throw new NotImplementedException();
+        }
     }
 }

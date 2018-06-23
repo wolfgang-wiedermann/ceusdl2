@@ -43,8 +43,10 @@ namespace KDV.CeusDL.Model.BL {
         }
 
         public BLConfig Config { get; private set; }
+        public CoreModel Core { get; private set; }
 
         public BLModel(CoreModel coreModel) {
+            this.Core = coreModel;
             this.Config = new BLConfig(coreModel.Config);
             this.Interfaces = new List<IBLInterface>();            
             CoreInterface finestTimeCoreAttribute = null;
