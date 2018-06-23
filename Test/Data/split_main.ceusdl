@@ -21,15 +21,6 @@ import "split_part_geografie.ceusdl"
 // Interface Definitionen
 // ----------------------
 
-//
-// Technisches Attribut: Datenlieferung enthält eine Datei mit Zeiträumen...
-//
-interface Steuerungsdaten : DimTable(mandant="true") {
-    ref Semester.KNZ as Min; // Beginn des Gültigkeitzeitraum der Lieferung
-    ref Semester.KNZ as Max; // Ende des Gültigkeitszeitraums der Lieferung
-    base Info:varchar(len="100");
-    //ref Tag.KNZ(primary_key="true") as Lieferung; // Tag, an dem die Lieferung erstellt wurde
-}
 
 //
 // Zeit-Attribute
@@ -179,6 +170,7 @@ interface Bewerber : FactTable(mandant="true", history="true", with_nowtable="tr
     fact Anzahl_F:decimal(len="1,0"); // ein default="1" wäre hier noch nett
     fact HZBNote_F:decimal(len="3,2");
     fact Alter_F:int(calculated="true"); // Beispiel für ein erstes Calculated-Fakt
+    fact AnzahlBewerbungen_F:int(calculated="true");
 }
 
 interface Antrag : FactTable(mandant="true", history="true", with_nowtable="true") {
