@@ -2,6 +2,7 @@
 using System.IO;
 using KDV.CeusDL.Generator;
 using KDV.CeusDL.Generator.BL;
+using KDV.CeusDL.Generator.BT;
 using KDV.CeusDL.Generator.CeusDL;
 using KDV.CeusDL.Generator.IL;
 using KDV.CeusDL.Model.Core;
@@ -154,6 +155,10 @@ namespace CeusDL2
                 ExecuteStep(new UpdateBLGenerator(model, conStr), GENERATED_SQL);
             }
             ExecuteStep(new CreateDefDataGenerator(model), GENERATED_PYCODE);
+
+            // BT generieren
+            ExecuteStep(new CreateBTGenerator(model), GENERATED_SQL);
+            ExecuteStep(new DropBTGenerator(model), GENERATED_SQL);
 
             // TODO: BT und AL generieren
             

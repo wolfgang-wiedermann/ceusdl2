@@ -13,11 +13,22 @@ namespace KDV.CeusDL.Model.BT {
         internal RefBLAttribute blAttribute;
         public RefBTAttribute(RefBLAttribute blAttribute, BTInterface ifa) {
             this.blAttribute = blAttribute;
-            this.ParentInterface = ifa;
+            this.ParentInterface = ifa;            
+
+            if(HasToUseVerionTable) {
+                // Wenn das aktuelle Interface keine FactTable ist und beide eine Historie haben, 
+                // dann wird die Beziehung über die Historientabellen aufgelöst
+                var blModel = blAttribute.ParentInterface.ParentModel;
+                this.ReferencedBLInterface = blModel.Interfaces.Where(i => i.Name == blAttribute.ReferencedAttribute.ParentInterface.Name+"_VERSION").First();
+                this.ReferencedBLAttribute = this.ReferencedBLInterface.Attributes.Where(a => a.IsIdentity).First();
+            } else {
+                // ansonsten wird die Tabelle ohne Historie verwendet.
+                this.ReferencedBLAttribute = blAttribute.ReferencedAttribute;
+                this.ReferencedBLInterface = blAttribute.ReferencedAttribute.ParentInterface;
+            }
+
             this.IdAttribute = new IdSubAttribute(this);
             this.KnzAttribute = new KnzSubAttribute(this);
-            this.ReferencedBLAttribute = blAttribute.ReferencedAttribute;
-            this.ReferencedBLInterface = blAttribute.ReferencedAttribute.ParentInterface;
         }
 
         public BTInterface ParentInterface { get; private set; }
@@ -32,6 +43,14 @@ namespace KDV.CeusDL.Model.BT {
 
         public bool IsPartOfUniqueKey => blAttribute.IsPartOfUniqueKey;
         
+        public bool HasToUseVerionTable { 
+            get {
+                return (blAttribute.ReferencedAttribute.ParentInterface.InterfaceType == CoreInterfaceType.DIM_TABLE
+                || blAttribute.ReferencedAttribute.ParentInterface.InterfaceType == CoreInterfaceType.DIM_VIEW)
+                && ParentInterface.blInterface.IsHistorized 
+                && blAttribute.ReferencedAttribute.ParentInterface.IsHistorized;
+            }
+        }
 
         public IBLAttribute GetBLAttribute()
         {

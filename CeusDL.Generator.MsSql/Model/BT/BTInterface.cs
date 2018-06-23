@@ -50,6 +50,8 @@ namespace KDV.CeusDL.Model.BT {
                 }
                 if(blInterface.InterfaceType == CoreInterfaceType.FACT_TABLE) {
                     return $"{prefix}BT_F_{coreInterface.Name}";
+                } else if(this.IsHistoryTable) {
+                    return $"{prefix}BT_D_{coreInterface.Name}_VERSION";
                 } else {
                     return $"{prefix}BT_D_{coreInterface.Name}";
                 }

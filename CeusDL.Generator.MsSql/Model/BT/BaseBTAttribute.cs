@@ -25,7 +25,11 @@ namespace KDV.CeusDL.Model.BT {
 
         public string Name {
             get {
-                return blAttribute.Name;
+                if(blAttribute.Name.Equals("Mandant_KNZ")) {
+                    return "Mandant_ID";
+                } else {
+                    return blAttribute.Name;
+                }
             }
         }
 
@@ -42,7 +46,15 @@ namespace KDV.CeusDL.Model.BT {
         public bool IsIdentity => blAttribute.IsIdentity;
         public bool IsPartOfUniqueKey => blAttribute.IsPartOfUniqueKey;
 
-        public CoreDataType DataType => blAttribute.DataType;
+        public CoreDataType DataType {
+            get {
+                if(blAttribute.Name == "Mandant_KNZ") {
+                    return CoreDataType.INT;
+                } else {
+                    return blAttribute.DataType;
+                }
+            }
+        } 
 
         public IBLAttribute GetBLAttribute() {
             return this.blAttribute;
@@ -53,7 +65,19 @@ namespace KDV.CeusDL.Model.BT {
         }
 
         public string GetSqlDataTypeDefinition() {
-            return blAttribute.GetSqlDataTypeDefinition();
+            if(blAttribute is CustomBLAttribute) {
+                if(blAttribute.Name == "Mandant_KNZ") {
+                    return "int not null"; // Mandant_ID
+                } else if(blAttribute.ParentInterface.InterfaceType == CoreInterfaceType.FACT_TABLE) {
+                    return "bigint primary key not null"; // *_ID Spalte in Faktentabelle
+                } else if(blAttribute.IsIdentity) {
+                    return "int primary key not null"; // *_ID Spalte in Dimensionstabelle
+                } else {
+                    throw new InvalidDataTypeException();
+                }
+            } else {
+                return blAttribute.GetSqlDataTypeDefinition();
+            }
         }
     }
 

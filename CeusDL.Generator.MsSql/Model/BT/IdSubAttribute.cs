@@ -17,13 +17,13 @@ namespace KDV.CeusDL.Model.BT
             this.blAttribute = refBTAttribute.blAttribute;
         }
 
-        public string ShortName => blAttribute.ReferencedAttribute.ParentInterface.PrimaryKeyAttributes.First().Name;
+        public string ShortName => refBTAttribute.ReferencedBLInterface.PrimaryKeyAttributes.First().Name;
 
         public string Alias => blAttribute.Core.Alias;
 
         public string Name {
             get {
-                var baseName = blAttribute.ReferencedAttribute.ParentInterface.PrimaryKeyAttributes.First().Name;
+                var baseName = refBTAttribute.ReferencedBLInterface.PrimaryKeyAttributes.First().Name;
                 var alias = blAttribute.Core.Alias;
                 if(string.IsNullOrEmpty(alias)) {
                     return baseName;
@@ -35,7 +35,7 @@ namespace KDV.CeusDL.Model.BT
 
         public string SqlDataType {
             get {
-                if(blAttribute.ReferencedAttribute.ParentInterface.InterfaceType == CoreInterfaceType.FACT_TABLE) {
+                if(refBTAttribute.ReferencedBLInterface.InterfaceType == CoreInterfaceType.FACT_TABLE) {
                     return "bigint"; // Bei Fakttabellen ist die ID-Spalte immer bigint
                 } else {
                     return "int"; // Bei allen anderen Tabellen ist die ID-Spalte immer int
