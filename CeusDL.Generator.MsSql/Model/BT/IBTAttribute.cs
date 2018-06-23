@@ -9,6 +9,10 @@ using KDV.CeusDL.Model.Exceptions;
 
 namespace KDV.CeusDL.Model.BT {
     public interface IBTAttribute {
+        bool IsIdentity { get; }
+        bool IsPartOfUniqueKey { get; }        
 
+        IBLAttribute GetBLAttribute();
+        CoreAttribute GetCoreAttribute();
     }
 }

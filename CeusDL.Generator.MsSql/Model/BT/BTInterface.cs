@@ -18,6 +18,20 @@ namespace KDV.CeusDL.Model.BT {
             this.ParentModel = model;
             this.blInterface = ifa;
             this.coreInterface = ifa.GetCoreInterface();
+            this.InterfaceType = coreInterface.Type;
+
+            // TODO: evtl. ist es auch vorteilhaft, wenn die beiden
+            //       Interfaces _VERSION und das Original eine Referenz aufeinander haben.
+            if(ifa is DerivedBLInterface) {
+                this.IsHistoryTable = true;
+            } else {
+                this.IsHistoryTable = false;
+            }
+
+            this.Attributes = new List<IBTAttribute>();
+            foreach(var attr in ifa.Attributes.Where(a => !a.IsTechnicalAttribute)) {
+                this.Attributes.Add(ConvertAttribute(attr));
+            } 
         }
 
         public BTModel ParentModel { get; private set; }
@@ -49,6 +63,27 @@ namespace KDV.CeusDL.Model.BT {
                     db = $"{ParentModel.Config.BTDatabase}.";
                 }
                 return $"{db}dbo.{this.Name}";
+            }
+        }
+
+        public List<IBTAttribute> Attributes { get; private set; }
+        public CoreInterfaceType InterfaceType { get; private set; }
+
+        // Markiert, ob es sich bei der Tabelle um eine technisch generierte Versionstabelle
+        // für den Fall history="true" handelt.
+        public bool IsHistoryTable { get; private set; } 
+
+        private IBTAttribute ConvertAttribute(IBLAttribute attr) {
+            if(attr is BaseBLAttribute) {
+                return new BaseBTAttribute((BaseBLAttribute)attr, this);
+            } else if(attr is RefBLAttribute) {
+                return new RefBTAttribute((RefBLAttribute)attr, this);
+            } else if(attr is CustomBLAttribute && attr.IsIdentity) {                
+                return new BaseBTAttribute((CustomBLAttribute)attr, this);
+            } else if(attr is CustomBLAttribute && attr.Name == "Mandant_KNZ") {                
+                return new BaseBTAttribute((CustomBLAttribute)attr, this);                   
+            } else {
+                throw new InvalidAttributeTypeException($"in new BTInterface.ConvertAttribute() for {attr.Name} in {attr.ParentInterface.Name}");
             }
         }
     }
