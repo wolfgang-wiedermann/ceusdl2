@@ -1,6 +1,7 @@
 /*
 * Beispiel für veränderte DefTable Semester
 * (Für ModificationAnalyterTest.TestTableExists_Complex_NotExists)
+* (inzwischen auch in BTModelTest.TestBTModel_BySimpleFile verwendet)
 */
 
 config {

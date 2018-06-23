@@ -22,6 +22,12 @@ namespace KDV.CeusDL.Model.BT {
 
         public BTModel ParentModel { get; private set; }
 
+        public string ShortName { 
+            get {
+                return coreInterface.Name;
+            }
+        }
+
         public string Name {
             get {
                 string prefix = "";                
@@ -33,6 +39,16 @@ namespace KDV.CeusDL.Model.BT {
                 } else {
                     return $"{prefix}BT_D_{coreInterface.Name}";
                 }
+            }
+        }
+
+        public string FullName {
+            get {
+                string db = "";
+                if(!string.IsNullOrEmpty(ParentModel.Config.BTDatabase)) {
+                    db = $"{ParentModel.Config.BTDatabase}.";
+                }
+                return $"{db}dbo.{this.Name}";
             }
         }
     }
