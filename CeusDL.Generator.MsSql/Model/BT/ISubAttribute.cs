@@ -10,8 +10,7 @@ namespace KDV.CeusDL.Model.BT
     {
         string ShortName { get; }
         string Alias { get; }
-        string Name { get; }
-        string FullName { get; }
+        string Name { get; }        
         CoreDataType DataType { get; }
         string SqlDataType { get; }
     }

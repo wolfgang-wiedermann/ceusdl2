@@ -31,9 +31,7 @@ namespace KDV.CeusDL.Model.BT
                     return $"{alias}_{baseName}";
                 }  
             }
-        }
-
-        public string FullName => throw new NotImplementedException();
+        }        
 
         public string SqlDataType {
             get {

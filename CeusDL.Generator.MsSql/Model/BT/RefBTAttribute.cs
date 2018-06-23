@@ -16,6 +16,8 @@ namespace KDV.CeusDL.Model.BT {
             this.ParentInterface = ifa;
             this.IdAttribute = new IdSubAttribute(this);
             this.KnzAttribute = new KnzSubAttribute(this);
+            this.ReferencedBLAttribute = blAttribute.ReferencedAttribute;
+            this.ReferencedBLInterface = blAttribute.ReferencedAttribute.ParentInterface;
         }
 
         public BTInterface ParentInterface { get; private set; }
@@ -23,14 +25,9 @@ namespace KDV.CeusDL.Model.BT {
         public ISubAttribute IdAttribute { get; private set; }
         public ISubAttribute KnzAttribute { get; private set; }
 
-// TODO: Das wird ersetzt
+        public IBLInterface ReferencedBLInterface { get; private set; }
+        public IBLAttribute ReferencedBLAttribute { get; private set; }
 
-        public string KnzName { 
-            get {
-                return blAttribute.Name;
-            }
-        }
-// ENDE von Das wird ersetzt
         public bool IsIdentity => blAttribute.IsIdentity;
 
         public bool IsPartOfUniqueKey => blAttribute.IsPartOfUniqueKey;

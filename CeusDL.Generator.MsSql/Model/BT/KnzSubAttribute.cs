@@ -22,9 +22,7 @@ namespace KDV.CeusDL.Model.BT
 
         public string Alias => blAttribute.Core.Alias;
 
-        public string Name => blAttribute.Name;
-
-        public string FullName => throw new NotImplementedException();
+        public string Name => blAttribute.Name;        
 
         public string SqlDataType => blAttribute.GetSqlDataTypeDefinition(); // Ob das so schon gut ist?
 
