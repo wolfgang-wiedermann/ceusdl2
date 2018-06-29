@@ -10,25 +10,37 @@ namespace KDV.CeusDL.Model.BT
     public class KnzSubAttribute : ISubAttribute
     {
         private RefBTAttribute refBTAttribute;
-        private RefBLAttribute blAttribute;
+        private IBLAttribute blAttribute;
+        private RefBLAttribute refBLAttribute;
 
         public KnzSubAttribute(RefBTAttribute refBTAttribute)
         {
             this.refBTAttribute = refBTAttribute;
-            this.blAttribute = refBTAttribute.blAttribute;
+            this.refBLAttribute = refBTAttribute.blAttribute;
+
+            if(refBTAttribute.blAttribute != null) {
+                this.blAttribute = refBTAttribute.blAttribute;                
+            } else {
+                this.blAttribute = refBTAttribute.otherBlAttribute;
+            }
 
             if(refBTAttribute.HasToUseVerionTable) {
                 var core = refBTAttribute.ReferencedBLInterface.GetCoreInterface();
                 var knz = core.Attributes.Where(a => a.IsPrimaryKey).First();
                 this.ShortName = $"{core.Name}_VERSION_{knz.Name}";
+                this.Alias = refBLAttribute.Core.Alias;
+            } else if(refBLAttribute == null) {
+                this.ShortName = this.blAttribute.Name;
+                this.Alias = null;
             } else {
-                this.ShortName = this.blAttribute.ReferencedAttribute.Name;
+                this.ShortName = this.refBLAttribute.ReferencedAttribute.Name;
+                this.Alias = refBLAttribute.Core.Alias;
             }
         }
 
         public string ShortName { get; private set; }
 
-        public string Alias => blAttribute.Core.Alias;
+        public string Alias { get; private set; }
 
         public string Name {
             get {

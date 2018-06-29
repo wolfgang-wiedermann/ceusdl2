@@ -29,12 +29,26 @@ namespace KDV.CeusDL.Model.BT {
             }
 
             this.Attributes = new List<IBTAttribute>();
-            foreach(var attr in ifa.Attributes.Where(a => !a.IsTechnicalAttribute)) {
-                this.Attributes.Add(ConvertAttribute(attr));
-            } 
+            if(IsHistoryTable)
+            {
+                // History-Table-Fall                
+                PrepareHistoryTable(ifa);
+            }
+            else {
+                // Standardfall
+                foreach(var blAttr in ifa.Attributes.Where(a => !a.IsTechnicalAttribute)) {
+                   var btAttr = ConvertAttribute(blAttr);
+                   if(blAttr.IsIdentity) {
+                       this.Identity = btAttr;
+                   }
+                   this.Attributes.Add(btAttr);
+                }
+            }             
         }
 
         public BTModel ParentModel { get; private set; }
+
+        public IBTAttribute Identity { get; private set; }
 
         public string ShortName { 
             get {
@@ -87,6 +101,47 @@ namespace KDV.CeusDL.Model.BT {
             } else {
                 throw new InvalidAttributeTypeException($"in new BTInterface.ConvertAttribute() for {attr.Name} in {attr.ParentInterface.Name}");
             }
+        }
+
+        ///
+        /// Baut die Dinge zusammen, die speziell für eine History-Table erforderlich sind
+        ///
+        private void PrepareHistoryTable(IBLInterface iifa)
+        {
+            if(!(iifa is DerivedBLInterface))
+                throw new InvalidInterfaceTypeException("An dieser Stelle dürfen nur DerivedBLInterfaces ankommen!");
+            
+            // Dadurch bekommen wir Zugriff aufs Default-Interface!
+            var ifa = (DerivedBLInterface)iifa;            
+            var identity = ifa.Attributes.Single(a => a.IsIdentity);            
+            var pk = (BaseBLAttribute)ifa.Attributes.Single(a => a.IsPartOfUniqueKey && a is BaseBLAttribute);            
+
+            this.Attributes.Add(ConvertAttribute(identity));
+            this.Attributes.Add(CreateVersionKNZAttribute(pk));
+            this.Attributes.Add(CreateNonVersionedRefAttribute(pk, ifa));
+
+            // Restliche Standardattribute
+            var dataAttributes = ifa.Attributes
+                                    .Where(a => !(a.IsTechnicalAttribute
+                                        || a.IsIdentity
+                                        || (a.IsPartOfUniqueKey && a is BaseBLAttribute)
+                                        ));
+            foreach (var attr in dataAttributes)
+            {
+                this.Attributes.Add(ConvertAttribute(attr));
+            }
+        }
+
+        private IBTAttribute CreateNonVersionedRefAttribute(BaseBLAttribute pk, DerivedBLInterface ifa)
+        {
+            return new RefBTAttribute(pk, ifa.DefaultInterface, this);            
+        }
+
+        private IBTAttribute CreateVersionKNZAttribute(BaseBLAttribute pk)
+        {
+            string ifaName = pk.GetILAttribute().Core.ParentInterface.Name;
+            string fieldName = pk.GetILAttribute().Core.Name;
+            return new BaseBTAttribute($"{ifaName}_VERSION_{fieldName}", pk, this);
         }
     }
 

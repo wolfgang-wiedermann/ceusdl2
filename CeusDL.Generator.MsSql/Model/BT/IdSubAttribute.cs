@@ -17,14 +17,14 @@ namespace KDV.CeusDL.Model.BT
             this.blAttribute = refBTAttribute.blAttribute;
         }
 
-        public string ShortName => refBTAttribute.ReferencedBLInterface.PrimaryKeyAttributes.First().Name;
+        public string ShortName => refBTAttribute.ReferencedBLInterface.PrimaryKeyAttributes.First().Name; // TODO: Prüfen ob das für alle Fälle so gut ist!
 
-        public string Alias => blAttribute.Core.Alias;
+        public string Alias => blAttribute?.Core?.Alias;
 
         public string Name {
             get {
-                var baseName = refBTAttribute.ReferencedBLInterface.PrimaryKeyAttributes.First().Name;
-                var alias = blAttribute.Core.Alias;
+                var baseName = refBTAttribute.ReferencedBLInterface.PrimaryKeyAttributes.First().Name; // TODO: Prüfen ob das für alle Fälle so gut ist!
+                var alias = blAttribute?.Core?.Alias;
                 if(string.IsNullOrEmpty(alias)) {
                     return baseName;
                 } else {

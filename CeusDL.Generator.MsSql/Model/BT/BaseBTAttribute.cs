@@ -14,24 +14,32 @@ namespace KDV.CeusDL.Model.BT {
         public BaseBTAttribute(BaseBLAttribute blAttribute, BTInterface ifa) {
             this.blAttribute = blAttribute;
             this.ParentInterface = ifa;
+            SetName();
+        }
+
+        public BaseBTAttribute(string name, BaseBLAttribute blAttribute, BTInterface ifa) {
+            this.blAttribute = blAttribute;
+            this.ParentInterface = ifa;
+            Name = name;
         }
 
         public BaseBTAttribute(CustomBLAttribute blAttribute, BTInterface ifa) {
             this.blAttribute = blAttribute;
             this.ParentInterface = ifa;
+            SetName();
+        }
+
+        private void SetName() {            
+            if(blAttribute.Name.Equals("Mandant_KNZ")) {
+                Name = "Mandant_ID";
+            } else {
+                Name = blAttribute.Name;
+            }            
         }
 
         public BTInterface ParentInterface { get; private set; }
 
-        public string Name {
-            get {
-                if(blAttribute.Name.Equals("Mandant_KNZ")) {
-                    return "Mandant_ID";
-                } else {
-                    return blAttribute.Name;
-                }
-            }
-        }
+        public string Name { get; set; }
 
         public string FullName {
             get {

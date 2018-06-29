@@ -73,10 +73,9 @@ namespace KDV.CeusDL.Generator.BT {
 
             sb.Append(")\n\n");
         }
-
-        // TODO: Da fehlt vermutlich noch der Verweis auf die nicht historisierte Tabelle!
+        
         private void CreateCreateHistoryTable(StringBuilder sb, BTInterface ifa)
-        {
+        {            
             sb.Append($"-- Historientabelle für {ifa.ShortName} anlegen\n");
             sb.Append($"create table {ifa.FullName} (\n");
             
@@ -97,6 +96,9 @@ namespace KDV.CeusDL.Generator.BT {
             }
 
             sb.Append(")\n\n");
+            //throw new NotImplementedException("Hier fehlt noch einiges!");
+            // TODO: Da fehlt vermutlich noch der Verweis auf die nicht historisierte Tabelle!
+            // Details siehe C:\Users\wiw39784\Documents\git\CeusDL2\Doc\IdeeHistorisierungZuordnungHistorisierteSaetze.sql
         }
     }
 }
