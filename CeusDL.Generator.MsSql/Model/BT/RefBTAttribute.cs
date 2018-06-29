@@ -10,10 +10,12 @@ using KDV.CeusDL.Model.Exceptions;
 namespace KDV.CeusDL.Model.BT {
 
     public class RefBTAttribute : IBTAttribute {
-        internal RefBLAttribute blAttribute;
+        internal IBLAttribute blAttribute;
+        internal RefBLAttribute refBLAttribute;
         internal BaseBLAttribute otherBlAttribute;
         public RefBTAttribute(RefBLAttribute blAttribute, BTInterface ifa) {
             this.blAttribute = blAttribute;
+            this.refBLAttribute = blAttribute;
             this.otherBlAttribute = null;
             this.ParentInterface = ifa;            
             this.IsIdentity = blAttribute.IsIdentity;
@@ -40,7 +42,8 @@ namespace KDV.CeusDL.Model.BT {
         /// Wichtig: nur in BT zur Abbildung der History-Beziehung nutzen!
         ///
         internal RefBTAttribute(BaseBLAttribute blAttribute, IBLInterface blIfa, BTInterface ifa) {
-            this.blAttribute = null;
+            this.blAttribute = blAttribute;
+            this.refBLAttribute = null;
             this.otherBlAttribute = blAttribute;
             this.ParentInterface = ifa;            
             this.IsIdentity = otherBlAttribute.IsIdentity;
@@ -52,7 +55,7 @@ namespace KDV.CeusDL.Model.BT {
             this.ReferencedBLAttribute = blIfa.Attributes.Single(a => a.IsPartOfUniqueKey && (a is BaseBLAttribute));
 
             this.IdAttribute = new IdSubAttribute(this);
-            this.KnzAttribute = new KnzSubAttribute(this);  
+            this.KnzAttribute = new KnzSubAttribute(this);             
         }
 
         public BTInterface ParentInterface { get; private set; }
@@ -62,6 +65,9 @@ namespace KDV.CeusDL.Model.BT {
 
         public IBLInterface ReferencedBLInterface { get; private set; }
         public IBLAttribute ReferencedBLAttribute { get; private set; }
+
+        public BTInterface ReferencedBTInterface { get; internal set; }
+        public IBTAttribute ReferencedBTAttribute { get; internal set; }
 
         public bool IsIdentity { get;  private set; }
 
@@ -76,14 +82,16 @@ namespace KDV.CeusDL.Model.BT {
 
         public CoreAttribute GetCoreAttribute()
         {
-            return blAttribute.Core;
+            if(refBLAttribute != null) return refBLAttribute.Core;
+            if(otherBlAttribute != null) return otherBlAttribute.GetILAttribute().Core;
+            else return null;
         }
 
         private bool GetHasToUseVersionTable() {
-            return (blAttribute.ReferencedAttribute.ParentInterface.InterfaceType == CoreInterfaceType.DIM_TABLE
-                || blAttribute.ReferencedAttribute.ParentInterface.InterfaceType == CoreInterfaceType.DIM_VIEW)
+            return (refBLAttribute.ReferencedAttribute.ParentInterface.InterfaceType == CoreInterfaceType.DIM_TABLE
+                || refBLAttribute.ReferencedAttribute.ParentInterface.InterfaceType == CoreInterfaceType.DIM_VIEW)
                 && ParentInterface.blInterface.IsHistorized 
-                && blAttribute.ReferencedAttribute.ParentInterface.IsHistorized;
+                && refBLAttribute.ReferencedAttribute.ParentInterface.IsHistorized;
         }
     }
 

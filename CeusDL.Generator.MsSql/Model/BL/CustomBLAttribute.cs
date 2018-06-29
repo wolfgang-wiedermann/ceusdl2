@@ -4,6 +4,7 @@ using System.Linq;
 
 using KDV.CeusDL.Model.Core;
 using KDV.CeusDL.Model.IL;
+using KDV.CeusDL.Model.Exceptions;
 
 namespace KDV.CeusDL.Model.BL {
     // TODO: Name ist nicht gut, Custom??? eigentlich wäre Technical wohl besser???
@@ -148,6 +149,9 @@ namespace KDV.CeusDL.Model.BL {
         /// Generiert ein neues T_Gueltig_Bis-Attribut
         ///
         public static IBLAttribute GetNewTGueltigBisAttribute(IBLInterface parentInterface, IBLInterface timeInterface) {
+            if(timeInterface == null)
+                throw new MissingFinestTimeAttributeException("Wenn Sie history=\"true\" verwenden müssen Sie ein finest_time_attribute angeben");
+
             // 1. Das Primärschlüssel-Attribut (z. B. KNZ) aus dem FinestTimeInterface ermitteln.
             var timeAttribute = timeInterface.UniqueKeyAttributes.Where(a => a.Name != "Mandant_KNZ").First();
             // 2. Custom-Attribut bauen.

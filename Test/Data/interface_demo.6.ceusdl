@@ -1,0 +1,40 @@
+/*
+* Für den Testfall BaseBLAttributeTest.TestRefBLAttribute_FormerName
+* Um zu prüfgen, ob die früheren Objekt-Namen korrekt aufgelöst werden.
+* (ob das in der Praxis dann schon die Lösung ist, oder ob die Werte 
+*  ggf. auch vom ModificationAnalyzer während der Analyse korrigiert werden 
+*  können müssen ist noch offen)
+*/
+
+config {
+     prefix="AP";
+     il_database="FH_AP_InterfaceLayer";
+     bl_database="FH_AP_BaseLayer";
+     bt_database="FH_AP_BaseLayer";
+     al_database="FH_AP_Warehouse";     
+     etl_db_server="CEUS-ETL";
+}
+
+interface Land : DimTable(mandant="true", history="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500"); 
+    base Laengengrad:varchar(len="50", calculated="true");
+    base Breitengrad:varchar(len="50", calculated="true");
+    ref Kontinent.KNZ(former_name="Kont");   
+    ref Semester.KNZ as ExistiertSeit;
+}
+
+interface Kontinent : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base Laengengrad:varchar(len="50", calculated="true");
+    base Breitengrad:varchar(len="50", calculated="true");    
+}
+
+interface Semester : TemporalTable(former_name="Sem", finest_time_attribute="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100", former_name="KurzBezeichnung");
+    base LANGBEZ:varchar(len="500");
+}

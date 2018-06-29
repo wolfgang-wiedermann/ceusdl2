@@ -95,10 +95,7 @@ namespace KDV.CeusDL.Generator.BT {
                 }
             }
 
-            sb.Append(")\n\n");
-            //throw new NotImplementedException("Hier fehlt noch einiges!");
-            // TODO: Da fehlt vermutlich noch der Verweis auf die nicht historisierte Tabelle!
-            // Details siehe C:\Users\wiw39784\Documents\git\CeusDL2\Doc\IdeeHistorisierungZuordnungHistorisierteSaetze.sql
+            sb.Append(")\n\n");            
         }
     }
 }

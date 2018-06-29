@@ -21,6 +21,10 @@ namespace KDV.CeusDL.Model.BT {
             foreach(var ifa in m.Interfaces) {
                 this.Interfaces.Add(new BTInterface(ifa, this));
             }
+            
+            foreach(var ifa in Interfaces) {
+                ifa.PostProcess();
+            }
         }        
 
         public BTConfig Config { get; private set; }

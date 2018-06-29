@@ -14,7 +14,9 @@ namespace KDV.CeusDL.Model.BT
         public IdSubAttribute(RefBTAttribute refBTAttribute)
         {
             this.refBTAttribute = refBTAttribute;
-            this.blAttribute = refBTAttribute.blAttribute;
+            if(refBTAttribute.blAttribute is RefBLAttribute) {
+                this.blAttribute = (RefBLAttribute)refBTAttribute.blAttribute;
+            }                   
         }
 
         public string ShortName => refBTAttribute.ReferencedBLInterface.PrimaryKeyAttributes.First().Name; // TODO: Prüfen ob das für alle Fälle so gut ist!

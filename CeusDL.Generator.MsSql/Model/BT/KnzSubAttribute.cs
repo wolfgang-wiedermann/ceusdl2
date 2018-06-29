@@ -16,13 +16,8 @@ namespace KDV.CeusDL.Model.BT
         public KnzSubAttribute(RefBTAttribute refBTAttribute)
         {
             this.refBTAttribute = refBTAttribute;
-            this.refBLAttribute = refBTAttribute.blAttribute;
-
-            if(refBTAttribute.blAttribute != null) {
-                this.blAttribute = refBTAttribute.blAttribute;                
-            } else {
-                this.blAttribute = refBTAttribute.otherBlAttribute;
-            }
+            this.refBLAttribute = refBTAttribute.refBLAttribute;
+            this.blAttribute = refBTAttribute.blAttribute;            
 
             if(refBTAttribute.HasToUseVerionTable) {
                 var core = refBTAttribute.ReferencedBLInterface.GetCoreInterface();

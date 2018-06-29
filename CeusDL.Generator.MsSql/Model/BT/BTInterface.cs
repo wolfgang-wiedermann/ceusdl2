@@ -89,6 +89,15 @@ namespace KDV.CeusDL.Model.BT {
         // für den Fall history="true" handelt.
         public bool IsHistoryTable { get; private set; } 
 
+        internal void PostProcess()
+        {
+            foreach(var attr in this.Attributes.Where(a => a is RefBTAttribute).Select(a => (RefBTAttribute)a)) {
+                var refIfaName = attr.GetBLAttribute().ParentInterface.Name;
+                attr.ReferencedBTInterface = this.ParentModel.Interfaces.Single(i => i.blInterface.Name == attr.ReferencedBLInterface.Name);
+                attr.ReferencedBTAttribute = attr.ReferencedBTInterface.Attributes.Single(a => a.IsIdentity);
+            } 
+        }
+
         private IBTAttribute ConvertAttribute(IBLAttribute attr) {
             if(attr is BaseBLAttribute) {
                 return new BaseBTAttribute((BaseBLAttribute)attr, this);

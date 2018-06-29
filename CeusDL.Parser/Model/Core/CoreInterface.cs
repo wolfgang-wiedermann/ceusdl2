@@ -76,7 +76,7 @@ namespace KDV.CeusDL.Model.Core {
             if(tmp.Parameters != null && tmp.Parameters.Where(a => a.Name == "finest_time_attribute" && a.Value == "true").Count() > 0) {
                 // Prüfung: InterfaceType muss TemporalTable sein
                 if(Type != CoreInterfaceType.TEMPORAL_TABLE) {                    
-                    throw new InvalidParameterException($"Fehler in Interface {Name}: Nur DefTables können finest_time_attribute sein");
+                    throw new InvalidParameterException($"Fehler in Interface {Name}: Nur TemporalTables können finest_time_attribute sein");
                 }                
 
                 // Prüfung: Nur eine Tabelle kann finest_time_attribute sein
