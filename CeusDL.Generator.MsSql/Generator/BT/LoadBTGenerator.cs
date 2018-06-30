@@ -66,7 +66,7 @@ namespace KDV.CeusDL.Generator.BT {
                 } else {
                     var refAttr = (RefBTAttribute)attr;
                     var idAttr = refAttr.ReferencedBLInterface.Attributes.Single(a => a.IsIdentity);
-                    sb.Append($"{refAttr.JoinAlias}.{idAttr.Name} as {refAttr.IdAttribute.Name},\nt.{attr.GetBLAttribute().Name} as {refAttr.KnzAttribute.Name}".Indent("    "));
+                    sb.Append($"coalesce({refAttr.JoinAlias}.{idAttr.Name}, -1) as {refAttr.IdAttribute.Name},\nt.{attr.GetBLAttribute().Name} as {refAttr.KnzAttribute.Name}".Indent("    "));
                 }
                 if(attr != ifa.Attributes.Last()) {
                     sb.Append(",");
