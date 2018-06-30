@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using KDV.CeusDL.Model.Core;
+using KDV.CeusDL.Model.BL;
 using KDV.CeusDL.Model.BT;
 using System.Text;
 
@@ -61,30 +62,44 @@ namespace KDV.CeusDL.Generator.BT {
             foreach(var attr in ifa.Attributes) {
                 if(attr is BaseBTAttribute) {
                     var baseAttr = (BaseBTAttribute)attr;
-                    sb.Append($"t.{baseAttr.Name}".Indent("    "));
+                    sb.Append($"t.{baseAttr.blAttribute.Name} as {baseAttr.Name}".Indent("    "));
                 } else {
                     var refAttr = (RefBTAttribute)attr;
-                    sb.Append($"{refAttr.JoinAlias}.{refAttr.IdAttribute.Name},\nt.{refAttr.KnzAttribute.Name}".Indent("    "));
+                    var idAttr = refAttr.ReferencedBLInterface.Attributes.Single(a => a.IsIdentity);
+                    sb.Append($"{refAttr.JoinAlias}.{idAttr.Name} as {refAttr.IdAttribute.Name},\nt.{attr.GetBLAttribute().Name} as {refAttr.KnzAttribute.Name}".Indent("    "));
                 }
                 if(attr != ifa.Attributes.Last()) {
                     sb.Append(",");
                 }
                 sb.Append("\n");
             }
-            sb.Append($"from {ifa.FullName} as t\n");
+            sb.Append($"from {ifa.blInterface.FullName} as t\n");
             foreach(var attr in refAttributes) {
                 sb.Append($"left join {attr.ReferencedBLInterface.FullName} as {attr.JoinAlias}\n");                
-                sb.Append($"on t.{attr.KnzAttribute.Name} = {attr.JoinAlias}.{attr.ReferencedBLAttribute.Name}\n".Indent("    "));
+                sb.Append($"on t.{attr.blAttribute.Name} = {attr.JoinAlias}.{attr.ReferencedBLAttribute.Name}\n".Indent("    "));
                 if(ifa.IsMandant && attr.ReferencedBLInterface.IsMandant) {
-                    sb.Append($"and t.Mandant_ID = cast({attr.JoinAlias}.Mandant_KNZ as int)\n".Indent("    "));
+                    sb.Append($"and t.Mandant_KNZ = {attr.JoinAlias}.Mandant_KNZ\n".Indent("    "));
                 }
-                if(ifa.blInterface.IsHistorized && attr.ReferencedBLInterface.IsHistorized) {
-                    // TODO: ...
-                    // --and t3.HISTORY_ATTRIBUTE is next smaller to t.Tag_KNZ
+                if(ifa.blInterface.IsHistorized && attr.ReferencedBLInterface.IsHistorized 
+                    && (attr.ReferencedBLInterface is DerivedBLInterface || attr.ReferencedBLInterface.GetILInterface().Core.Type == CoreInterfaceType.FACT_TABLE )) {
+                    GenerateHistoryCondition(sb, attr);
                 }
             }   
             sb.Append("\n"); 
-        }        
+        }
+
+        private void GenerateHistoryCondition(StringBuilder sb, RefBTAttribute attr)
+        {
+            var idColumn = attr.ReferencedBLInterface.Attributes.Single(a => a.IsIdentity);
+            sb.Append($"and {attr.JoinAlias}.{idColumn.Name} = (\n".Indent("    "));
+            sb.Append($"select min(tx.{idColumn.Name})\nfrom {attr.ReferencedBLInterface.FullName} tx\n".Indent("        "));
+            sb.Append($"where tx.{attr.ReferencedBLAttribute.Name} = {attr.JoinAlias}.{attr.ReferencedBLAttribute.Name}\n".Indent("        "));
+            if(attr.ParentInterface.IsMandant && attr.ReferencedBLInterface.IsMandant) {
+                sb.Append($"and tx.Mandant_KNZ = {attr.JoinAlias}.Mandant_KNZ\n".Indent("        "));
+            }
+            sb.Append($"and tx.{attr.ReferencedBLInterface.HistoryAttribute.Name} > t.{attr.ParentInterface.blInterface.HistoryAttribute.Name}\n".Indent("        "));            
+            sb.Append(")\n".Indent("    "));
+        }
 
         private void GenerateTruncate(StringBuilder sb, BTInterface ifa)
         {

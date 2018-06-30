@@ -64,8 +64,8 @@ namespace KDV.CeusDL.Model.BL {
 
         public IBLAttribute HistoryAttribute {
             get {
-                if(IsHistorized) {
-                    // Fraglich, ob das schon funktioniert!
+                // Immer noch fraglich ob das so passt
+                if(IsHistorized && coreInterface.Type == CoreInterfaceType.FACT_TABLE) {                    
                     return Attributes.Where(a => a.ShortName == this.coreInterface.HistoryBy.Name).First();
                 } else {
                     return null;
