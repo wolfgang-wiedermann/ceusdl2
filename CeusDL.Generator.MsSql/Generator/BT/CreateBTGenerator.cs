@@ -74,6 +74,7 @@ namespace KDV.CeusDL.Generator.BT {
             sb.Append(")\n\n");
         }
         
+        // Ist das nicht exakt das gleiche wie CreateCreateNonHistoryTable???
         private void CreateCreateHistoryTable(StringBuilder sb, BTInterface ifa)
         {            
             sb.Append($"-- Historientabelle für {ifa.ShortName} anlegen\n");

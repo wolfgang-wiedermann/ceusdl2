@@ -26,8 +26,8 @@ namespace KDV.CeusDL.Model.BT {
                 // Wenn das aktuelle Interface keine FactTable ist und beide eine Historie haben, 
                 // dann wird die Beziehung über die Historientabellen aufgelöst
                 var blModel = blAttribute.ParentInterface.ParentModel;
-                this.ReferencedBLInterface = blModel.Interfaces.Where(i => i.Name == blAttribute.ReferencedAttribute.ParentInterface.Name+"_VERSION").First();
-                this.ReferencedBLAttribute = this.ReferencedBLInterface.Attributes.Where(a => a.IsIdentity).First();
+                this.ReferencedBLInterface = blModel.Interfaces.Single(i => i.Name == blAttribute.ReferencedAttribute.ParentInterface.Name+"_VERSION");
+                this.ReferencedBLAttribute = this.ReferencedBLInterface.Attributes.Single(a => a.IsPartOfUniqueKey && !a.IsTechnicalAttribute && a.Name != "Mandant_KNZ");
             } else {
                 // ansonsten wird die Tabelle ohne Historie verwendet.
                 this.ReferencedBLAttribute = blAttribute.ReferencedAttribute;
@@ -74,6 +74,8 @@ namespace KDV.CeusDL.Model.BT {
         public bool IsPartOfUniqueKey { get; private set; }
         
         public bool HasToUseVerionTable { get; private set; }            
+
+        public string JoinAlias { get; internal set; }
 
         public IBLAttribute GetBLAttribute()
         {

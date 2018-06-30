@@ -159,6 +159,7 @@ namespace CeusDL2
             // BT generieren
             ExecuteStep(new CreateBTGenerator(model), GENERATED_SQL);
             ExecuteStep(new DropBTGenerator(model), GENERATED_SQL);
+            ExecuteStep(new LoadBTGenerator(model), GENERATED_SQL);
 
             // TODO: BT und AL generieren
             

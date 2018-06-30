@@ -19,6 +19,7 @@ namespace KDV.CeusDL.Model.BT {
             this.blInterface = ifa;
             this.coreInterface = ifa.GetCoreInterface();
             this.InterfaceType = coreInterface.Type;
+            this.IsMandant = ifa.IsMandant;
 
             // TODO: evtl. ist es auch vorteilhaft, wenn die beiden
             //       Interfaces _VERSION und das Original eine Referenz aufeinander haben.
@@ -88,13 +89,17 @@ namespace KDV.CeusDL.Model.BT {
         // Markiert, ob es sich bei der Tabelle um eine technisch generierte Versionstabelle
         // für den Fall history="true" handelt.
         public bool IsHistoryTable { get; private set; } 
+        // für den Fall mandant="true"
+        public bool IsMandant { get; private set; }
 
         internal void PostProcess()
         {
-            foreach(var attr in this.Attributes.Where(a => a is RefBTAttribute).Select(a => (RefBTAttribute)a)) {
+            int idx = 0;
+            foreach(var attr in this.Attributes.Where(a => a is RefBTAttribute).Select(a => (RefBTAttribute)a)) {                
                 var refIfaName = attr.GetBLAttribute().ParentInterface.Name;
                 attr.ReferencedBTInterface = this.ParentModel.Interfaces.Single(i => i.blInterface.Name == attr.ReferencedBLInterface.Name);
                 attr.ReferencedBTAttribute = attr.ReferencedBTInterface.Attributes.Single(a => a.IsIdentity);
+                attr.JoinAlias = $"t{++idx}";
             } 
         }
 
