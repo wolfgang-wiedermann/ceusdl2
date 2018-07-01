@@ -90,10 +90,13 @@ namespace KDV.CeusDL.Model.BT {
         }
 
         private bool GetHasToUseVersionTable() {
+            // TODO: Prüfen, ob die Bedingung nicht vereinfacht werden kann!
             return (refBLAttribute.ReferencedAttribute.ParentInterface.InterfaceType == CoreInterfaceType.DIM_TABLE
-                || refBLAttribute.ReferencedAttribute.ParentInterface.InterfaceType == CoreInterfaceType.DIM_VIEW)
+                    || refBLAttribute.ReferencedAttribute.ParentInterface.InterfaceType == CoreInterfaceType.DIM_VIEW)
                 && ParentInterface.blInterface.IsHistorized 
-                && refBLAttribute.ReferencedAttribute.ParentInterface.IsHistorized;
+                && ParentInterface.blInterface is DerivedBLInterface
+                && refBLAttribute.ReferencedAttribute.ParentInterface.IsHistorized
+                ;                
         }
     }
 

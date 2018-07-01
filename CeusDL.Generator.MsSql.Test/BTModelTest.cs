@@ -137,6 +137,7 @@ namespace KDV.CeusDL.Model.BT.Test
             Assert.AreEqual("AP_BL_D_Land", reference.ReferencedBLInterface.Name);
             Assert.AreEqual("AP_BT_D_Land", reference.ReferencedBTInterface.Name);
             Assert.AreEqual("Land_ID", ((BaseBTAttribute)(reference.ReferencedBTAttribute)).Name);
+            Assert.AreEqual("Land_KNZ", reference.ReferencedBLAttribute.Name);
         }
     }
 }

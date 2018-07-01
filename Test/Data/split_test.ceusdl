@@ -1,0 +1,21 @@
+interface Test1 : DimTable(history="true", mandant="true") {
+    base KNZ:varchar(len="20", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="100");
+}
+
+interface Test2 : DimTable(history="true", mandant="true") {
+    base KNZ:varchar(len="20", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="100");
+    ref Test1.KNZ as T1;
+    ref JaNein.KNZ as Lebt;
+    ref JaNein.KNZ as Bayerisch;
+}
+
+interface Test3 : FactTable(history="true", mandant="true") {
+    base Nummer:varchar(len="10", primary_key="true");
+    ref Tag.KNZ(primary_key="true");
+    ref Test1.KNZ;
+    fact Anzahl_F:int;
+}

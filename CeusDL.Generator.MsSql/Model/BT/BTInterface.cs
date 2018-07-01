@@ -20,13 +20,19 @@ namespace KDV.CeusDL.Model.BT {
             this.coreInterface = ifa.GetCoreInterface();
             this.InterfaceType = coreInterface.Type;
             this.IsMandant = ifa.IsMandant;
+            this.IsHistorized = ifa.IsHistorized;
 
             // TODO: evtl. ist es auch vorteilhaft, wenn die beiden
             //       Interfaces _VERSION und das Original eine Referenz aufeinander haben.
             if(ifa is DerivedBLInterface) {
                 this.IsHistoryTable = true;
+                this.IsCurrentStateTable = false;                
+            } else if(ifa.GetCoreInterface().IsHistorized) {
+                this.IsHistoryTable = false;
+                this.IsCurrentStateTable = true;
             } else {
                 this.IsHistoryTable = false;
+                this.IsCurrentStateTable = false;
             }
 
             this.Attributes = new List<IBTAttribute>();
@@ -86,9 +92,14 @@ namespace KDV.CeusDL.Model.BT {
         public List<IBTAttribute> Attributes { get; private set; }
         public CoreInterfaceType InterfaceType { get; private set; }
 
+        // Wert des Attributs history (history="true" oder history="false")
+        public bool IsHistorized { get; private set; }
         // Markiert, ob es sich bei der Tabelle um eine technisch generierte Versionstabelle
         // für den Fall history="true" handelt.
-        public bool IsHistoryTable { get; private set; } 
+        public bool IsHistoryTable { get; private set; }
+        // Markiert, ob es sich bei der Tabelle um die Dimensionstabelle ohne Historie
+        // für den Fall history="true" handelt.
+        public bool IsCurrentStateTable { get; private set; }
         // für den Fall mandant="true"
         public bool IsMandant { get; private set; }
 

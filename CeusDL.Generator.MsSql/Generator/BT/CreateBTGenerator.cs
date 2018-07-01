@@ -44,15 +44,11 @@ namespace KDV.CeusDL.Generator.BT {
         private void CreateCreateTable(StringBuilder sb, BTInterface ifa)
         {
             if(ifa.IsHistoryTable) {
-                CreateCreateHistoryTable(sb, ifa);
+                sb.Append($"-- Historientabelle für {ifa.ShortName} anlegen\n");
             } else {
-                CreateCreateNonHistoryTable(sb, ifa);
-            }
-        }
-
-        private void CreateCreateNonHistoryTable(StringBuilder sb, BTInterface ifa)
-        {
-            sb.Append($"-- Tabelle für {ifa.ShortName} anlegen\n");
+                sb.Append($"-- Tabelle für {ifa.ShortName} anlegen\n");
+            }            
+            
             sb.Append($"create table {ifa.FullName} (\n");
             
             foreach(var attr in ifa.Attributes) {
@@ -72,31 +68,6 @@ namespace KDV.CeusDL.Generator.BT {
             }
 
             sb.Append(")\n\n");
-        }
-        
-        // Ist das nicht exakt das gleiche wie CreateCreateNonHistoryTable???
-        private void CreateCreateHistoryTable(StringBuilder sb, BTInterface ifa)
-        {            
-            sb.Append($"-- Historientabelle für {ifa.ShortName} anlegen\n");
-            sb.Append($"create table {ifa.FullName} (\n");
-            
-            foreach(var attr in ifa.Attributes) {
-                if(attr is BaseBTAttribute) {
-                    var baseAttr = (BaseBTAttribute)attr;
-                    sb.Append($"{baseAttr.Name} {baseAttr.GetSqlDataTypeDefinition()}".Indent("    "));                    
-                } else if(attr is RefBTAttribute) {
-                    var refAttr = (RefBTAttribute)attr;
-                    sb.Append($"{refAttr.IdAttribute.Name} {refAttr.IdAttribute.SqlDataType},\n".Indent("    "));
-                    sb.Append($"{refAttr.KnzAttribute.Name} {refAttr.KnzAttribute.SqlDataType}".Indent("    "));
-                }
-                if(attr != ifa.Attributes.Last()) {
-                    sb.Append(",\n");
-                } else {
-                    sb.Append("\n");
-                }
-            }
-
-            sb.Append(")\n\n");            
         }
     }
 }
