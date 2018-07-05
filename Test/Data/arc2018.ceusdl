@@ -1,0 +1,26 @@
+config {
+     prefix="ARC";
+     il_database="ARC_InterfaceLayer";
+     bl_database="ARC_BaseLayer";
+     bt_database="ARC_BaseLayer";
+     al_database="ARC_AnalyticLayer";          
+}
+
+// import "something-else.ceusdl"
+
+interface Term : TemporalTable { 
+    base SRCID:varchar(len="50", primary_key="true");
+    base DESC:varchar(len="100");    
+}
+
+interface Gender : DimTable {
+    base SRCID:varchar(len="50", primary_key="true");
+    base DESC:varchar(len="100");    
+}
+
+interface Students : FactTable {
+    base SomeExternalID:varchar(len="12", primary_key="true");
+    ref Term.SRCID(primary_key="true");
+    ref Gender.SRCID;
+    fact Number_F:int;    
+}
