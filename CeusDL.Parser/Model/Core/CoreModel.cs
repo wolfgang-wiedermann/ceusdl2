@@ -97,10 +97,17 @@ namespace KDV.CeusDL.Model.Core {
         }
 
         public CoreAttribute GetAttributeByName(string ifaName, string attrName) {
-            return Interfaces.Where(i => i.Name == ifaName)
-                             ?.First().Attributes
-                             .Where(a => a is CoreBaseAttribute && a.Name == attrName)
-                             ?.First();
+            var ifa = Interfaces.Where(i => i.Name == ifaName).FirstOrDefault();
+            if(ifa == null) {
+                throw new InvalidInterfaceNameException($"Error in GetAttributeByName: Can not find Interface {ifaName}");
+            }
+
+            var attr = ifa.Attributes.Where(a => a is CoreBaseAttribute && a.Name == attrName).FirstOrDefault();
+            if(attr == null) {
+                throw new InvalidAttributeNameException($"Error in GetAttributeByName: Can not find Attribute {ifaName}.{attrName}");
+            }
+
+            return attr;
         } 
     }
 }
