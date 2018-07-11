@@ -50,9 +50,10 @@ namespace KDV.CeusDL.Generator.BL {
                     )
                 )
                 .Where(i => i.Attributes.Where(a => a is RefBLAttribute).Count() > 0)
-                .OrderByDescending(i => i.MaxReferenceDepth)
+                .OrderByDescending(i => i.MaxReferenceDepth) // Wichtig!
                 .Select(i => (DerivedBLInterface)i);
 
+            sb.Append(";\n"); // Ohne dass die vorherigen Anwendungen mit ; abgeschlossen sind geht die CTE in CascadeVersions nicht!
             foreach(var ifa in ifaForCascade) {
                 sb.Append(GenerateCascadeVersions(ifa));
             }
@@ -62,8 +63,7 @@ namespace KDV.CeusDL.Generator.BL {
 
         private string GenerateCascadeVersions(DerivedBLInterface ifa)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(";\n"); // Ohne dass die vorherigen Anwendungen mit ; abgeschlossen sind geht die CTE nicht!
+            StringBuilder sb = new StringBuilder();            
 
             // Nur Beziehungen zwischen zwei historisierten Dimensionen sind relevant
             var relevantRelationships = ifa.Attributes.Where(a => a is RefBLAttribute)
@@ -71,13 +71,17 @@ namespace KDV.CeusDL.Generator.BL {
                 .Where(a => a.ReferencedAttribute.ParentInterface.IsHistorized)
                 .ToList();
 
-            foreach(var rel in relevantRelationships) {
+            foreach(var rel in relevantRelationships) {                
                 GenerateCascadeVersions(ifa, rel, sb);
             }
             
             return sb.ToString();
         }
 
+        ///
+        /// Kaskadierendes Auflösung von Versionen von Kind-Dimensionen in den 
+        /// Elterndimensionen für ein einzelnes Eltern-Kind-Paar auflösen
+        ///
         private void GenerateCascadeVersions(DerivedBLInterface childIfa, RefBLAttribute reference, StringBuilder sb) {
             var parentIfa = GetDerivedForDefault(reference.ReferencedAttribute.ParentInterface);
             var parentNonIdentityAttributes = parentIfa.Attributes.Where(a => !a.IsIdentity);
@@ -133,9 +137,7 @@ namespace KDV.CeusDL.Generator.BL {
                 } else {
                     sb.Append($"and t1.{uk.Name} = mv.{uk.Name}\n".Indent(1));
                 }                
-            }
-            // TODO: statt 99991231 muss ich irgendwie noch dynamisch, abhängig von
-            //       der für die historisierung gewählten Zeiteinheit einen maxwert ermitteln!
+            }            
             sb.Append($"and coalesce(t1.{parentIfa.HistoryAttribute.Name}, '{max}') = (\n".Indent(1));
             sb.Append($"select min(coalesce(z.{parentIfa.HistoryAttribute.Name}, '{max}'))\n".Indent(2));
             sb.Append($"from {parentIfa.FullName} as z\n".Indent(2));
