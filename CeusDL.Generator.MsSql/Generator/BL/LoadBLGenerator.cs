@@ -81,6 +81,7 @@ namespace KDV.CeusDL.Generator.BL {
         private void GenerateCascadeVersions(DerivedBLInterface childIfa, RefBLAttribute reference, StringBuilder sb) {
             var parentIfa = GetDerivedForDefault(reference.ReferencedAttribute.ParentInterface);
             var parentNonIdentityAttributes = parentIfa.Attributes.Where(a => !a.IsIdentity);
+            var max = GetMaxValueForHistoryAttribute(parentIfa.HistoryAttribute);
 
             sb.Append($"-- Cascade Versions for {parentIfa.Name} -> {reference.ReferencedAttribute.FullName}\n");            
             sb.Append($"-- {childIfa.Name}\n");
@@ -135,8 +136,8 @@ namespace KDV.CeusDL.Generator.BL {
             }
             // TODO: statt 99991231 muss ich irgendwie noch dynamisch, abhängig von
             //       der für die historisierung gewählten Zeiteinheit einen maxwert ermitteln!
-            sb.Append($"and coalesce(t1.{parentIfa.HistoryAttribute.Name}, '99991231') = (\n".Indent(1));
-            sb.Append($"select min(coalesce(z.{parentIfa.HistoryAttribute.Name}, '99991231'))\n".Indent(2));
+            sb.Append($"and coalesce(t1.{parentIfa.HistoryAttribute.Name}, '{max}') = (\n".Indent(1));
+            sb.Append($"select min(coalesce(z.{parentIfa.HistoryAttribute.Name}, '{max}'))\n".Indent(2));
             sb.Append($"from {parentIfa.FullName} as z\n".Indent(2));
             foreach(var uk in parentUkWithoutHistory) {
                 if(uk == parentUkWithoutHistory.First()) {
@@ -145,9 +146,22 @@ namespace KDV.CeusDL.Generator.BL {
                     sb.Append($"and z.{uk.Name} = t1.{uk.Name}\n".Indent("          "));
                 }
             }
-            sb.Append($"and coalesce(z.{parentIfa.HistoryAttribute.Name}, '99991231') >= coalesce(mv.{parentIfa.HistoryAttribute.Name}, '99991231')\n".Indent("          "));
+            sb.Append($"and coalesce(z.{parentIfa.HistoryAttribute.Name}, '{max}') >= coalesce(mv.{parentIfa.HistoryAttribute.Name}, '{max}')\n".Indent("          "));
             sb.Append(")\n".Indent(1));
             sb.Append(";\n");
+        }
+
+        private string GetMaxValueForHistoryAttribute(IBLAttribute hist) {
+            switch(hist.DataType) {
+                case CoreDataType.INT: return Int32.MaxValue.ToString();
+                case CoreDataType.DECIMAL: return Decimal.MaxValue.ToString();
+                case CoreDataType.VARCHAR: return "~MAX_VALUE";
+                case CoreDataType.DATETIME: return DateTime.MaxValue.ToString("yyyy-MM-dd hh:mm:ss");
+                case CoreDataType.DATE: return DateTime.MaxValue.ToString("yyyy-MM-dd");
+                case CoreDataType.TIME: return DateTime.MaxValue.ToString("hh:mm:ss");                
+                default: 
+                    throw new InvalidDataTypeException();
+            }
         }
 
         private DerivedBLInterface GetDerivedForDefault(IBLInterface ifa) {
