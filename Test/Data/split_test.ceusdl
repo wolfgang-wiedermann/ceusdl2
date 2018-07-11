@@ -1,3 +1,13 @@
+/*
+* Dimensionsattribute für das Testen der Historisierung
+* 
+* Hier im Speziellen das Kaskardieren von Versionen zwischen 
+* einander referenzierenden Dimensionen
+*
+* Die Datei Doc/B_CascadeVersions_DimToDimByRef.sql zeigt, wie die 
+* Generierung der fehlenden Versionen in der Elterndimension erreicht werden kann.
+*/
+
 interface Test1 : DimTable(history="true", mandant="true") {
     base KNZ:varchar(len="20", primary_key="true");
     base KURZBEZ:varchar(len="100");

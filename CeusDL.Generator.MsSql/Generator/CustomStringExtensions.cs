@@ -10,5 +10,13 @@ namespace KDV.CeusDL.Generator {
                 return strOut;
             }
         }
+
+        public static string Indent(this string str, int depth) {
+            string indent = "";
+            for(int i = 0; i < depth*4; i++) {
+                indent += " ";
+            }
+            return str.Indent(indent);
+        }
     }
 }

@@ -58,7 +58,7 @@ interface Antragsfachstatus : DimTable(mandant="true") {
 }
 
 // request_status
-interface Antragsstatus : DimTable(mandant="true") {
+interface Antragsstatus : DimTable(mandant="true", former_name="Antragsstatus") {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
@@ -147,7 +147,7 @@ interface Bewerber : FactTable(mandant="true", history="true", with_nowtable="tr
     ref Geschlecht.KNZ;
     ref Tag.KNZ as Geburtstag;
 
-    base Alter:int(calculated="true"); // Beispiel für ein erstes Calculated-Attribut
+    base Alter:int(calculated="true", former_name="Age"); // Beispiel für ein erstes Calculated-Attribut
 
     ref Semester.KNZ;
 

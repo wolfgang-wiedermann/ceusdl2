@@ -33,7 +33,7 @@ namespace KDV.CeusDL.Generator.BT {
             foreach(var ifa in model.Interfaces) {
                 GenerateTruncate(sb, ifa);
                 GenerateInsert(sb, ifa);
-            }
+            }            
             return sb.ToString();
         }
 
@@ -110,7 +110,7 @@ namespace KDV.CeusDL.Generator.BT {
                 // Erfordert mehr als zwei Versionen von Studiengang 00 um die Beziehung zur umbenannten Fakultät
                 // sauber abzubilden.
                 //
-                 throw new NotImplementedException("Dieser Beziehungstyp ist noch nicht implementiert");
+                // throw new NotImplementedException("Dieser Beziehungstyp ist noch nicht implementiert");
                 // sb.Append($"-- GenerateD2DHistoryCondition noch nicht implementiert: {ifa.Name} => {attr.ReferencedBTInterface.Name}\n");
             }
         }

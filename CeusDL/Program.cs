@@ -31,10 +31,12 @@ namespace CeusDL2
             if(System.Diagnostics.Debugger.IsAttached) {
                 // Dieser Code wird bei F5 in Visual Studio ausgeführt
                 string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\split_main.ceusdl";
+                //string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\arc2018.ceusdl";
                 string dbConnectionFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\connection.txt";
                 string rootFolder = "."; 
                 PrepareEnvironment(rootFolder);
                 ExecuteCompilation(ceusdlFileName, File.ReadAllText(dbConnectionFileName));
+                //ExecuteCompilation(ceusdlFileName, null);
             } else {
                 // Dieser Code wird beim Aufruf über Commandline ausgeführt
                 var cla = new CommandLineApplication();                

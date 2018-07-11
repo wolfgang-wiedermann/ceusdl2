@@ -42,7 +42,123 @@ namespace KDV.CeusDL.Generator.BL {
                 sb.Append(GenerateFactTableInsert(ifa));
             }
 
+            // Kaskadierende Versionsgenerierung (nur DerivedInterfaces mit Ref-Attributen durchlaufen)
+            var ifaForCascade = model.Interfaces
+                .Where(i => i is DerivedBLInterface && 
+                    (i.InterfaceType == CoreInterfaceType.DIM_TABLE 
+                     || i.InterfaceType == CoreInterfaceType.DIM_VIEW
+                    )
+                )
+                .Where(i => i.Attributes.Where(a => a is RefBLAttribute).Count() > 0)
+                .OrderByDescending(i => i.MaxReferenceDepth)
+                .Select(i => (DerivedBLInterface)i);
+
+            foreach(var ifa in ifaForCascade) {
+                sb.Append(GenerateCascadeVersions(ifa));
+            }
+
             return sb.ToString();
+        }
+
+        private string GenerateCascadeVersions(DerivedBLInterface ifa)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(";\n"); // Ohne dass die vorherigen Anwendungen mit ; abgeschlossen sind geht die CTE nicht!
+
+            // Nur Beziehungen zwischen zwei historisierten Dimensionen sind relevant
+            var relevantRelationships = ifa.Attributes.Where(a => a is RefBLAttribute)
+                .Select(a => (RefBLAttribute)a)
+                .Where(a => a.ReferencedAttribute.ParentInterface.IsHistorized)
+                .ToList();
+
+            foreach(var rel in relevantRelationships) {
+                GenerateCascadeVersions(ifa, rel, sb);
+            }
+            
+            return sb.ToString();
+        }
+
+        private void GenerateCascadeVersions(DerivedBLInterface childIfa, RefBLAttribute reference, StringBuilder sb) {
+            var parentIfa = GetDerivedForDefault(reference.ReferencedAttribute.ParentInterface);
+            var parentNonIdentityAttributes = parentIfa.Attributes.Where(a => !a.IsIdentity);
+
+            sb.Append($"-- Cascade Versions for {parentIfa.Name} -> {reference.ReferencedAttribute.FullName}\n");            
+            sb.Append($"-- {childIfa.Name}\n");
+
+            // Ermittlung der im parentIfa fehlenden Versionen
+            sb.Append("with missing_versions as (\n");
+            sb.Append("select\n".Indent(1));
+            foreach(var uk in childIfa.UniqueKeyAttributes.Where(a => childIfa.HistoryAttribute != a)) {
+                sb.Append($"t2.{uk.Name},\n".Indent(2));
+            }
+            sb.Append($"t2.{reference.Name} as {reference.ReferencedAttribute.Name},\n".Indent(2));
+            sb.Append($"t2.{childIfa.HistoryAttribute.Name}\n".Indent(2));
+            sb.Append($"from {childIfa.FullName} as t2\nleft outer join {parentIfa.FullName} as t1\n".Indent(1));
+            sb.Append($"on t2.{reference.Name} = t1.{reference.ReferencedAttribute.Name}\n".Indent(2));
+            if(childIfa.IsMandant && parentIfa.IsMandant) {
+                sb.Append($"and t2.Mandant_KNZ = t1.Mandant_KNZ\n".Indent(2));
+            }
+            sb.Append($"and coalesce(t1.{parentIfa.HistoryAttribute.Name}, 'NOW') = coalesce(t2.{childIfa.HistoryAttribute.Name}, 'NOW')\n".Indent(2));
+            sb.Append($"where t1.{parentIfa.PrimaryKeyAttributes.First().Name} is null\n".Indent(1));
+            sb.Append(")\n");
+
+            // Einfügen der fehlenden Versionen in die BL-Tabelle zu parrentIfa
+            sb.Append($"insert into {parentIfa.FullName} (\n");            
+            foreach(var attr in parentNonIdentityAttributes) {                
+                sb.Append(attr.Name.Indent(1));
+                if(attr != parentNonIdentityAttributes.Last()) {
+                    sb.Append(",");
+                }
+                sb.Append("\n");
+            }
+            sb.Append(")\n");
+            sb.Append("select\n");
+            foreach(var attr in parentNonIdentityAttributes.Where(a => !a.IsTechnicalAttribute)) {
+                sb.Append($"t1.{attr.Name},\n".Indent(1));
+            }
+            sb.Append("'I' as T_Modifikation,\n".Indent(1));
+            sb.Append($"cast('Cascaded for {reference.FullName}' as varchar(100)) as T_Bemerkung,\n".Indent(1));
+            sb.Append("SYSTEM_USER as T_Benutzer,\n".Indent(1));
+            sb.Append("'H' as T_System,\n".Indent(1));
+            sb.Append($"mv.{childIfa.HistoryAttribute.Name} as {parentIfa.HistoryAttribute.Name},\n".Indent(1));
+            sb.Append("GETDATE() as T_Erst_Dat,\nGETDATE() as T_Aend_Dat,\n".Indent(1));
+            sb.Append("t1.T_Ladelauf_NR\n".Indent(1));
+            sb.Append($"from {parentIfa.FullName} as t1\n");
+            sb.Append($"inner join missing_versions as mv\n");
+            var parentUkWithoutHistory = parentIfa.UniqueKeyAttributes.Where(a => parentIfa.HistoryAttribute != a);
+            foreach(var uk in parentUkWithoutHistory) {
+                if(uk == parentUkWithoutHistory.First()) {
+                    sb.Append($"on t1.{uk.Name} = mv.{uk.Name}\n".Indent(1));
+                } else {
+                    sb.Append($"and t1.{uk.Name} = mv.{uk.Name}\n".Indent(1));
+                }                
+            }
+            // TODO: statt 99991231 muss ich irgendwie noch dynamisch, abhängig von
+            //       der für die historisierung gewählten Zeiteinheit einen maxwert ermitteln!
+            sb.Append($"and coalesce(t1.{parentIfa.HistoryAttribute.Name}, '99991231') = (\n".Indent(1));
+            sb.Append($"select min(coalesce(z.{parentIfa.HistoryAttribute.Name}, '99991231'))\n".Indent(2));
+            sb.Append($"from {parentIfa.FullName} as z\n".Indent(2));
+            foreach(var uk in parentUkWithoutHistory) {
+                if(uk == parentUkWithoutHistory.First()) {
+                    sb.Append($"where z.{uk.Name} = t1.{uk.Name}\n".Indent(2));
+                } else {
+                    sb.Append($"and z.{uk.Name} = t1.{uk.Name}\n".Indent("          "));
+                }
+            }
+            sb.Append($"and coalesce(z.{parentIfa.HistoryAttribute.Name}, '99991231') >= coalesce(mv.{parentIfa.HistoryAttribute.Name}, '99991231')\n".Indent("          "));
+            sb.Append(")\n".Indent(1));
+            sb.Append(";\n");
+        }
+
+        private DerivedBLInterface GetDerivedForDefault(IBLInterface ifa) {
+            if(!(ifa is DefaultBLInterface))
+                throw new InvalidInterfaceTypeException("GetDerivedForDefault erwartet ein DefaultInterface!");
+
+            return this.model.Interfaces
+                .Where(i => i is DerivedBLInterface)
+                .Select(i => (DerivedBLInterface)i)
+                .Where(i => i.DefaultInterface == ifa)
+                .FirstOrDefault();
         }
 
         internal string GenerateFactTableInsert(IBLInterface ifa)
