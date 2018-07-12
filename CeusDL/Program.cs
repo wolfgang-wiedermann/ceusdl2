@@ -162,8 +162,9 @@ namespace CeusDL2
             ExecuteStep(new CreateBTGenerator(model), GENERATED_SQL);
             ExecuteStep(new DropBTGenerator(model), GENERATED_SQL);
             ExecuteStep(new LoadBTGenerator(model), GENERATED_SQL);
+            ExecuteStep(new GraphvizBTGenerator(model), GENERATED_GRAPHVIZ);
 
-            // TODO: BT und AL generieren
+            // TODO: AL generieren
             
         }
 
