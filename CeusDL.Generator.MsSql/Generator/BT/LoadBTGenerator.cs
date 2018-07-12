@@ -97,7 +97,7 @@ namespace KDV.CeusDL.Generator.BT {
                 GenerateF2DHistoryCondition(sb, attr);
             } else if(attr.ReferencedBTInterface.IsHistoryTable && ifa.IsHistoryTable) {
                 // Beziehung zwischen zwei historisierten Dimensionen
-                //GenerateF2DHistoryCondition(sb, attr); 
+                GenerateF2DHistoryCondition(sb, attr); // Durch die kaskadierung der Versionen in BL sollte das jetzt gehen.
                 // Das ist so noch nicht optimal, denn wir müssten im D2D-Fall zusätzliche Elemente
                 // der feineren Dimension generieren, wenn ein Element einer groberen Dimension der gleichen Hierarchie
                 // eine neue Version erhält.
@@ -130,7 +130,7 @@ namespace KDV.CeusDL.Generator.BT {
 
         private void GenerateF2FHistoryCondition(StringBuilder sb, RefBTAttribute attr)
         {            
-            sb.Append($"and tx.{attr.ReferencedBLInterface.HistoryAttribute.Name} = t.{attr.ParentInterface.blInterface.HistoryAttribute.Name}\n".Indent("    "));                        
+            sb.Append($"and t.{attr.ReferencedBLInterface.HistoryAttribute.Name} = {attr.JoinAlias}.{attr.ParentInterface.blInterface.HistoryAttribute.Name}\n".Indent("    "));                        
         }        
 
         private void GenerateTruncate(StringBuilder sb, BTInterface ifa)
