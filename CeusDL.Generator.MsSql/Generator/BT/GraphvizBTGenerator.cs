@@ -49,11 +49,16 @@ namespace KDV.CeusDL.Generator.BT {
 
         private string GenerateRelations(BTInterface ifa)
         {
-            string code = "# Beziehungen \n";
-            foreach(var r in ifa.Attributes.Where(a => a is RefBTAttribute).Select(a => (RefBTAttribute)a)) {
-                code += $"{ifa.Name}:{r.IdAttribute.Name} -- {r.ReferencedBTInterface.Name}:{((BaseBTAttribute)r.ReferencedBTAttribute).Name}\n";
+            var relevantAttributes = ifa.Attributes.Where(a => a is RefBTAttribute).Select(a => (RefBTAttribute)a);
+            if(relevantAttributes.Count() > 0) {
+                string code = "# Beziehungen \n";
+                foreach(var r in relevantAttributes) {
+                    code += $"{ifa.Name}:{r.IdAttribute.Name} -- {r.ReferencedBTInterface.Name}:{((BaseBTAttribute)r.ReferencedBTAttribute).Name}\n";
+                }
+                return code;
+            } else {
+                return "";
             }
-            return code;
         }
 
         private string GenerateInterface(BTInterface ifa)
