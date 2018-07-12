@@ -38,7 +38,7 @@ namespace KDV.CeusDL.Generator.BT {
         }
 
         private void GenerateInsert(StringBuilder sb, BTInterface ifa)
-        {
+        {            
             var refAttributes = ifa.Attributes.Where(a => a is RefBTAttribute)
                                               .Select(a => (RefBTAttribute)a)
                                               .ToList<RefBTAttribute>();
@@ -98,34 +98,22 @@ namespace KDV.CeusDL.Generator.BT {
             } else if(attr.ReferencedBTInterface.IsHistoryTable && ifa.IsHistoryTable) {
                 // Beziehung zwischen zwei historisierten Dimensionen
                 GenerateF2DHistoryCondition(sb, attr); // Durch die kaskadierung der Versionen in BL sollte das jetzt gehen.
-                // Das ist so noch nicht optimal, denn wir müssten im D2D-Fall zusätzliche Elemente
-                // der feineren Dimension generieren, wenn ein Element einer groberen Dimension der gleichen Hierarchie
-                // eine neue Version erhält.
-                //
-                // Beispiel: 
-                // ---------
-                // Fakultät 01 => Informatik von 20101 bis 20162; Informatik und Mathematik von 20171 bis heute
-                // Studiengang 00 in Fakultät 01 => 
-                //             => Informatik (BA) von 20091 bis 20181; Allgemeine Informatik (BA) von 20182 bis heute
-                // Erfordert mehr als zwei Versionen von Studiengang 00 um die Beziehung zur umbenannten Fakultät
-                // sauber abzubilden.
-                //
-                // throw new NotImplementedException("Dieser Beziehungstyp ist noch nicht implementiert");
-                // sb.Append($"-- GenerateD2DHistoryCondition noch nicht implementiert: {ifa.Name} => {attr.ReferencedBTInterface.Name}\n");
             }
         }
 
         private void GenerateF2DHistoryCondition(StringBuilder sb, RefBTAttribute attr)
         {
             var idColumn = attr.ReferencedBLInterface.Attributes.Single(a => a.IsIdentity);
-            sb.Append($"and {attr.JoinAlias}.{idColumn.Name} = (\n".Indent("    "));
-            sb.Append($"select min(tx.{idColumn.Name})\nfrom {attr.ReferencedBLInterface.FullName} tx\n".Indent("        "));
-            sb.Append($"where tx.{attr.ReferencedBLAttribute.Name} = {attr.JoinAlias}.{attr.ReferencedBLAttribute.Name}\n".Indent("        "));
+            sb.Append($"and coalesce({attr.JoinAlias}.{attr.ReferencedBLInterface.HistoryAttribute.Name}, '99991231') = (\n".Indent(1));
+            sb.Append($"select min(coalesce(tx.{attr.ReferencedBLInterface.HistoryAttribute.Name}, '99991231'))\n".Indent(2));
+            sb.Append($"from {attr.ReferencedBLInterface.FullName} tx\n".Indent(2));
+            sb.Append($"where tx.{attr.ReferencedBLAttribute.Name} = {attr.JoinAlias}.{attr.ReferencedBLAttribute.Name}\n".Indent(2));
             if(attr.ParentInterface.IsMandant && attr.ReferencedBLInterface.IsMandant) {
-                sb.Append($"and tx.Mandant_KNZ = {attr.JoinAlias}.Mandant_KNZ\n".Indent("        "));
+                sb.Append($"and tx.Mandant_KNZ = {attr.JoinAlias}.Mandant_KNZ\n".Indent(2));
             }
-            sb.Append($"and tx.{attr.ReferencedBLInterface.HistoryAttribute.Name} > t.{attr.ParentInterface.blInterface.HistoryAttribute.Name}\n".Indent("        "));            
-            sb.Append(")\n".Indent("    "));
+            // TODO: 99991231 noch durch Typbezogene Werte wie in BL beim Cascade ersetzen!!
+            sb.Append($"and coalesce(tx.{attr.ReferencedBLInterface.HistoryAttribute.Name}, '99991231') > t.{attr.ParentInterface.blInterface.HistoryAttribute.Name}\n".Indent(2));            
+            sb.Append(")\n".Indent(1));
         }
 
         private void GenerateF2FHistoryCondition(StringBuilder sb, RefBTAttribute attr)

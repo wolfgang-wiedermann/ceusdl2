@@ -24,21 +24,31 @@ namespace KDV.CeusDL.Model.BT {
 
             // TODO: evtl. ist es auch vorteilhaft, wenn die beiden
             //       Interfaces _VERSION und das Original eine Referenz aufeinander haben.
-            if(ifa is DerivedBLInterface) {
+            if(ifa.InterfaceType == CoreInterfaceType.FACT_TABLE && ifa.GetCoreInterface().IsHistorized) {
+                this.IsHistoryTable = false;
+                this.IsCurrentStateTable = false;
+                this.IsHistorizedFactTable = true;
+            } else if(ifa is DerivedBLInterface) {
                 this.IsHistoryTable = true;
-                this.IsCurrentStateTable = false;                
+                this.IsCurrentStateTable = false; 
+                this.IsHistorizedFactTable = false;               
             } else if(ifa.GetCoreInterface().IsHistorized) {
                 this.IsHistoryTable = false;
                 this.IsCurrentStateTable = true;
+                this.IsHistorizedFactTable = false;
             } else {
                 this.IsHistoryTable = false;
                 this.IsCurrentStateTable = false;
+                this.IsHistorizedFactTable = false;
             }
 
             this.Attributes = new List<IBTAttribute>();
-            if(IsHistoryTable)
-            {
-                // History-Table-Fall                
+            if(IsHistorizedFactTable) {
+                // Fakttabelle mit Zeitattribut, die falls vorhanden 
+                // auf die historisierten Versionen der Dimensionen referenziert
+                PrepareHistorizedFactTable(ifa);
+            } else if(IsHistoryTable) {
+                // Dimmension: History-Table-Fall                
                 PrepareHistoryTable(ifa);
             }
             else {
@@ -100,6 +110,8 @@ namespace KDV.CeusDL.Model.BT {
         // Markiert, ob es sich bei der Tabelle um die Dimensionstabelle ohne Historie
         // für den Fall history="true" handelt.
         public bool IsCurrentStateTable { get; private set; }
+        // Markiert historisierte Fakttabellen
+        public bool IsHistorizedFactTable { get; private set; }
         // für den Fall mandant="true"
         public bool IsMandant { get; private set; }
 
@@ -167,6 +179,28 @@ namespace KDV.CeusDL.Model.BT {
             string ifaName = pk.GetILAttribute().Core.ParentInterface.Name;
             string fieldName = pk.GetILAttribute().Core.Name;
             return new BaseBTAttribute($"{ifaName}_VERSION_{fieldName}", pk, this);
+        }
+
+        private void PrepareHistorizedFactTable(IBLInterface iifa)
+        {
+            if(!(iifa is DefaultBLInterface))
+                throw new InvalidInterfaceTypeException("An dieser Stelle dürfen nur DefaultBLInterfaces ankommen!");
+            if(!iifa.IsHistorized)
+                throw new InvalidInterfaceTypeException("An dieser Stelle dürfen nur historisierte Interfaces ankommen!");
+            if(iifa.InterfaceType != CoreInterfaceType.FACT_TABLE)
+                throw new InvalidInterfaceTypeException("An dieser Stelle dürfen nur FactTable Interfaces ankommen!");
+                        
+            var ifa = (DefaultBLInterface)iifa;            
+            var identity = ifa.Attributes.Single(a => a.IsIdentity);            
+            var pk = (BaseBLAttribute)ifa.Attributes.Single(a => a.IsPartOfUniqueKey && a is BaseBLAttribute);                        
+
+            // Restliche Standardattribute
+            var dataAttributes = ifa.Attributes
+                                    .Where(a => !(a.IsTechnicalAttribute));
+            foreach (var attr in dataAttributes)
+            {
+                this.Attributes.Add(ConvertAttribute(attr));                
+            }
         }
     }
 

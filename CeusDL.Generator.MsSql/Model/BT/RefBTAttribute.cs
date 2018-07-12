@@ -91,11 +91,21 @@ namespace KDV.CeusDL.Model.BT {
 
         private bool GetHasToUseVersionTable() {
             // TODO: Prüfen, ob die Bedingung nicht vereinfacht werden kann!
-            return (refBLAttribute.ReferencedAttribute.ParentInterface.InterfaceType == CoreInterfaceType.DIM_TABLE
+            return 
+                // Fall: DimTable oder DimView
+                ((refBLAttribute.ReferencedAttribute.ParentInterface.InterfaceType == CoreInterfaceType.DIM_TABLE
                     || refBLAttribute.ReferencedAttribute.ParentInterface.InterfaceType == CoreInterfaceType.DIM_VIEW)
+                && refBLAttribute.ReferencedAttribute.ParentInterface.IsHistorized
                 && ParentInterface.blInterface.IsHistorized 
                 && ParentInterface.blInterface is DerivedBLInterface
+                )
+                // Fall: FactTable
+                || ((refBLAttribute.ReferencedAttribute.ParentInterface.InterfaceType == CoreInterfaceType.DIM_TABLE
+                    || refBLAttribute.ReferencedAttribute.ParentInterface.InterfaceType == CoreInterfaceType.DIM_VIEW)
                 && refBLAttribute.ReferencedAttribute.ParentInterface.IsHistorized
+                && ParentInterface.blInterface.IsHistorized
+                && ParentInterface.blInterface.InterfaceType == CoreInterfaceType.FACT_TABLE
+                )
                 ;                
         }
     }
