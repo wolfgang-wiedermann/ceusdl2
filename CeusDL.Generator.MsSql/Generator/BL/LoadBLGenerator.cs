@@ -153,11 +153,11 @@ namespace KDV.CeusDL.Generator.BL {
             sb.Append(";\n");
         }
 
-        private string GetMaxValueForHistoryAttribute(IBLAttribute hist) {
+        public static string GetMaxValueForHistoryAttribute(IBLAttribute hist) {
             switch(hist.DataType) {
                 case CoreDataType.INT: return Int32.MaxValue.ToString();
                 case CoreDataType.DECIMAL: return Decimal.MaxValue.ToString();
-                case CoreDataType.VARCHAR: return "~MAX_VALUE";
+                case CoreDataType.VARCHAR: return "MAX_VALUE";
                 case CoreDataType.DATETIME: return DateTime.MaxValue.ToString("yyyy-MM-dd hh:mm:ss");
                 case CoreDataType.DATE: return DateTime.MaxValue.ToString("yyyy-MM-dd");
                 case CoreDataType.TIME: return DateTime.MaxValue.ToString("hh:mm:ss");                

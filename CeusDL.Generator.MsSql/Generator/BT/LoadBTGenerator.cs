@@ -103,16 +103,19 @@ namespace KDV.CeusDL.Generator.BT {
 
         private void GenerateF2DHistoryCondition(StringBuilder sb, RefBTAttribute attr)
         {
+            var max = BL.LoadBLGenerator.GetMaxValueForHistoryAttribute(attr.ReferencedBLInterface.HistoryAttribute);
             var idColumn = attr.ReferencedBLInterface.Attributes.Single(a => a.IsIdentity);
-            sb.Append($"and coalesce({attr.JoinAlias}.{attr.ReferencedBLInterface.HistoryAttribute.Name}, '99991231') = (\n".Indent(1));
-            sb.Append($"select min(coalesce(tx.{attr.ReferencedBLInterface.HistoryAttribute.Name}, '99991231'))\n".Indent(2));
+
+            sb.Append($"and coalesce({attr.JoinAlias}.{attr.ReferencedBLInterface.HistoryAttribute.Name}, '{max}') = (\n".Indent(1));
+            sb.Append($"select min(coalesce(tx.{attr.ReferencedBLInterface.HistoryAttribute.Name}, '{max}'))\n".Indent(2));
             sb.Append($"from {attr.ReferencedBLInterface.FullName} tx\n".Indent(2));
             sb.Append($"where tx.{attr.ReferencedBLAttribute.Name} = {attr.JoinAlias}.{attr.ReferencedBLAttribute.Name}\n".Indent(2));
             if(attr.ParentInterface.IsMandant && attr.ReferencedBLInterface.IsMandant) {
                 sb.Append($"and tx.Mandant_KNZ = {attr.JoinAlias}.Mandant_KNZ\n".Indent(2));
             }
             // TODO: 99991231 noch durch Typbezogene Werte wie in BL beim Cascade ersetzen!!
-            sb.Append($"and coalesce(tx.{attr.ReferencedBLInterface.HistoryAttribute.Name}, '99991231') > t.{attr.ParentInterface.blInterface.HistoryAttribute.Name}\n".Indent(2));            
+            sb.Append($"and coalesce(tx.{attr.ReferencedBLInterface.HistoryAttribute.Name}, '{max}') > ".Indent(2));
+            sb.Append($"coalesce(t.{attr.ParentInterface.blInterface.HistoryAttribute.Name}, '{max}')\n");            
             sb.Append(")\n".Indent(1));
         }
 
