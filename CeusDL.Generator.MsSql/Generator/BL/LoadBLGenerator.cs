@@ -28,6 +28,10 @@ namespace KDV.CeusDL.Generator.BL {
         {
             var sb = new StringBuilder();
 
+            if(!string.IsNullOrEmpty(model.Config.BLDatabase)) {
+                sb.Append($"\nuse {model.Config.BLDatabase};\n\n");
+            }
+
             // Dimensionen
             foreach(var ifa in model.DimTableInterfaces) {
                 sb.Append(GenerateDimTableUpdate(ifa));
