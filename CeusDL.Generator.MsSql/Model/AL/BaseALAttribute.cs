@@ -30,7 +30,8 @@ namespace KDV.CeusDL.Model.AL {
             if(ParentInterface is FactALInterface) {
                 return ((BaseBTAttribute)BTAttribute).Name;
             } else if (ParentInterface is DimensionALInterface) {
-                return $"{ParentInterface.ShortName}_{((BaseBTAttribute)BTAttribute).Name}";
+                var pi = (DimensionALInterface)ParentInterface;
+                return $"{pi.Alias}{((BaseBTAttribute)BTAttribute).Name}";
             } else {
                 throw new NotImplementedException("Unerwarteter InterfaceTyp");
             }

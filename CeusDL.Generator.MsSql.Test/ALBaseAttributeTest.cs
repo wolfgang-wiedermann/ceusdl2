@@ -53,6 +53,37 @@ namespace KDV.CeusDL.Model.AL.Test
             var dim = new DimensionALInterface(alModel, refBt);
             Assert.IsNotNull(refBt);            
             Assert.AreEqual("ARC_D_Term_1_Term", dim.Name);
-        }        
+        }
+
+        [TestMethod]
+        public void TestDimensionALInterface_CheckReferences()
+        {
+            // Daten einlesen...
+            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\al_tests.ceusdl";
+            var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
+            var p = new FileParser(data);
+            var result = p.Parse();            
+            var model = new CoreModel(result);
+
+            var bt = new BT.BTModel(model);
+            var alModel = new AL.ALModel(bt);
+            var refAttr = alModel.FactInterfaces[0].Attributes.Where(a => a is RefALAttribute).Select(a => (RefALAttribute)a).FirstOrDefault();
+            Assert.IsNotNull(refAttr);
+            Assert.AreEqual("Term_ID", refAttr.Name);
+            
+            var dim = refAttr.ReferencedDimension;
+            Assert.IsNotNull(dim);
+            Assert.AreEqual("ARC_D_Term_1_Term", dim.Name);
+            Assert.AreEqual("ARC_D_Term_1_Term", dim.RootDimension.Name);
+            Assert.AreEqual(5, dim.Attributes.Count);
+
+            var childRef = dim.Attributes.Where(a => a is RefALAttribute).Select(a => (RefALAttribute)a).FirstOrDefault();
+            Assert.IsNotNull(childRef);
+            Assert.AreEqual("Primary_TermGroup_ID", childRef.Name);
+            Assert.IsNotNull(childRef.ReferencedDimension);
+            var childDim = childRef.ReferencedDimension;
+            Assert.AreEqual("ARC_D_Term_2_Primary_TermGroup", childDim.Name);
+            Assert.AreEqual("ARC_D_Term_1_Term", childDim.RootDimension.Name);
+        }  
     }
 }

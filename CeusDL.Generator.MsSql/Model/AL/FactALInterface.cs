@@ -35,9 +35,16 @@ namespace KDV.CeusDL.Model.AL
                 if(attr is BT.BaseBTAttribute) {                    
                     Attributes.Add(new BaseALAttribute(this, (BT.BaseBTAttribute)attr));
                 } else if(attr is BT.RefBTAttribute) {
-                    var dim = new DimensionALInterface(Model, (BT.RefBTAttribute)attr);                 
-                    dim = Model.GetDimensionInterfaceFor(dim);
-                    //Attributes.Add(new RefALAttribute());
+                    // TODO: diesen elseif-Block evtl. auslagern in Methode
+                    var refAttr = (BT.RefBTAttribute)attr;
+                    if(refAttr.ReferencedBTInterface.InterfaceType == CoreInterfaceType.FACT_TABLE) {
+                        // TODO: Integration der Attribute einer referenzierten Fakttabelle
+                        //       ausprogrammieren
+                    } else {
+                        var dim = new DimensionALInterface(Model, refAttr);                 
+                        dim = Model.GetDimensionInterfaceFor(dim);
+                        Attributes.Add(new RefALAttribute(this, dim, refAttr));
+                    }
                 } else {
                     throw new NotImplementedException($"FactALInterface.PrepareAttributes: Attributtyp {attr.GetType().Name} nicht unterstützt");
                 }
