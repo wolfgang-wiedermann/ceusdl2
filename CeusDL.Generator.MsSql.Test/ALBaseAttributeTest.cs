@@ -11,23 +11,31 @@ namespace KDV.CeusDL.Model.AL.Test
     [TestClass]
     public class ALBaseAttributeTest
     {
-        /*
         [TestMethod]
         public void TestALBaseAttribute_GetName()
         {
             // Daten einlesen...
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\arc2018.ceusdl";
+            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\al_tests.ceusdl";
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
             var model = new CoreModel(result);
 
             var bt = new BT.BTModel(model);
-            var al = new BaseALAttribute(null, (BT.BaseBTAttribute)bt.Interfaces[2].Attributes.Where(a => a is BT.BaseBTAttribute).First());
-            Assert.IsNull(al.Core);
-            Assert.AreEqual("Students_ID", al.Name);
-        }
-        */
+            var alModel = new AL.ALModel(bt);
+
+            var baseAttr = alModel.FactInterfaces[0].Attributes.Where(a => a is BaseALAttribute).FirstOrDefault();
+            Assert.IsNotNull(baseAttr);            
+            Assert.AreEqual("Students_ID", baseAttr.Name);
+
+            baseAttr = alModel.DimensionInterfaces[0].Attributes.Where(a => a is BaseALAttribute).FirstOrDefault();
+            Assert.IsNotNull(baseAttr);            
+            Assert.AreEqual("Primary_TermGroup_TermGroup_ID", baseAttr.Name);
+
+            baseAttr = alModel.DimensionInterfaces[2].Attributes.Where(a => a is BaseALAttribute).FirstOrDefault();
+            Assert.IsNotNull(baseAttr);            
+            Assert.AreEqual("Term_Term_ID", baseAttr.Name);
+        }        
 
         [TestMethod]
         public void TestDimensionALInterface_GetName()

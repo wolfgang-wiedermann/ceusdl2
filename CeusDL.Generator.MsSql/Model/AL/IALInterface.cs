@@ -7,6 +7,7 @@ namespace KDV.CeusDL.Model.AL {
         Core.CoreInterface Core { get; }
         
         BT.BTInterface BTInterface { get; }
+        string ShortName { get; }
         string Name { get; }       
         List<IALAttribute> Attributes { get; }
     }

@@ -22,6 +22,8 @@ namespace KDV.CeusDL.Model.AL
 
         public BT.BTInterface BTInterface { get; private set; }
 
+        public string ShortName => null; // ???
+
         public string Name => throw new System.NotImplementedException();
 
         public List<IALAttribute> Attributes { get; private set; }
@@ -31,7 +33,7 @@ namespace KDV.CeusDL.Model.AL
             Attributes = new List<IALAttribute>();
             foreach(var attr in BTInterface.Attributes.OrderBy(a => a.GetBLAttribute().SortId)) {
                 if(attr is BT.BaseBTAttribute) {                    
-                    //Attributes.Add(new BaseALAttribute(this, (BT.BaseBTAttribute)attr));
+                    Attributes.Add(new BaseALAttribute(this, (BT.BaseBTAttribute)attr));
                 } else if(attr is BT.RefBTAttribute) {
                     var dim = new DimensionALInterface(Model, (BT.RefBTAttribute)attr);                 
                     dim = Model.GetDimensionInterfaceFor(dim);
