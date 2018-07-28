@@ -39,13 +39,7 @@ namespace KDV.CeusDL.Model.AL
             } else {
                 name = $"{model.Config.Prefix}_D_";
             }
-
-            if(string.IsNullOrEmpty(refAttr?.refBLAttribute?.Core?.Alias)) {                
-                name += $"{RootDimension.ShortName}_{Depth}_{refAttr.ReferencedBTInterface.ShortName}";                 
-            } else {
-                // TODO: Prüfen ob das gut ist so!
-                name += $"{RootDimension.ShortName}_{Depth}_{refAttr.refBLAttribute.Core.Alias}_{refAttr.ReferencedBTInterface.ShortName}"; 
-            }
+            name += $"{RootDimension.ShortName}_{Depth}_{this.ShortName}";                 
             return name;
         }
 
