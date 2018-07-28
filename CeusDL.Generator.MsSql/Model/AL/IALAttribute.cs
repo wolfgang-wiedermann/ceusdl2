@@ -6,7 +6,6 @@ namespace KDV.CeusDL.Model.AL {
         IALInterface ParentInterface { get; }
         BT.IBTAttribute BTAttribute { get; }
         string Name { get; }       
-        string SqlType { get; } 
-        string SqlTypeDefinition { get; }
+        string SqlType { get; }         
     }
 }

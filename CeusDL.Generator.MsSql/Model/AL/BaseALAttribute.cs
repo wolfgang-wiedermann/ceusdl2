@@ -22,9 +22,18 @@ namespace KDV.CeusDL.Model.AL {
 
         public string Name { get; private set; }
 
-        public string SqlType => throw new NotImplementedException();
-
-        public string SqlTypeDefinition => throw new System.NotImplementedException();
+        public string SqlType {
+            get {
+                var attr = (BaseBTAttribute)BTAttribute;
+                if(!attr.IsIdentity) {
+                    return attr.GetSqlDataTypeDefinition();
+                } else if(attr.ParentInterface.InterfaceType == CoreInterfaceType.FACT_TABLE) {
+                    return "bigint";
+                } else {
+                    return "int";
+                }
+            }
+        }         
 
         private string CalculateName() {
             if(ParentInterface is FactALInterface) {

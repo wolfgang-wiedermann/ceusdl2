@@ -23,8 +23,6 @@ namespace KDV.CeusDL.Model.AL {
 
         public string Name => ReferencedDimension.IdColumn.Name;
 
-        public string SqlType => throw new System.NotImplementedException();
-
-        public string SqlTypeDefinition => throw new System.NotImplementedException();
+        public string SqlType => ((RefBTAttribute)BTAttribute).IdAttribute.SqlDataType;        
     }
 }
