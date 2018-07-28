@@ -15,6 +15,7 @@ namespace KDV.CeusDL.Model.AL
             this.Core = refAttr.ReferencedBTInterface.coreInterface;                        
             this.Depth = 1;            
             this.RootDimension = this;
+            this.Alias = CalculateAlias(model, refAttr);
             this.ShortName = CalculateShortName(model, refAttr);
             this.Name = CalculateName(model, refAttr);
             PrepareAttributes();

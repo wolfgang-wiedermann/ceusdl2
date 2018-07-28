@@ -36,7 +36,7 @@ namespace KDV.CeusDL.Model.AL {
         }         
 
         private string CalculateName() {
-            if(ParentInterface is FactALInterface) {
+            if(ParentInterface is FactALInterface) {                
                 return ((BaseBTAttribute)BTAttribute).Name;
             } else if (ParentInterface is DimensionALInterface) {
                 var pi = (DimensionALInterface)ParentInterface;

@@ -84,6 +84,10 @@ namespace KDV.CeusDL.Model.AL.Test
             var childDim = childRef.ReferencedDimension;
             Assert.AreEqual("ARC_D_Term_2_Primary_TermGroup", childDim.Name);
             Assert.AreEqual("ARC_D_Term_1_Term", childDim.RootDimension.Name);
+
+            refAttr = alModel.FactInterfaces[0].Attributes.Where(a => a is RefALAttribute).Select(a => (RefALAttribute)a).LastOrDefault();
+            Assert.IsNotNull(refAttr);
+            Assert.AreEqual("Former_Gender_ID", refAttr.Name);
         }  
     }
 }
