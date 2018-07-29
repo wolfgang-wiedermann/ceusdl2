@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using KDV.CeusDL.Generator;
+using KDV.CeusDL.Generator.AL.Star;
+using KDV.CeusDL.Generator.AL.Snowflake;
 using KDV.CeusDL.Generator.BL;
 using KDV.CeusDL.Generator.BT;
 using KDV.CeusDL.Generator.CeusDL;
@@ -164,8 +166,11 @@ namespace CeusDL2
             ExecuteStep(new LoadBTGenerator(model), GENERATED_SQL);
             ExecuteStep(new GraphvizBTGenerator(model), GENERATED_GRAPHVIZ);
 
-            // TODO: AL generieren
+            // AL generieren (Starschema)
+            ExecuteStep(new CreateStarALGenerator(model), GENERATED_SQL);
             
+            // (Snowflake-Schema)
+            ExecuteStep(new CreateSnowflakeALGenerator(model), GENERATED_SQL);
         }
 
         static void ExecuteStep(IGenerator generator, string baseFolder) {

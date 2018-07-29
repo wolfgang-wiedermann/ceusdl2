@@ -21,11 +21,14 @@ namespace KDV.CeusDL.Model.AL
             PrepareAttributes();
         }
 
-        internal DimensionALInterface(ALModel model, BT.RefBTAttribute refAttr, DimensionALInterface rootDimension) {
+        internal DimensionALInterface(ALModel model, BT.RefBTAttribute refAttr, DimensionALInterface rootDimension, int depth) {
+            if(rootDimension == null) {
+                rootDimension = this;
+            }
             this.Model = model;
             this.BTInterface = refAttr.ReferencedBTInterface;
             this.Core = refAttr.ReferencedBTInterface.coreInterface;                        
-            this.Depth = rootDimension.Depth + 1;            
+            this.Depth = depth;            
             this.RootDimension = rootDimension;
             this.Alias = CalculateAlias(model, refAttr);
             this.ShortName = CalculateShortName(model, refAttr);
@@ -44,9 +47,14 @@ namespace KDV.CeusDL.Model.AL
             return name;
         }
 
-        private string CalculateShortName(ALModel model, BT.RefBTAttribute refAttr) {            
-            if(string.IsNullOrEmpty(refAttr?.refBLAttribute?.Core?.Alias)) {
+        private string CalculateShortName(ALModel model, BT.RefBTAttribute refAttr) {
+
+            if(string.IsNullOrEmpty(refAttr?.refBLAttribute?.Core?.Alias) && refAttr.ReferencedBTInterface.IsHistoryTable) {
+                return $"{refAttr.ReferencedBTInterface.ShortName}_VERSION";
+            } else if(string.IsNullOrEmpty(refAttr?.refBLAttribute?.Core?.Alias)) {
                 return refAttr.ReferencedBTInterface.ShortName;
+            } else if(refAttr.ReferencedBTInterface.IsHistoryTable) {
+                return $"{refAttr.refBLAttribute.Core.Alias}_{refAttr.ReferencedBTInterface.ShortName}_VERSION";
             } else {
                 return $"{refAttr.refBLAttribute.Core.Alias}_{refAttr.ReferencedBTInterface.ShortName}";
             }            
@@ -73,9 +81,17 @@ namespace KDV.CeusDL.Model.AL
                         throw new InvalidStateException($"Die Dimension {this.Name} hat mehr als eine Identity-Spalte");
                     }
                 } else if(attr is BT.RefBTAttribute) {
-                    var dim = new DimensionALInterface(Model, (BT.RefBTAttribute)attr, this);                 
+                    var refAttr = (BT.RefBTAttribute)attr;
+                    DimensionALInterface dim = null; 
+                    // Prüfen, ob es sich um die Current-State-Table zur aktuellen Tabelle handelt
+                    if(this.BTInterface.IsHistoryTable && refAttr.ReferencedBTInterface.IsCurrentStateTable 
+                        && refAttr.ReferencedBTInterface.coreInterface == this.BTInterface.coreInterface) {
+                            dim = new DimensionALInterface(Model, refAttr, null, this.Depth+1);
+                    } else {
+                        dim = new DimensionALInterface(Model, refAttr, this.RootDimension, this.Depth+1);                 
+                    }
                     dim = Model.GetDimensionInterfaceFor(dim);
-                    Attributes.Add(new RefALAttribute(this, dim, (BT.RefBTAttribute)attr));
+                    Attributes.Add(new RefALAttribute(this, dim, refAttr));
                 } else {
                     throw new NotImplementedException($"DimensionALInterface.PrepareAttributes: Attributtyp {attr.GetType().Name} nicht unterstützt");
                 }

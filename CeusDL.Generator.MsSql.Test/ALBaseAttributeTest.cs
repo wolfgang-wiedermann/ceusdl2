@@ -30,11 +30,11 @@ namespace KDV.CeusDL.Model.AL.Test
 
             baseAttr = alModel.DimensionInterfaces[0].Attributes.Where(a => a is BaseALAttribute).FirstOrDefault();
             Assert.IsNotNull(baseAttr);            
-            Assert.AreEqual("Primary_TermGroup_TermGroup_ID", baseAttr.Name);
+            Assert.AreEqual("Primary_TermGroup_ID", baseAttr.Name);
 
             baseAttr = alModel.DimensionInterfaces[2].Attributes.Where(a => a is BaseALAttribute).FirstOrDefault();
             Assert.IsNotNull(baseAttr);            
-            Assert.AreEqual("Term_Term_ID", baseAttr.Name);
+            Assert.AreEqual("Term_ID", baseAttr.Name);
         }        
 
         [TestMethod]

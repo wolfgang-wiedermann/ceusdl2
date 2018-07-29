@@ -38,8 +38,7 @@ interface Regierungsbezirk : DimTable(mandant="true") {
     base LANGBEZ:varchar(len="500");    
     base AMT_ID:varchar(len="50");
     base Laengengrad:varchar(len="50", calculated="true");
-    base Breitengrad:varchar(len="50", calculated="true");
-    ref Bundesland.KNZ;
+    base Breitengrad:varchar(len="50", calculated="true");    
 }
 
 interface Kreis : DimTable(mandant="true") {
