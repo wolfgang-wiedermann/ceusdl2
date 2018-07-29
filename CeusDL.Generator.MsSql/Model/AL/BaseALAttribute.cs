@@ -40,7 +40,12 @@ namespace KDV.CeusDL.Model.AL {
                 return ((BaseBTAttribute)BTAttribute).Name;
             } else if (ParentInterface is DimensionALInterface) {
                 var pi = (DimensionALInterface)ParentInterface;
-                return $"{pi.Alias}{((BaseBTAttribute)BTAttribute).Name}";
+                var baseAttr = (BaseBTAttribute)BTAttribute;
+                if("Mandant_ID".Equals(baseAttr.Name)) {
+                    return "Mandant_ID";
+                } else {
+                    return $"{pi.RootDimension.ShortName}_{pi.Alias}{((BaseBTAttribute)BTAttribute).Name}";
+                }                
             } else {
                 throw new NotImplementedException("Unerwarteter InterfaceTyp");
             }
