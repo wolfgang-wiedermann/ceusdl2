@@ -18,16 +18,25 @@ namespace KDV.CeusDL.Model.AL
 
         public ALModel Model { get; private set; }
 
-        public CoreInterface Core => throw new System.NotImplementedException();
+        public CoreInterface Core => BTInterface.coreInterface;
 
         public BT.BTInterface BTInterface { get; private set; }
 
-        public string ShortName => null; // ???
+        public string ShortName => BTInterface.ShortName;
 
-        public string Name => throw new System.NotImplementedException();
+        public string Name {
+            get {
+                string prefix = "";
+                if(!string.IsNullOrEmpty(Model.Config.Prefix)) {
+                    prefix = $"{Model.Config.Prefix}_";
+                }
+                return $"{prefix}AP_{ShortName}";
+            }
+        } 
 
         public List<IALAttribute> Attributes { get; private set; }
 
+        // TODO: Was ist mit dem Einschachteln der Attribute übergeordneter Fakttabellen??!!
         private void PrepareAttributes()
         {
             Attributes = new List<IALAttribute>();
