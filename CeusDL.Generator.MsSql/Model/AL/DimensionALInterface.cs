@@ -32,7 +32,7 @@ namespace KDV.CeusDL.Model.AL
             this.RootDimension = rootDimension;
             this.Alias = CalculateAlias(model, refAttr);
             this.ShortName = CalculateShortName(model, refAttr);
-            this.Name = CalculateName(model, refAttr);
+            this.Name = CalculateName(model, refAttr);            
             PrepareAttributes();
         }
 
@@ -111,9 +111,17 @@ namespace KDV.CeusDL.Model.AL
 
         public BTInterface BTInterface { get; private set; }
 
-        public string Name { get; set; }
-
         public string ShortName { get; set; }
+        public string Name { get; set; }        
+        public string FullName {
+            get {
+                if(!string.IsNullOrEmpty(Model.Config.ALDatabase)) {
+                    return $"{Model.Config.ALDatabase}.dbo.{Name}";
+                } else {
+                    return $"dbo.{Name}";
+                }
+            }
+        }
         public string Alias { get; set; }
 
         public List<IALAttribute> Attributes { get; private set; }

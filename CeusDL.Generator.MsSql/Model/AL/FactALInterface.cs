@@ -33,14 +33,24 @@ namespace KDV.CeusDL.Model.AL
                 if(!string.IsNullOrEmpty(Model.Config.Prefix)) {
                     prefix = $"{Model.Config.Prefix}_";
                 }
-                return $"{prefix}AL_{ShortName}";
+                return $"{prefix}F_{ShortName}";
             }
-        } 
+        }
+
+        public string FullName {
+            get {
+                if(!string.IsNullOrEmpty(Model.Config.ALDatabase)) {
+                    return $"{Model.Config.ALDatabase}.dbo.{Name}";
+                } else {
+                    return $"dbo.{Name}";
+                }
+            }
+        }
 
         public List<IALAttribute> Attributes { get; private set; }
 
-        public IALAttribute HistoryAttribute { get; private set; }
-        
+        public IALAttribute HistoryAttribute { get; private set; }        
+
         private void PrepareAttributes()
         {
             Attributes = new List<IALAttribute>();

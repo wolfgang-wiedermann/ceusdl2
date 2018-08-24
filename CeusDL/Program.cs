@@ -171,6 +171,7 @@ namespace CeusDL2
             
             // (Snowflake-Schema)
             ExecuteStep(new CreateSnowflakeALGenerator(model), GENERATED_SQL);
+            ExecuteStep(new DropSnowflakeALGenerator(model), GENERATED_SQL);
         }
 
         static void ExecuteStep(IGenerator generator, string baseFolder) {
