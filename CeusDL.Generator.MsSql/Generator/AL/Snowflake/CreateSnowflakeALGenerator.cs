@@ -46,15 +46,17 @@ namespace KDV.CeusDL.Generator.AL.Snowflake {
             sb.Append($"create table {ifa.Name} (\n");
             foreach (var a in ifa.Attributes)
             {
-                sb.Append($"{a.Name} {a.SqlType}".Indent(1));                
+                sb.Append($"{a.Name} {a.SqlType}".Indent(1));
+                if (a == ifa.IdColumn)
+                {
+                    sb.Append(" primary key not null");
+                }           
                 if (a != ifa.Attributes.Last())
                 {
                     sb.Append(",");
                 }
                 sb.Append("\n");
-            }
-            // TODO: Primary-Key-Spezifikation noch offen! -> evtl. sollte ich auch mehrelementige PKs unterstützen?
-            //       aber kanns die überhaupt geben?
+            }            
             sb.Append(");\n");
             sb.Append("\n");
         }

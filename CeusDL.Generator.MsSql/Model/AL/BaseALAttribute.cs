@@ -33,7 +33,9 @@ namespace KDV.CeusDL.Model.AL {
                     return "int";
                 }
             }
-        }         
+        }
+
+        public bool IsFact => BTAttribute.GetCoreAttribute() is CoreFactAttribute;
 
         private string CalculateName() {
             if(ParentInterface is FactALInterface) {                

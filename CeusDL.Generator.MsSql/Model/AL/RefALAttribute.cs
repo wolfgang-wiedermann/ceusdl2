@@ -23,6 +23,8 @@ namespace KDV.CeusDL.Model.AL {
 
         public string Name => ReferencedDimension.IdColumn.Name;
 
-        public string SqlType => ((RefBTAttribute)BTAttribute).IdAttribute.SqlDataType;        
+        public string SqlType => ((RefBTAttribute)BTAttribute).IdAttribute.SqlDataType;
+
+        public bool IsFact => false;
     }
 }

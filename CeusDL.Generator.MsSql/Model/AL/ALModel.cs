@@ -29,7 +29,10 @@ namespace KDV.CeusDL.Model.AL {
                                ;
             
             foreach(var f in factBT) {
-                FactInterfaces.Add(new FactALInterface(f, this));
+                var fIfa = new FactALInterface(f, this);
+                if(this.GetFactInterfaceByName(fIfa.Name) == null) {
+                    FactInterfaces.Add(fIfa);
+                }
             }            
         }
 
@@ -40,10 +43,23 @@ namespace KDV.CeusDL.Model.AL {
                 dimOut = dimIn;                
             }
             return dimOut;
-        }
+        }        
 
         internal DimensionALInterface GetDimensionInterfaceByName(string name) {
             return DimensionInterfaces.SingleOrDefault(i => i.Name == name);            
+        }
+
+        internal FactALInterface GetFactInterfaceFor(FactALInterface factIn) {
+            var factOut = GetFactInterfaceByName(factIn.Name);
+            if(factOut == null) {
+                FactInterfaces.Add(factIn);
+                factOut = factIn;
+            }
+            return factOut;
+        }
+
+        internal FactALInterface GetFactInterfaceByName(string name) {
+            return FactInterfaces.SingleOrDefault(i => i.Name == name);
         }
     }
 }
