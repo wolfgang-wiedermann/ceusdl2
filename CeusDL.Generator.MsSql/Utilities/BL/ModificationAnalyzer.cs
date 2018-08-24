@@ -70,9 +70,7 @@ namespace KDV.CeusDL.Utilities.BL {
         // (das schließt gleich auch die _BAK Tabellen mit ein!)
         public List<string> FindAllBLAndDefTablesInDB(BLModel model) {
             List<string> result = new List<string>();
-            if(!con.State.Equals(System.Data.ConnectionState.Open)) {
-                con.Open();
-            }
+            AssureOpenConnection();
             using(var cmd = con.CreateCommand()) {
                 cmd.CommandText = "select table_name from FH_AP_BaseLayer.information_schema.tables ";
                 cmd.CommandText += "where table_catalog = @table_catalog and table_schema = 'dbo' ";
@@ -110,9 +108,7 @@ namespace KDV.CeusDL.Utilities.BL {
 
         private bool ColumnHasCorrectType(IBLAttribute attr)
         {
-            if(!con.State.Equals(System.Data.ConnectionState.Open)) {
-                con.Open();
-            }
+            AssureOpenConnection();
             using(var cmd = con.CreateCommand()) {
                 List<SqlParameter> openParams = new List<SqlParameter>();
                 cmd.CommandText =  "select 1 from information_schema.columns where table_name = @table_name and table_schema = 'dbo' ";
@@ -142,29 +138,43 @@ namespace KDV.CeusDL.Utilities.BL {
 
         #endregion complex operations
         #region simple operations
-        public bool TableWithNameExists(string tableName) {
-            if(tableName == null) {
+        public bool TableWithNameExists(string tableName)
+        {
+            if (tableName == null)
+            {
                 return false;
             }
-            if(!con.State.Equals(System.Data.ConnectionState.Open)) {
-                con.Open();
-            }
-            using(var cmd = con.CreateCommand()) {
+            AssureOpenConnection();
+            using (var cmd = con.CreateCommand())
+            {
                 cmd.CommandText = "select 1 from information_schema.tables where table_name = @table_name and table_schema = 'dbo'";
                 cmd.Prepare();
                 cmd.Parameters.Add(new SqlParameter("table_name", tableName));
                 object result = cmd.ExecuteScalar();
                 return result != null;
-            }            
+            }
+        }
+
+        private void AssureOpenConnection()
+        {
+            if (!con.State.Equals(System.Data.ConnectionState.Open))
+            {
+                try
+                {
+                    con.Open();
+                }
+                catch (SqlException ex)
+                {
+                    throw new DatabaseConnectionException("Eine Verbindung zur Prüfung der Datenbank konnte nicht hergestellt werden", ex);
+                }
+            }
         }
 
         public bool ColumnExists(string tableName, string columnName) {
             if(tableName == null || columnName == null) {
                 return false;
             }
-            if(!con.State.Equals(System.Data.ConnectionState.Open)) {
-                con.Open();
-            }
+            AssureOpenConnection();
             using(var cmd = con.CreateCommand()) {
                 cmd.CommandText = "select 1 from information_schema.columns where table_name = @table_name and table_schema = 'dbo' and column_name = @column_name";
                 cmd.Prepare();
@@ -179,9 +189,7 @@ namespace KDV.CeusDL.Utilities.BL {
             if(tableName == null || constraintName == null || fields == null) {
                 return false;
             }
-            if(!con.State.Equals(System.Data.ConnectionState.Open)) {
-                con.Open();
-            }
+            AssureOpenConnection();
             using(var cmd = con.CreateCommand()) {
                 cmd.CommandText = "select count(*) from information_schema.CONSTRAINT_COLUMN_USAGE "
                     +"where table_name = @table_name "
@@ -216,9 +224,7 @@ namespace KDV.CeusDL.Utilities.BL {
         }
 
         private List<string> GetColumnNamesFromDb(string tableName) {
-            if(!con.State.Equals(System.Data.ConnectionState.Open)) {
-                con.Open();
-            }
+            AssureOpenConnection();
             List<string> result = new List<string>();
             using(var cmd = con.CreateCommand()) {
                 cmd.CommandText = "select column_name from information_schema.columns where table_name = @table_name and table_schema = 'dbo' order by ordinal_position";
