@@ -155,6 +155,10 @@ namespace KDV.CeusDL.Utilities.BL {
             }
         }
 
+        /// 
+        /// Sicherstellen, dass die Datenbankverbindung offen ist und ggf. eine sprechende
+        /// Meldung liefern
+        ///
         private void AssureOpenConnection()
         {
             if (!con.State.Equals(System.Data.ConnectionState.Open))

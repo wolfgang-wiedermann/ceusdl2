@@ -27,6 +27,7 @@ namespace KDV.CeusDL.Generator.AL.Star {
 
         private string GenerateCreateTables() {
             StringBuilder sb = new StringBuilder();
+            GenerateUseStatement(sb);
             sb.Append("/*\n");
             foreach(var i in model.DimensionInterfaces) {
                 sb.Append(i.Name);
@@ -34,6 +35,12 @@ namespace KDV.CeusDL.Generator.AL.Star {
             }
             sb.Append("*/\n");
             return sb.ToString();
+        }
+
+        private void GenerateUseStatement(StringBuilder sb) {
+            if(!string.IsNullOrEmpty(model.Config.ALDatabase)) {
+                sb.Append($"use {model.Config.ALDatabase};\n\n");
+            }
         }
     }
 }
