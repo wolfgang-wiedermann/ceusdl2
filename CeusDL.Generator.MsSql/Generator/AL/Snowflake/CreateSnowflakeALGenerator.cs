@@ -3,19 +3,19 @@ using System.Linq;
 using System.Collections.Generic;
 using KDV.CeusDL.Model.Core;
 using KDV.CeusDL.Model.AL;
-using KDV.CeusDL.Model.AL.Star;
+using KDV.CeusDL.Model.AL.Snowflake;
 using System.Text;
 
 namespace KDV.CeusDL.Generator.AL.Snowflake {
     public class CreateSnowflakeALGenerator : IGenerator
     {
-        private StarALModel model;
+        private SnowflakeALModel model;
 
         public CreateSnowflakeALGenerator(CoreModel model) {
-            this.model = new StarALModel(model);
+            this.model = new SnowflakeALModel(model);
         }
 
-        public CreateSnowflakeALGenerator(StarALModel model) {
+        public CreateSnowflakeALGenerator(SnowflakeALModel model) {
             this.model = model;
         }
 
