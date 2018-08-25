@@ -166,12 +166,14 @@ namespace CeusDL2
             ExecuteStep(new LoadBTGenerator(model), GENERATED_SQL);
             ExecuteStep(new GraphvizBTGenerator(model), GENERATED_GRAPHVIZ);
 
+            // AL generieren TODO: noch Art des Schemas per Kommandozeilenparameter auswählbar machen
             // AL generieren (Starschema)
             ExecuteStep(new CreateStarALGenerator(model), GENERATED_SQL);
             
-            // (Snowflake-Schema)
+            // AL generieren (Snowflake-Schema)
             ExecuteStep(new CreateSnowflakeALGenerator(model), GENERATED_SQL);
             ExecuteStep(new DropSnowflakeALGenerator(model), GENERATED_SQL);
+            ExecuteStep(new LoadSnowflakeALGenerator(model), GENERATED_SQL);
         }
 
         static void ExecuteStep(IGenerator generator, string baseFolder) {

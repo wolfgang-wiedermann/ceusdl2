@@ -7,12 +7,15 @@ using KDV.CeusDL.Model.BT;
 namespace KDV.CeusDL.Model.AL
 {
     public class FactALInterface : IALInterface
-    {                
+    {           
+        private int joinIdx;
         public FactALInterface(BTInterface ifa, ALModel alModel)
         {
+            this.joinIdx = 0;
             this.BTInterface = ifa;
             this.Model = alModel;
             this.HistoryAttribute = null;
+            this.FactInterfaceReferences = new List<FactInterfaceReference>();
 
             PrepareAttributes();
         }
@@ -49,7 +52,9 @@ namespace KDV.CeusDL.Model.AL
 
         public List<IALAttribute> Attributes { get; private set; }
 
-        public IALAttribute HistoryAttribute { get; private set; }        
+        public IALAttribute HistoryAttribute { get; private set; }
+
+        public List<FactInterfaceReference> FactInterfaceReferences { get; private set; }   
 
         private void PrepareAttributes()
         {
@@ -68,6 +73,7 @@ namespace KDV.CeusDL.Model.AL
         private void PrepareBaseAttribute(IBTAttribute attr)
         {
             var baseAttr = new BaseALAttribute(this, (BT.BaseBTAttribute)attr);
+            baseAttr.JoinAlias = "t0";
             Attributes.Add(baseAttr);
             if (attr.IsIdentity)
             {
@@ -81,11 +87,21 @@ namespace KDV.CeusDL.Model.AL
             {                
                 var child = new FactALInterface(refAttr.ReferencedBTInterface, Model);
                 child = Model.GetFactInterfaceFor(child);
+                joinIdx += 1;
+                var joinAlias = $"t{joinIdx}";
+
+                this.FactInterfaceReferences.Add(new FactInterfaceReference() {
+                    BTInterface = refAttr.ReferencedBTInterface,
+                    JoinAlias = joinAlias,
+                    RefColumnName = refAttr.IdAttribute.Name
+                });
 
                 // Alle Attribute der Kind-Fakttabelle übernehmen
                 // (ohne Fakten, Historisierungsattribut und Mandant-Spalte)
                 foreach(var attr in child.Attributes.Where(a => !a.IsFact && a.Name != "Mandant_ID" && a != child.HistoryAttribute)) {
-                    Attributes.Add(attr); // TODO: prüfen ob die Objekte nicht geklont werden müssen, wegen ggf. falschem ParentInterface!
+                    var clone = attr.Clone(this);
+                    clone.JoinAlias = joinAlias;
+                    Attributes.Add(clone); 
                 }
             }
             else
@@ -93,6 +109,7 @@ namespace KDV.CeusDL.Model.AL
                 var dim = new DimensionALInterface(Model, refAttr);
                 dim = Model.GetDimensionInterfaceFor(dim);
                 var refAlAttr = new RefALAttribute(this, dim, refAttr);
+                refAlAttr.JoinAlias = "t0";
                 Attributes.Add(refAlAttr);
 
                 // Wenn es sich hier um das Historienattribut handelt, merken

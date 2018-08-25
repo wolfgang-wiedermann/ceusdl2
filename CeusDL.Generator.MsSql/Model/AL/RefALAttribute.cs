@@ -10,7 +10,8 @@ namespace KDV.CeusDL.Model.AL {
         {
             this.ParentInterface = parentInterface;
             this.ReferencedDimension = referencedDim;
-            this.BTAttribute = btAttribute;         
+            this.BTAttribute = btAttribute;
+            this.Name = ReferencedDimension.IdColumn.Name;    
         }
 
         public CoreAttribute Core => throw new System.NotImplementedException();
@@ -21,10 +22,19 @@ namespace KDV.CeusDL.Model.AL {
         
         public IBTAttribute BTAttribute { get; private set; }
 
-        public string Name => ReferencedDimension.IdColumn.Name;
+        public string Name { get; private set; }
 
         public string SqlType => ((RefBTAttribute)BTAttribute).IdAttribute.SqlDataType;
 
         public bool IsFact => false;
+
+        public string JoinAlias { get; set; }
+
+        public IALAttribute Clone(IALInterface newParent)
+        {
+            var clone = new RefALAttribute(newParent, ReferencedDimension, (RefBTAttribute)BTAttribute);
+            clone.Name = this.Name;
+            return clone;
+        }
     }
 }

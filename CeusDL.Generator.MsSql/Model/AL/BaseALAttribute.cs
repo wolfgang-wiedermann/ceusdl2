@@ -37,6 +37,15 @@ namespace KDV.CeusDL.Model.AL {
 
         public bool IsFact => BTAttribute.GetCoreAttribute() is CoreFactAttribute;
 
+        public string JoinAlias { get; set; }
+
+        public IALAttribute Clone(IALInterface newParent)
+        {
+            var clone = new BaseALAttribute(newParent, (BaseBTAttribute)this.BTAttribute);
+            clone.Name = this.Name;
+            return clone;       
+        }
+
         private string CalculateName() {
             if(ParentInterface is FactALInterface) {                
                 return ((BaseBTAttribute)BTAttribute).Name;

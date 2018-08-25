@@ -7,6 +7,9 @@ namespace KDV.CeusDL.Model.AL {
         BT.IBTAttribute BTAttribute { get; }
         string Name { get; }       
         string SqlType { get; }
-        bool IsFact { get; }   
+        bool IsFact { get; }
+        string JoinAlias { get; set; }
+
+        IALAttribute Clone(IALInterface newParent);
     }
 }
