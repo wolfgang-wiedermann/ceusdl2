@@ -47,7 +47,7 @@ namespace KDV.CeusDL.Generator.CeusDL
 
         private string GenerateInterface(CoreInterface ifa, CoreModel model)
         {
-            string code = $"{ifa.WhitespaceBefore}interface {ifa.Name} : {InterfaceTypeToString(ifa.Type)}";            
+            string code = $"interface {ifa.Name} : {InterfaceTypeToString(ifa.Type)}";            
 
             // Interface-Parameter setzen
             // --------------------------
@@ -93,7 +93,7 @@ namespace KDV.CeusDL.Generator.CeusDL
             }
 
             // Und die Attribute setzen
-            code += " {";
+            code += " {\n";
             foreach(var item in ifa.ItemObjects) {                                
                 if(item is CoreFactAttribute) {
                     code += GenerateFactAttribute((CoreFactAttribute)item, ifa, model);
@@ -102,10 +102,11 @@ namespace KDV.CeusDL.Generator.CeusDL
                 } else if(item is CoreRefAttribute) {
                     code += GenerateRefAttribute((CoreRefAttribute)item, ifa, model);
                 } else if(item is CoreComment) {       
-                    code += item.ToString();
+                    code += item.ToString().TrimStart(new char[]{' ', '\t', '\n', '\r'}).Indent(1);
+                    //code += "\n";
                 }                                
             }
-            code += "\n}";
+            code += "}\n\n";
             return code;
         }
 
@@ -119,7 +120,7 @@ namespace KDV.CeusDL.Generator.CeusDL
 
         private string GenerateBaseAttribute(string type, CoreBaseAttribute attr, CoreInterface ifa, CoreModel model)
         {
-            var code = $"{attr.WhitespaceBefore}{type} {attr.Name}:{DataTypeToString(attr.DataType)}";
+            var code = $"{type} {attr.Name}:{DataTypeToString(attr.DataType)}".Indent(1);
             if(attr.IsPrimaryKey 
                 || attr.DataType == CoreDataType.DECIMAL 
                 || attr.DataType == CoreDataType.VARCHAR 
@@ -159,13 +160,13 @@ namespace KDV.CeusDL.Generator.CeusDL
                 }
                 code += ")";
             }
-            code += ";";
+            code += ";\n";
             return code;
         }
 
         private string GenerateRefAttribute(CoreRefAttribute attr, CoreInterface ifa, CoreModel model)
         {
-            string code = $"{attr.WhitespaceBefore}ref  {attr.ReferencedInterface.Name}.{attr.ReferencedAttribute.Name}";
+            string code = $"ref  {attr.ReferencedInterface.Name}.{attr.ReferencedAttribute.Name}".Indent(1);
             bool dirty = false;
             if(attr.IsPrimaryKey) 
             {             
@@ -196,7 +197,7 @@ namespace KDV.CeusDL.Generator.CeusDL
             if(!string.IsNullOrEmpty(attr.Alias)) {
                 code += $" as {attr.Alias}";
             }
-            code += ";";
+            code += ";\n";
             return code;
         }
 
@@ -266,7 +267,7 @@ namespace KDV.CeusDL.Generator.CeusDL
         {
             CeusDLGenerator generator = new CeusDLGenerator(obj);            
             generator.GenerateCode(result);
-            return $"{obj.WhitespaceBefore}import \"{obj.Path.Substring(obj.BaseDirectory.Length+1).Replace(System.IO.Path.DirectorySeparatorChar, '/')}\"\n";
+            return $"import \"{obj.Path.Substring(obj.BaseDirectory.Length+1).Replace(System.IO.Path.DirectorySeparatorChar, '/')}\"\n";
         }
 
         #endregion

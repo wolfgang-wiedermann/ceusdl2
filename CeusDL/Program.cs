@@ -51,8 +51,8 @@ namespace CeusDL2
                 var ceusdlOpt = cla.Option("-c | --ceusdl <ceusdlfile>", "Path to the ceusdl file to compile", CommandOptionType.SingleValue);
                 var dirOpt = cla.Option("-d | --directory <target_directory>", "Path to store the result of compilation.", CommandOptionType.SingleValue);
                 var conOpt = cla.Option("-con | --connection <connectionfile>", "Textfile containing connection string to Database", CommandOptionType.SingleValue);
-                var starOpt = cla.Option("--star", "Analytical Layer als Star-Schema generieren", CommandOptionType.NoValue);
-                var snowflakeOpt = cla.Option("--snowflake", "Analytical Layer als Snowflake-Schema generieren", CommandOptionType.NoValue);
+                var starOpt = cla.Option("--star", "Generate analytical layer as star scheme", CommandOptionType.NoValue);
+                var snowflakeOpt = cla.Option("--snowflake", "Generate analytical layer as snowflake scheme", CommandOptionType.NoValue);
                 cla.HelpOption("-? | -h | --help");
 
                 cla.OnExecute(() => {
@@ -60,6 +60,7 @@ namespace CeusDL2
                     string conStr = null;
                     if(!ceusdlOpt.HasValue()) {
                         Console.WriteLine("ERROR: you have to specify a ceusdl file to start its compilation, use -c <filename>.ceusdl");
+                        Console.WriteLine("     : list help using --help");
                         return 1;
                     }
                     if(dirOpt.HasValue()) {
