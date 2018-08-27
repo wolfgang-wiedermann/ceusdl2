@@ -27,14 +27,54 @@ namespace KDV.CeusDL.Generator.AL.Star {
 
         private string GenerateCreateTables() {
             StringBuilder sb = new StringBuilder();
-            GenerateUseStatement(sb);
-            sb.Append("/*\n");
-            foreach(var i in model.DimensionInterfaces) {
-                sb.Append(i.Name);
+            GenerateUseStatement(sb);            
+            foreach(var i in model.StarDimensionTables) {
+                GenerateDimensionInterface(sb, i);                
+            }
+            foreach(var i in model.FactInterfaces) {
+                GenerateFactInterface(sb, i);
+            }       
+            return sb.ToString();
+        }
+
+        private void GenerateFactInterface(StringBuilder sb, FactALInterface ifa)
+        {
+            sb.Append($"create table {ifa.Name} (\n");
+            foreach (var a in ifa.Attributes)
+            {
+                sb.Append($"{a.Name} {a.SqlType}".Indent(1));
+                if (a == ifa.IdColumn)
+                {
+                    sb.Append(" primary key not null");
+                }           
+                if (a != ifa.Attributes.Last())
+                {
+                    sb.Append(",");
+                }
+                sb.Append("\n");
+            }            
+            sb.Append(");\n");
+            sb.Append("\n");
+        }
+
+        private void GenerateDimensionInterface(StringBuilder sb, StarDimensionTable i)
+        {
+            sb.Append($"create table {i.Name} (\n");
+            foreach (var a in i.Attributes)
+            {
+                sb.Append($"{a.Name} {a.SqlType}".Indent(1));
+                if (a == i.IdColumn)
+                {
+                    sb.Append(" primary key not null");
+                }                
+                if (a != i.Attributes.Last())
+                {
+                    sb.Append(",");
+                }
                 sb.Append("\n");
             }
-            sb.Append("*/\n");
-            return sb.ToString();
+            sb.Append(");\n");
+            sb.Append("\n");
         }
 
         private void GenerateUseStatement(StringBuilder sb) {

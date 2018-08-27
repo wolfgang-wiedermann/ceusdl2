@@ -169,6 +169,7 @@ namespace CeusDL2
             // AL generieren TODO: noch Art des Schemas per Kommandozeilenparameter auswählbar machen
             // AL generieren (Starschema)
             ExecuteStep(new CreateStarALGenerator(model), GENERATED_SQL);
+            ExecuteStep(new DropStarALGenerator(model), GENERATED_SQL);
             
             // AL generieren (Snowflake-Schema)
             ExecuteStep(new CreateSnowflakeALGenerator(model), GENERATED_SQL);
