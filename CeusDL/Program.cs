@@ -28,7 +28,8 @@ namespace CeusDL2
         static string GENERATED_CSV;        
 
         static void Main(string[] args)
-        {            
+        {
+            GenerationOptions options = new GenerationOptions();
             // Unterscheidung zwischen IDE und Commandline!
             if(System.Diagnostics.Debugger.IsAttached) {
                 // Dieser Code wird bei F5 in Visual Studio ausgeführt
@@ -37,7 +38,11 @@ namespace CeusDL2
                 string dbConnectionFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\connection.txt";
                 string rootFolder = "."; 
                 PrepareEnvironment(rootFolder);
-                ExecuteCompilation(ceusdlFileName, File.ReadAllText(dbConnectionFileName));
+
+                options.DbConnectionString = File.ReadAllText(dbConnectionFileName);
+                options.GenerateSnowflake = true;
+                options.GenerateStar = true;
+                ExecuteCompilation(ceusdlFileName, options);
                 //ExecuteCompilation(ceusdlFileName, null);
             } else {
                 // Dieser Code wird beim Aufruf über Commandline ausgeführt
@@ -46,6 +51,8 @@ namespace CeusDL2
                 var ceusdlOpt = cla.Option("-c | --ceusdl <ceusdlfile>", "Path to the ceusdl file to compile", CommandOptionType.SingleValue);
                 var dirOpt = cla.Option("-d | --directory <target_directory>", "Path to store the result of compilation.", CommandOptionType.SingleValue);
                 var conOpt = cla.Option("-con | --connection <connectionfile>", "Textfile containing connection string to Database", CommandOptionType.SingleValue);
+                var starOpt = cla.Option("--star", "Analytical Layer als Star-Schema generieren", CommandOptionType.NoValue);
+                var snowflakeOpt = cla.Option("--snowflake", "Analytical Layer als Snowflake-Schema generieren", CommandOptionType.NoValue);
                 cla.HelpOption("-? | -h | --help");
 
                 cla.OnExecute(() => {
@@ -67,6 +74,9 @@ namespace CeusDL2
                         }
                     }
 
+                    options.GenerateStar = starOpt.HasValue();
+                    options.GenerateSnowflake = snowflakeOpt.HasValue();
+
                     PrepareEnvironment(rootFolder);
                     var srcFile = ceusdlOpt.Value();
 
@@ -75,7 +85,7 @@ namespace CeusDL2
                         return 2;
                     }
 
-                    ExecuteCompilation(srcFile, conStr);
+                    ExecuteCompilation(srcFile, options);
 
                     return 0;
                 });
@@ -132,7 +142,8 @@ namespace CeusDL2
             GENERATED_CSV = generatedCsv;
         }
 
-        static void ExecuteCompilation(string srcFile, string conStr) {
+        static void ExecuteCompilation(string srcFile, GenerationOptions options) {
+            var conStr = options.DbConnectionString;
             var data = new ParsableData(System.IO.File.ReadAllText(srcFile), srcFile);            
             var p = new FileParser(data);
             var result = p.Parse();
@@ -165,17 +176,20 @@ namespace CeusDL2
             ExecuteStep(new DropBTGenerator(model), GENERATED_SQL);
             ExecuteStep(new LoadBTGenerator(model), GENERATED_SQL);
             ExecuteStep(new GraphvizBTGenerator(model), GENERATED_GRAPHVIZ);
-
-            // AL generieren TODO: noch Art des Schemas per Kommandozeilenparameter auswählbar machen
+            
             // AL generieren (Starschema)
-            ExecuteStep(new CreateStarALGenerator(model), GENERATED_SQL);
-            ExecuteStep(new DropStarALGenerator(model), GENERATED_SQL);
-            ExecuteStep(new LoadStarALGenerator(model), GENERATED_SQL);
+            if(options.GenerateStar) {
+                ExecuteStep(new CreateStarALGenerator(model), GENERATED_SQL);
+                ExecuteStep(new DropStarALGenerator(model), GENERATED_SQL);
+                ExecuteStep(new LoadStarALGenerator(model), GENERATED_SQL);
+            }
             
             // AL generieren (Snowflake-Schema)
-            ExecuteStep(new CreateSnowflakeALGenerator(model), GENERATED_SQL);
-            ExecuteStep(new DropSnowflakeALGenerator(model), GENERATED_SQL);
-            ExecuteStep(new LoadSnowflakeALGenerator(model), GENERATED_SQL);
+            if(options.GenerateSnowflake) {
+                ExecuteStep(new CreateSnowflakeALGenerator(model), GENERATED_SQL);
+                ExecuteStep(new DropSnowflakeALGenerator(model), GENERATED_SQL);
+                ExecuteStep(new LoadSnowflakeALGenerator(model), GENERATED_SQL);
+            }
         }
 
         static void ExecuteStep(IGenerator generator, string baseFolder) {

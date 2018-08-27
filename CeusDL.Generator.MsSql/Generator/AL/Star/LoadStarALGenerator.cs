@@ -80,8 +80,9 @@ namespace KDV.CeusDL.Generator.AL.Star {
                 }
                 sb.Append("\n");
             }
-            // TODO: Korrekte Interfaces und Joins, oben noch Aliases einführen!!! ...
             sb.Append($"from {ifa.MainBTInterface.FullName} as t0\n");
+
+            // Referenzierte/untergeordnete Dimensionen joinen
             foreach(var ifaRef in ifa.InterfaceReferences) {
                 sb.Append($"left join {ifaRef.ReferencedBTInterface.FullName} as {ifaRef.JoinAlias}\n");
                 sb.Append($"on {ifaRef.JoinAlias}.{ifaRef.ReferencedRefColumnName} = {ifaRef.ParentJoinAlias}.{ifaRef.ParentRefColumnName}\n".Indent(1));
@@ -110,7 +111,8 @@ namespace KDV.CeusDL.Generator.AL.Star {
                 }
                 sb.Append("\n");
             }            
-            sb.Append($"from {ifa.BTInterface.FullName} as t0\n");          
+            sb.Append($"from {ifa.BTInterface.FullName} as t0\n");
+                      
             // referenzierte BT-Fakttabellen joinen
             foreach(var fref in ifa.FactInterfaceReferences) {
                 sb.Append($"inner join {fref.BTInterface.FullName} as {fref.JoinAlias}\n".Indent(1));
