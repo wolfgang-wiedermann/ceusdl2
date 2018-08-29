@@ -10,6 +10,7 @@ using KDV.CeusDL.Generator.IL;
 using KDV.CeusDL.Model.Core;
 using KDV.CeusDL.Parser;
 using Microsoft.Extensions.CommandLineUtils;
+using KDV.CeusDL.Validator;
 
 namespace CeusDL2
 {
@@ -33,8 +34,8 @@ namespace CeusDL2
             // Unterscheidung zwischen IDE und Commandline!
             if(System.Diagnostics.Debugger.IsAttached) {
                 // Dieser Code wird bei F5 in Visual Studio ausgeführt
-                string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\split_main.ceusdl";
-                //string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\arc2018.ceusdl";
+                //string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\split_main.ceusdl";
+                string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\sp_main.ceusdl";
                 string dbConnectionFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\connection.txt";
                 string rootFolder = "."; 
                 PrepareEnvironment(rootFolder);
@@ -149,6 +150,13 @@ namespace CeusDL2
             var p = new FileParser(data);
             var result = p.Parse();
             var model = new CoreModel(result);
+
+            var validationResult = CoreModelValidator.Validate(model);
+            validationResult.Print();
+            if(validationResult.ContainsErrors()) {
+                Console.WriteLine("ERROR: Compilation stopped by validation errors");
+                return;
+            }
 
             // CeusDL generieren.
             ExecuteStep(new CeusDLGenerator(model), GENERATED_CEUSDL);            

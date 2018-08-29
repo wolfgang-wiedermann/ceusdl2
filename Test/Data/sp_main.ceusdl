@@ -26,8 +26,9 @@ interface Student : FactTable(mandant="true") {
     fact Anzahl_F:int(calculated="true");
 }
 
+/*
 interface Studienverlauf : FactTable(mandant="true", history="true") {
-    ref Student.Matrikelnummer(primary_key="true");
+    ref Student.Matrikelnummer(primary_key="true"); // Das funktioniert so noch nicht -> Kracht in BTInterface -> Zeile 195 
     ref Semester.KNZ;
     ref Pruefungsordnung.KNZ;
     ref Studientyp.KNZ; // Das hänge ich hier in den Verlaufssatz, auch wenns bei H1 im Studiengang hängt...
@@ -35,3 +36,4 @@ interface Studienverlauf : FactTable(mandant="true", history="true") {
 
     fact Anzahl_F:int(calculated="true");
 }
+*/
