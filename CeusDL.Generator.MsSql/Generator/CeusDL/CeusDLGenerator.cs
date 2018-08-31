@@ -47,7 +47,7 @@ namespace KDV.CeusDL.Generator.CeusDL
 
         private string GenerateInterface(CoreInterface ifa, CoreModel model)
         {
-            string code = $"interface {ifa.Name} : {InterfaceTypeToString(ifa.Type)}";            
+            string code = $"\ninterface {ifa.Name} : {InterfaceTypeToString(ifa.Type)}";            
 
             // Interface-Parameter setzen
             // --------------------------
@@ -106,7 +106,7 @@ namespace KDV.CeusDL.Generator.CeusDL
                     //code += "\n";
                 }                                
             }
-            code += "}\n\n";
+            code += "}\n";
             return code;
         }
 
@@ -242,14 +242,14 @@ namespace KDV.CeusDL.Generator.CeusDL
         #region Config-Generator
 
         private string GenerateConfig(CoreConfig config) {
-            string code = "config {";
+            string code = "\nconfig {";
             code += GenerateConfigParameter("prefix", config.Prefix);
             code += GenerateConfigParameter("al_database", config.ALDatabase);
             code += GenerateConfigParameter("bt_database", config.BTDatabase);
             code += GenerateConfigParameter("bl_database", config.BLDatabase);
             code += GenerateConfigParameter("il_database", config.ILDatabase);            
             code += GenerateConfigParameter("etl_db_server", config.EtlDbServer);
-            code += "\n}";
+            code += "\n}\n\n";
             return code;
         }
 
