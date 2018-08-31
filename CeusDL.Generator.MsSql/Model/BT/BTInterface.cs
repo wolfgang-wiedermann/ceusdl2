@@ -190,9 +190,7 @@ namespace KDV.CeusDL.Model.BT {
             if(iifa.InterfaceType != CoreInterfaceType.FACT_TABLE)
                 throw new InvalidInterfaceTypeException("An dieser Stelle dürfen nur FactTable Interfaces ankommen!");
                         
-            var ifa = (DefaultBLInterface)iifa;            
-            var identity = ifa.Attributes.Single(a => a.IsIdentity);            
-            var pk = (BaseBLAttribute)ifa.Attributes.Single(a => a.IsPartOfUniqueKey && a is BaseBLAttribute);                        
+            var ifa = (DefaultBLInterface)iifa;                                                     
 
             // Restliche Standardattribute
             var dataAttributes = ifa.Attributes
