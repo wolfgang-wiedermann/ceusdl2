@@ -38,6 +38,33 @@ interface Fakultaet : DimTable(mandant="true") {
     base LANGBEZ:varchar(len="500");
 }
 
+/*
+ * Studientyp, -art und -form
+ */
+interface Studientyp : DimTable(mandant="true") {
+    // Standard-Attributfelder
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="10");
+}
+
+interface Studienart : DimTable(mandant="true") {
+    // Standard-Attributfelder
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="10");
+}
+
+interface Studienform : DimTable(mandant="true") {
+    // Standard-Attributfelder
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="10");
+}
+
 //
 // Def-Tabellen
 //
@@ -63,11 +90,4 @@ interface Studienfeld : DefTable {
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
     base AMT_ID:varchar(len="50");    
-}
-
-interface Studientyp : DefTable {
-    // Standard-Attributfelder
-    base KNZ:varchar(len="50", primary_key="true");
-    base KURZBEZ:varchar(len="100");
-    base LANGBEZ:varchar(len="500");
 }

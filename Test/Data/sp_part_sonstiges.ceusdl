@@ -1,0 +1,35 @@
+/*
+* Bundesweites Hochschulverzeichnis - wird pro Mandant aus Quellsystem geliefert!
+*/
+interface Hochschule : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="4");
+}
+
+interface Note : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");    
+    base WERT:int(calculated="true");
+}
+
+interface Status : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");    
+    //base KDV_ID:varchar(len="10"); // ??? evtl. müssen wir hier eine Generalisierung einführen
+}
+
+interface Beurlaubungsgrund : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");        
+}
+
+interface Exmatrikulationsgrund : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");        
+}

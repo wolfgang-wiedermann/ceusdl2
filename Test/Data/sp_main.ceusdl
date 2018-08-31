@@ -12,24 +12,73 @@ config {
 }
 
 import "sp_part_datum.ceusdl"
+import "sp_part_persoenliches.ceusdl"
 import "sp_part_geografie.ceusdl"
 import "sp_part_studiengang.ceusdl"
+import "sp_part_sonstiges.ceusdl"
 
 interface Student : FactTable(mandant="true") {
     base Matrikelnummer:varchar(len="50", primary_key="true");
     
     ref Monat.KNZ as Geburtsmonat;
-    ref Kreis.KNZ as HZBKreis;
-    ref Land.KNZ as Staatsangehoerigkeit;
-    ref Kreis.KNZ as HeimatKreis;
+    ref Geschlecht.KNZ;
 
-    fact Anzahl_F:int(calculated="true");
+    // Herkunft
+    ref Land.KNZ as Staatsangehoerigkeit;    
+    ref Land.KNZ as HeimatLand; 
+    ref Kreis.KNZ as HeimtKreis;
+
+    // Erster Studienbegin
+    ref Hochschule.KNZ as Ersthochschule;
+    ref Semester.KNZ as ErstSemester;
+
+    // Hochschulzugangsberechtigung
+    ref Jahr.KNZ as HZBJahr;
+    ref HZBArt.KNZ;
+    ref Kreis.KNZ as HZBKreis;
+    ref Land.KNZ as HZBLand;
+    ref Note.KNZ as HZBNote;
+
+    // Anwesenheitszeitraum
+    ref Semester.KNZ as ImmaSemester;
+    ref Semester.KNZ as ExmaSemester;
+    ref Tag.KNZ as ExmaDatum;
+
+    // TODO: hier weiter
+
+    fact Anzahl_F:int(calculated="true");    // Konstant 1
+    fact HZBNote_F:int(calculated="true");   // Wird berechnet aus ref Note.KNZ as HZBNote
 }
 
 interface Studienverlauf : FactTable(mandant="true", history="true") {
-    ref Student.Matrikelnummer(primary_key="true"); // Das funktioniert so noch nicht -> Kracht in BTInterface -> Zeile 195 
+    ref Student.Matrikelnummer(primary_key="true"); 
     ref Semester.KNZ(primary_key="true");
+
+    ref Land.KNZ as SemesterLand; // Semesterwohnsitz in Land
+    ref Kreis.KNZ as SemesterKreis; // Semesterwohnsitz in Kreis
+    ref Status.KNZ; 
+    ref Beurlaubungsgrund.KNZ;
+    ref Exmatrikulationsgrund.KNZ;
+
+    ref Semester.KNZ as StgImmaSemester;
+    ref Semester.KNZ as StgExmaSemester; 
+
+    // Semesterzähler
+    ref Anzahl.KNZ as Fachsemester;
+    ref Anzahl.KNZ as Lehrplansemester;
+    ref Anzahl.KNZ as Hochschulsemester;
+    ref Anzahl.KNZ as Urlaubssemester;
+    ref Anzahl.KNZ as Praxissemester;
+    ref Anzahl.KNZ as Unterbrechungssemester;
+
+    // Stud1Ausl. etc dürfte durch das neue HStatG überholt sein -> TODO: mit Daniel besprechen
+
+    // Studiengangzuordnung (über PO)
     ref Pruefungsordnung.KNZ;
+    ref Studientyp.KNZ;
+    ref Studienart.KNZ;
+    ref Studienform.KNZ;
+
     ref Studientyp.KNZ; // Das hänge ich hier in den Verlaufssatz, auch wenns bei H1 im Studiengang hängt...
                         // wir müssen ja auch zu PRIMUSS kompatibel bleiben.
 

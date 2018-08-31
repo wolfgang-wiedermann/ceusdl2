@@ -1,0 +1,30 @@
+/*
+* Persönliche Attribute wie Geschlecht etc.
+*/
+
+interface Geschlecht : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+interface HZBArt : DimTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="50");
+    ref HZBSchulart.KNZ;
+    ref HZBTyp.KNZ;
+}
+
+interface HZBSchulart : DimTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");    
+}
+
+interface HZBTyp : DimTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");    
+}
