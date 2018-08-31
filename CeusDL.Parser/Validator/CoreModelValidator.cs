@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using KDV.CeusDL.Model.Core;
 
@@ -12,6 +13,11 @@ namespace KDV.CeusDL.Validator {
 
             if(!HasJustOneFinestTimeUnit(m)) {
                 repo.AddError("Your ceusdl code contains more then one interface with finest_time_attribute=\"true\", that may cause errors", ValidationResult.OT_ELSE);
+            }
+
+            var duplicates = FindNonUniqueInterfaceNames(m);
+            foreach(var name in duplicates) {
+                repo.AddError($"The interface name \"{name}\" is non unique", ValidationResult.OT_INTERFACE);
             }
 
             foreach(var ifa in m.Interfaces) {
@@ -60,6 +66,17 @@ namespace KDV.CeusDL.Validator {
         {
             var count = m.Interfaces.Where(i => i.IsFinestTime).Count();
             return count == 0 || count == 1;
+        }
+
+        private static ICollection<string> FindNonUniqueInterfaceNames(CoreModel m) {
+            var result = new HashSet<string>();
+            foreach(var ifa in m.Interfaces) {
+                var tmp = m.Interfaces.Where(i => i.Name == ifa.Name);
+                if(tmp.Count() > 1) {
+                    result.Add(ifa.Name);
+                }
+            }
+            return result;
         }
     }
 }
