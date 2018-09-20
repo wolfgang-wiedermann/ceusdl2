@@ -79,8 +79,6 @@ interface Studienverlauf : FactTable(mandant="true", history="true") {
     ref Studienart.KNZ;
     ref Studienform.KNZ;
 
-    ref Studientyp.KNZ; // Das hänge ich hier in den Verlaufssatz, auch wenns bei H1 im Studiengang hängt...
-                        // wir müssen ja auch zu PRIMUSS kompatibel bleiben.
 
     fact Anzahl_F:int(calculated="true");
 }

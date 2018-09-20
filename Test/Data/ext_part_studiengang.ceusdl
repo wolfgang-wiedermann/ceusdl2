@@ -1,0 +1,27 @@
+interface Studiengang : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    ref Studienfach.KNZ;
+    ref Abschluss.KNZ;
+    ref Fakultaet.KNZ;
+}
+
+interface Abschluss : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="50");    
+}
+
+interface Studienfach : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");        
+}
+
+interface Fakultaet : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}

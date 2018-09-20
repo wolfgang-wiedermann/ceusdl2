@@ -1,0 +1,80 @@
+/*
+ * Beispiel zur Umsetzung einer neuen Studenten und Prüfungen Domäne 
+ */
+
+config {
+    prefix="EXT";
+    il_database="FH_EXT_InterfaceLayer";
+    bl_database="FH_EXT_BaseLayer";
+    bt_database="FH_EXT_BaseLayer";
+    al_database="FH_EXT_Warehouse";     
+    etl_db_server="CEUS-ETL";
+}
+
+import "ext_part_zeit.ceusdl"
+import "ext_part_studiengang.ceusdl"
+import "ext_part_geografie.ceusdl"
+
+interface JaNein : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+interface Geschlecht : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+interface Hochschule : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="50"); 
+}
+
+// International, Dual, Standard
+interface Typ:DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+/*
+* Faktentabellen
+*/
+
+interface BewerberBayern : FactTable(mandant="true", history="true") {
+    ref Abschluss.KNZ(primary_key="true");
+    ref Hochschule.KNZ(primary_key="true");
+    ref Semester.KNZ(primary_key="true");
+    ref JaNein.KNZ as NC;
+    fact AnzahlBewerber:int;
+}
+
+interface Studierende : FactTable(mandant="true", history="true") {
+    base zeile:int(primary_key="true");
+
+    ref Semester.KNZ(primary_key="true");
+    ref Abschluss.KNZ;
+    ref Studiengang.KNZ;
+    ref JaNein.KNZ as Bildungsauslaender;
+    ref Land.KNZ as HZB;
+    ref Kreis.KNZ as HZB;
+    ref Typ.KNZ; // Detail
+    ref Fakultaet.KNZ;
+    ref Geschlecht.KNZ;
+
+    fact Absolventen:int;
+    fact Bewerbungen:int;
+    fact Studienanfaenger_1FS:int;
+    fact Studienanfaenger_1HS:int;
+    fact Studierende:int;
+}
+
+/*
+interface Finanzen : FactTable(mandant="true", history="true") {
+    
+}
+*/
