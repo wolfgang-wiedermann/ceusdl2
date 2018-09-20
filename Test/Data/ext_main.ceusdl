@@ -49,7 +49,7 @@ interface BewerberBayern : FactTable(mandant="true", history="true") {
     ref Abschluss.KNZ(primary_key="true");
     ref Hochschule.KNZ(primary_key="true");
     ref Semester.KNZ(primary_key="true");
-    ref JaNein.KNZ as NC;
+    ref JaNein.KNZ(primary_key="true") as NC;
     fact AnzahlBewerber:int;
 }
 
