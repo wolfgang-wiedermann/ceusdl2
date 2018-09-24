@@ -174,6 +174,7 @@ namespace CeusDL2
 
             // BL generieren
             ExecuteStep(new CreateBLGenerator(model), GENERATED_SQL);
+            ExecuteStep(new InitialDefaultValuesGenerator(model), GENERATED_SQL);
             ExecuteStep(new DropBLGenerator(model), GENERATED_SQL);            
             ExecuteStep(new GraphvizBLGenerator(model), GENERATED_GRAPHVIZ);
             ExecuteStep(new LoadBLGenerator(model), GENERATED_SQL);            
