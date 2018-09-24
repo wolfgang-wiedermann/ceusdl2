@@ -1,3 +1,6 @@
+/*
+* TODO: Prüfen, ob wir das nicht besser als DefTable umsetzen.
+*/
 interface Kreis : DimTable(mandant="true") {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
