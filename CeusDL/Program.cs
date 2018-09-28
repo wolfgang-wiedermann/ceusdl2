@@ -84,15 +84,8 @@ namespace CeusDL2
                     options.ExecuteUpdate = executeUpdate.HasValue();
                     options.ExecuteReplace = executeReplace.HasValue();
 
-                    if(options.ExecuteReplace && options.ExecuteUpdate) {
-                        Console.WriteLine("ERROR: ExecuteReplace and ExecuteUpdate can not be selected together");
-                        return 4; // Invalid combination of options
-                    }
-                    if(options.GenerateSnowflake && options.GenerateStar 
-                        && (options.ExecuteUpdate || options.ExecuteReplace)) {
-                        Console.WriteLine("ERROR: using an execute option is just possible with generate star or generate snowflake, not with both together");
-                        return 4; // Invalid combination of options
-                    }   
+                    int result = CheckOptions(options);
+                    if(result != 0) return result;   
 
                     PrepareEnvironment(rootFolder);
                     var srcFile = ceusdlOpt.Value();
@@ -109,6 +102,24 @@ namespace CeusDL2
 
                 cla.Execute(args);
             }
+        }
+
+        private static int CheckOptions(GenerationOptions options)
+        {
+            if(options.ExecuteReplace && options.ExecuteUpdate) {
+                Console.WriteLine("ERROR: ExecuteReplace and ExecuteUpdate can not be selected together");
+                return 4; // Invalid combination of options
+            }
+            if((options.ExecuteReplace || options.ExecuteUpdate) && string.IsNullOrEmpty(options.DbConnectionString)) {
+                Console.WriteLine("ERROR: An Execute (update or replace) command can just be run with a given database connection (-c)");
+                return 4; // Invalid combination of options
+            }
+            if(options.GenerateSnowflake && options.GenerateStar 
+                && (options.ExecuteUpdate || options.ExecuteReplace)) {
+                Console.WriteLine("ERROR: using an execute option is just possible with generate star or generate snowflake, not with both together");
+                return 4; // Invalid combination of options
+            }
+            return 0;
         }
 
         static void PrepareEnvironment(string rootFolder) {
