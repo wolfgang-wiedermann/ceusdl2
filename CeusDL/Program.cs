@@ -42,8 +42,9 @@ namespace CeusDL2
                 PrepareEnvironment(rootFolder);
 
                 //options.DbConnectionString = File.ReadAllText(dbConnectionFileName);
-                options.GenerateSnowflake = true;
+                //options.GenerateSnowflake = true;
                 options.GenerateStar = true;
+                options.ExecuteReplace = true;
                 ExecuteCompilation(ceusdlFileName, options);                
             } else {
                 // Dieser Code wird beim Aufruf über Commandline ausgeführt
@@ -54,6 +55,8 @@ namespace CeusDL2
                 var conOpt = cla.Option("-con | --connection <connectionfile>", "Textfile containing connection string to Database", CommandOptionType.SingleValue);
                 var starOpt = cla.Option("--star", "Generate analytical layer as star scheme", CommandOptionType.NoValue);
                 var snowflakeOpt = cla.Option("--snowflake", "Generate analytical layer as snowflake scheme", CommandOptionType.NoValue);
+                var executeUpdate = cla.Option("--update", "Update Baselayer, Replace everything else", CommandOptionType.NoValue);
+                var executeReplace = cla.Option("--replace", "Replace all Layers (deletes all Data)", CommandOptionType.NoValue);
                 cla.HelpOption("-? | -h | --help");
 
                 cla.OnExecute(() => {
@@ -78,6 +81,18 @@ namespace CeusDL2
 
                     options.GenerateStar = starOpt.HasValue();
                     options.GenerateSnowflake = snowflakeOpt.HasValue();
+                    options.ExecuteUpdate = executeUpdate.HasValue();
+                    options.ExecuteReplace = executeReplace.HasValue();
+
+                    if(options.ExecuteReplace && options.ExecuteUpdate) {
+                        Console.WriteLine("ERROR: ExecuteReplace and ExecuteUpdate can not be selected together");
+                        return 4; // Invalid combination of options
+                    }
+                    if(options.GenerateSnowflake && options.GenerateStar 
+                        && (options.ExecuteUpdate || options.ExecuteReplace)) {
+                        Console.WriteLine("ERROR: using an execute option is just possible with generate star or generate snowflake, not with both together");
+                        return 4; // Invalid combination of options
+                    }   
 
                     PrepareEnvironment(rootFolder);
                     var srcFile = ceusdlOpt.Value();
