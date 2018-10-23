@@ -71,11 +71,12 @@ namespace CeusDL2
                 cla.Name = "ceusdlc";
                 var ceusdlOpt = cla.Option("-c | --ceusdl <ceusdlfile>", "Path to the ceusdl file to compile", CommandOptionType.SingleValue);
                 var dirOpt = cla.Option("-d | --directory <target_directory>", "Path to store the result of compilation.", CommandOptionType.SingleValue);
-                var conOpt = cla.Option("-con | --connection <connectionfile>", "Textfile containing connection string to Database", CommandOptionType.SingleValue);
+                var conOpt = cla.Option("--connection <connectionfile>", "Textfile containing connection string to Database", CommandOptionType.SingleValue);
                 var starOpt = cla.Option("--star", "Generate analytical layer as star scheme", CommandOptionType.NoValue);
                 var snowflakeOpt = cla.Option("--snowflake", "Generate analytical layer as snowflake scheme", CommandOptionType.NoValue);
                 var executeUpdate = cla.Option("--update", "Update Baselayer, Replace everything else", CommandOptionType.NoValue);
                 var executeReplace = cla.Option("--replace", "Replace all Layers (deletes all Data)", CommandOptionType.NoValue);
+                var help = cla.HelpOption("-? | --help");
 
                 cla.OnExecute(() => {
                     string rootFolder = ".";
@@ -96,6 +97,7 @@ namespace CeusDL2
                             return 3; // Datei nicht gefunden
                         }
                     }
+                    options.DbConnectionString = conStr;
 
                     options.GenerateStar = starOpt.HasValue();
                     options.GenerateSnowflake = snowflakeOpt.HasValue();
@@ -138,7 +140,7 @@ namespace CeusDL2
                 return 4; // Invalid combination of options
             }
             if((options.ExecuteReplace || options.ExecuteUpdate) && string.IsNullOrEmpty(options.DbConnectionString)) {
-                Console.WriteLine("ERROR: An Execute (update or replace) command can just be run with a given database connection (-c)");
+                Console.WriteLine("ERROR: An Execute (update or replace) command can just be run with a given database connection (--connection)");
                 return 4; // Invalid combination of options
             }
             if(options.GenerateSnowflake && options.GenerateStar 
@@ -309,10 +311,12 @@ namespace CeusDL2
                 {
                     exec.ExecuteSQL(stm.FileName);
                 }
+                exec.ExecuteSQL("BL_Drop_FKs.sql");
                 foreach (var stm in UpdateSQLStatements)
                 {
                     exec.ExecuteSQL(stm.FileName);
                 }
+                exec.ExecuteSQL("BL_Create_FKs.sql");
                 foreach (var stm in CoreBTSQLStatements)
                 {
                     exec.ExecuteSQL(stm.FileName);
