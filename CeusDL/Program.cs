@@ -228,7 +228,7 @@ namespace CeusDL2
             // BL generieren
             ReplaceSQLStatements.AddRange(ExecuteStep(new DropBLGenerator(model), GENERATED_SQL));
             ReplaceSQLStatements.AddRange(ExecuteStep(new CreateBLGenerator(model), GENERATED_SQL));
-            ExecuteStep(new InitialDefaultValuesGenerator(model), GENERATED_SQL);            
+            ReplaceSQLStatements.AddRange(ExecuteStep(new InitialDefaultValuesGenerator(model), GENERATED_SQL));            
             ExecuteStep(new GraphvizBLGenerator(model), GENERATED_GRAPHVIZ);
             ExecuteStep(new LoadBLGenerator(model), GENERATED_SQL);            
             if(conStr != null) {
