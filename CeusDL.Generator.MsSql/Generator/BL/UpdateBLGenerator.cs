@@ -43,7 +43,7 @@ namespace KDV.CeusDL.Generator.BL {
         public List<GeneratorResult> GenerateCode() {            
             this.MissingTables = GetMissingTables();
             this.ModifiedTables = GetModifiedTables();
-            this.DeletedTables = analyzer.ListDeletedInterfaceNames(this.model);    
+            this.DeletedTables = analyzer.ListDeletedInterfaceNames(this.model).ToList();    
             var result = new List<GeneratorResult>();
             result.Add(new GeneratorResult("BL_Update.sql", GenerateUpdateTables()));            
             return result;
