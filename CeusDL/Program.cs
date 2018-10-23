@@ -11,6 +11,8 @@ using KDV.CeusDL.Model.Core;
 using KDV.CeusDL.Parser;
 using Microsoft.Extensions.CommandLineUtils;
 using KDV.CeusDL.Validator;
+using CeusDL.Generator.MsSql.Generator;
+using System.Collections.Generic;
 
 namespace CeusDL2
 {
@@ -26,7 +28,14 @@ namespace CeusDL2
         static string GENERATED_CODE;
         static string GENERATED_PYCODE;
         static string GENERATED_GRAPHVIZ;
-        static string GENERATED_CSV;        
+        static string GENERATED_CSV;
+
+        static List<GeneratorResult> CoreILSQLStatements = new List<GeneratorResult>();
+        static List<GeneratorResult> UpdateSQLStatements = new List<GeneratorResult>();     // BL
+        static List<GeneratorResult> ReplaceSQLStatements = new List<GeneratorResult>();    // BL
+        static List<GeneratorResult> CoreBTSQLStatements = new List<GeneratorResult>();
+        static List<GeneratorResult> StarSQLStatements = new List<GeneratorResult>();       // AL
+        static List<GeneratorResult> SnowflakeSQLStatements = new List<GeneratorResult>();  // AL
 
         static void Main(string[] args)
         {
@@ -34,18 +43,28 @@ namespace CeusDL2
             // Unterscheidung zwischen IDE und Commandline!
             if(System.Diagnostics.Debugger.IsAttached) {
                 // Dieser Code wird bei F5 in Visual Studio ausgeführt
-                //string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\split_main.ceusdl";
+                string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\split_main.ceusdl";
                 //string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\sp_main.ceusdl";
-                string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\ext_main.ceusdl";
+                //string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\ext_main.ceusdl";
                 string dbConnectionFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\connection.txt";
                 string rootFolder = "."; 
                 PrepareEnvironment(rootFolder);
 
-                //options.DbConnectionString = File.ReadAllText(dbConnectionFileName);
+                options.DbConnectionString = File.ReadAllText(dbConnectionFileName);
                 //options.GenerateSnowflake = true;
                 options.GenerateStar = true;
-                options.ExecuteReplace = true;
-                ExecuteCompilation(ceusdlFileName, options);                
+                options.ExecuteReplace = false;
+                options.ExecuteUpdate = true;
+                ExecuteCompilation(ceusdlFileName, options);
+                if (!string.IsNullOrEmpty(options.DbConnectionString) && options.ExecuteUpdate) {
+                    ExecuteUpdate(GENERATED_SQL, options);
+                }
+                else if (!string.IsNullOrEmpty(options.DbConnectionString) && options.ExecuteReplace)
+                {
+                    ExecuteReplace(GENERATED_SQL, options);
+                }
+                //Console.WriteLine("...");
+                //Console.ReadKey();
             } else {
                 // Dieser Code wird beim Aufruf über Commandline ausgeführt
                 var cla = new CommandLineApplication();                
@@ -57,7 +76,6 @@ namespace CeusDL2
                 var snowflakeOpt = cla.Option("--snowflake", "Generate analytical layer as snowflake scheme", CommandOptionType.NoValue);
                 var executeUpdate = cla.Option("--update", "Update Baselayer, Replace everything else", CommandOptionType.NoValue);
                 var executeReplace = cla.Option("--replace", "Replace all Layers (deletes all Data)", CommandOptionType.NoValue);
-                cla.HelpOption("-? | -h | --help");
 
                 cla.OnExecute(() => {
                     string rootFolder = ".";
@@ -96,6 +114,15 @@ namespace CeusDL2
                     }
 
                     ExecuteCompilation(srcFile, options);
+
+                    if (options.ExecuteUpdate)
+                    {
+                        ExecuteUpdate(GENERATED_SQL, options);
+                    }
+                    else if (options.ExecuteReplace)
+                    {
+                        ExecuteReplace(GENERATED_SQL, options);
+                    }
 
                     return 0;
                 });
@@ -188,59 +215,137 @@ namespace CeusDL2
             }
 
             // CeusDL generieren.
-            ExecuteStep(new CeusDLGenerator(model), GENERATED_CEUSDL);            
+            ExecuteStep(new CeusDLGenerator(model), GENERATED_CEUSDL);
 
             // IL generieren.
-            ExecuteStep(new CreateILGenerator(model), GENERATED_SQL);            
-            ExecuteStep(new DropILGenerator(model), GENERATED_SQL);
+            CoreILSQLStatements.AddRange(ExecuteStep(new DropILGenerator(model), GENERATED_SQL));
+            CoreILSQLStatements.AddRange(ExecuteStep(new CreateILGenerator(model), GENERATED_SQL));            
             ExecuteStep(new LoadILGenerator(model), GENERATED_CODE);
             ExecuteStep(new GraphvizILGenerator(model), GENERATED_GRAPHVIZ);
             ExecuteStep(new DummyDataILGenerator(model), GENERATED_CSV);
             ExecuteStep(new DummyILPythonGenerator(model), GENERATED_PYCODE);
 
             // BL generieren
-            ExecuteStep(new CreateBLGenerator(model), GENERATED_SQL);
-            ExecuteStep(new InitialDefaultValuesGenerator(model), GENERATED_SQL);
-            ExecuteStep(new DropBLGenerator(model), GENERATED_SQL);            
+            ReplaceSQLStatements.AddRange(ExecuteStep(new DropBLGenerator(model), GENERATED_SQL));
+            ReplaceSQLStatements.AddRange(ExecuteStep(new CreateBLGenerator(model), GENERATED_SQL));
+            ExecuteStep(new InitialDefaultValuesGenerator(model), GENERATED_SQL);            
             ExecuteStep(new GraphvizBLGenerator(model), GENERATED_GRAPHVIZ);
             ExecuteStep(new LoadBLGenerator(model), GENERATED_SQL);            
             if(conStr != null) {
                 // Aktualisierung nur generieren, wenn eine Verbindung zur Datenbank angegeben wurde.
-                ExecuteStep(new UpdateBLGenerator(model, conStr), GENERATED_SQL);
+                UpdateSQLStatements.AddRange(ExecuteStep(new UpdateBLGenerator(model, conStr), GENERATED_SQL));
             }
             ExecuteStep(new CreateDefDataGenerator(model), GENERATED_PYCODE);
 
             // BT generieren
-            ExecuteStep(new CreateBTGenerator(model), GENERATED_SQL);
-            ExecuteStep(new DropBTGenerator(model), GENERATED_SQL);
+            CoreBTSQLStatements.AddRange(ExecuteStep(new DropBTGenerator(model), GENERATED_SQL));
+            CoreBTSQLStatements.AddRange(ExecuteStep(new CreateBTGenerator(model), GENERATED_SQL));
             ExecuteStep(new LoadBTGenerator(model), GENERATED_SQL);
             ExecuteStep(new GraphvizBTGenerator(model), GENERATED_GRAPHVIZ);
             
             // AL generieren (Starschema)
             if(options.GenerateStar) {
-                ExecuteStep(new CreateStarALGenerator(model), GENERATED_SQL);
-                ExecuteStep(new DropStarALGenerator(model), GENERATED_SQL);
+                StarSQLStatements.AddRange(ExecuteStep(new DropStarALGenerator(model), GENERATED_SQL));
+                StarSQLStatements.AddRange(ExecuteStep(new CreateStarALGenerator(model), GENERATED_SQL));
                 ExecuteStep(new LoadStarALGenerator(model), GENERATED_SQL);
             }
             
             // AL generieren (Snowflake-Schema)
             if(options.GenerateSnowflake) {
-                ExecuteStep(new CreateSnowflakeALGenerator(model), GENERATED_SQL);
-                ExecuteStep(new DropSnowflakeALGenerator(model), GENERATED_SQL);
+                SnowflakeSQLStatements.AddRange(ExecuteStep(new DropSnowflakeALGenerator(model), GENERATED_SQL));
+                SnowflakeSQLStatements.AddRange(ExecuteStep(new CreateSnowflakeALGenerator(model), GENERATED_SQL));
                 ExecuteStep(new LoadSnowflakeALGenerator(model), GENERATED_SQL);
             }
         }
 
-        static void ExecuteStep(IGenerator generator, string baseFolder) {
+        private static void ExecuteReplace(string sql, GenerationOptions options)
+        {
+            if (string.IsNullOrEmpty(options.DbConnectionString))
+            {
+                throw new InvalidOperationException("ExecuteUpdate ist nur mit Datenbankverbindung zulässig");
+            }
+
+            using (IExecutor exec = new SqlServerExecutor(options.DbConnectionString, GENERATED_SQL))
+            {
+                foreach (var stm in CoreILSQLStatements)
+                {
+                    exec.ExecuteSQL(stm.FileName);
+                }
+                foreach (var stm in ReplaceSQLStatements)
+                {
+                    exec.ExecuteSQL(stm.FileName);
+                }
+                foreach (var stm in CoreBTSQLStatements)
+                {
+                    exec.ExecuteSQL(stm.FileName);
+                }
+                if (options.GenerateSnowflake)
+                {
+                    foreach (var stm in SnowflakeSQLStatements)
+                    {
+                        exec.ExecuteSQL(stm.FileName);
+                    }
+                }
+                else if (options.GenerateStar)
+                {
+                    foreach (var stm in StarSQLStatements)
+                    {
+                        exec.ExecuteSQL(stm.FileName);
+                    }
+                }
+            }
+        }
+
+        private static void ExecuteUpdate(string sql, GenerationOptions options)
+        {
+            if (string.IsNullOrEmpty(options.DbConnectionString))
+            {
+                throw new InvalidOperationException("ExecuteUpdate ist nur mit Datenbankverbindung zulässig");
+            }
+
+            using (IExecutor exec = new SqlServerExecutor(options.DbConnectionString, GENERATED_SQL))
+            {
+                foreach(var stm in CoreILSQLStatements)
+                {
+                    exec.ExecuteSQL(stm.FileName);
+                }
+                foreach (var stm in UpdateSQLStatements)
+                {
+                    exec.ExecuteSQL(stm.FileName);
+                }
+                foreach (var stm in CoreBTSQLStatements)
+                {
+                    exec.ExecuteSQL(stm.FileName);
+                }
+                if (options.GenerateSnowflake)
+                {
+                    foreach (var stm in SnowflakeSQLStatements)
+                    {
+                        exec.ExecuteSQL(stm.FileName);
+                    }
+                }
+                else if(options.GenerateStar)
+                {
+                    foreach (var stm in StarSQLStatements)
+                    {
+                        exec.ExecuteSQL(stm.FileName);
+                    }
+                }
+            }
+        }
+
+        static List<GeneratorResult> ExecuteStep(IGenerator generator, string baseFolder) {
             var code = generator.GenerateCode();
 
             if(code == null) {
-                return;
+                return new List<GeneratorResult>();
             }
             
             foreach(var file in code) {
                 File.WriteAllText(Path.Combine(baseFolder, file.FileName), file.Content);
             }
+
+            return code;
         }
     }
 }

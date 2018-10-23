@@ -4,3 +4,6 @@ Generated
 README.pdf
 *.trx
 *.zargo~
+.vs/CeusDL2/v15/.suo
+.vs/CeusDL2/v15/Server/sqlite3/db.lock
+.vs/CeusDL2/v15/Server/sqlite3/storage.ide
