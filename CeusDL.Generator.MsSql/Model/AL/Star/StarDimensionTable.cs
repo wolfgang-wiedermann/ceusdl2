@@ -13,6 +13,7 @@ namespace KDV.CeusDL.Model.AL.Star
             var currentJoinAlias = $"t{joinIdx}";
             
             InterfaceReferences = new List<DimensionInterfaceReference>();
+            Config = dim.Model.Config;
 
             Attributes = new List<IALAttribute>();
             // Basis-Attribute            
@@ -46,6 +47,8 @@ namespace KDV.CeusDL.Model.AL.Star
             // InterfaceReferences nach Alias sortieren!
             InterfaceReferences = InterfaceReferences.OrderBy(i => $"{i.JoinAlias.Length}{i.JoinAlias}").ToList();
         }
+
+        public ALConfig Config { get; private set; }
 
         public List<IALAttribute> Attributes { get; private set; }
 

@@ -43,9 +43,9 @@ namespace CeusDL2
             // Unterscheidung zwischen IDE und Commandline!
             if(System.Diagnostics.Debugger.IsAttached) {
                 // Dieser Code wird bei F5 in Visual Studio ausgeführt
-                string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\split_main.ceusdl";
+                //string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\split_main.ceusdl";
                 //string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\sp_main.ceusdl";
-                //string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\ext_main.ceusdl";
+                string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\ext_main.ceusdl";
                 string dbConnectionFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\connection.txt";
                 string rootFolder = "."; 
                 PrepareEnvironment(rootFolder);
@@ -63,8 +63,6 @@ namespace CeusDL2
                 {
                     ExecuteReplace(GENERATED_SQL, options);
                 }
-                //Console.WriteLine("...");
-                //Console.ReadKey();
             } else {
                 // Dieser Code wird beim Aufruf über Commandline ausgeführt
                 var cla = new CommandLineApplication();                
@@ -250,6 +248,7 @@ namespace CeusDL2
                 StarSQLStatements.AddRange(ExecuteStep(new DropStarALGenerator(model), GENERATED_SQL));
                 StarSQLStatements.AddRange(ExecuteStep(new CreateStarALGenerator(model), GENERATED_SQL));
                 ExecuteStep(new LoadStarALGenerator(model), GENERATED_SQL);
+                ExecuteStep(new CopyStarALGenerator(model), GENERATED_SQL);
             }
             
             // AL generieren (Snowflake-Schema)
