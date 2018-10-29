@@ -53,7 +53,41 @@ namespace KDV.CeusDL.Generator.IL {
                     sb.Append(";");
                 }
             }
-            sb.Append("')\n# TODO: hier Code einfügen\n\n");
+            sb.Append("')\n# TODO: hier den eigenen Code einfügen\n\n");
+
+            sb.Append("# Beispiel:\n");
+            sb.Append("print(print_line(");
+            foreach(var attr in ifa.NonCalculatedAttributes) {
+                switch(attr.CDataType) {
+                    case CoreDataType.INT:
+                        sb.Append("-1");
+                        break;
+                    case CoreDataType.VARCHAR:
+                        if(attr.Name.Contains("BEZ")) {
+                            sb.Append("'Unbekannt'");
+                        } else {
+                            sb.Append("'-1'");
+                        }
+                        break;
+                    case CoreDataType.DATE:
+                    case CoreDataType.DATETIME:
+                        sb.Append("'2000-01-01'");
+                        break;
+                    case CoreDataType.TIME:
+                        sb.Append("'00:00:00'");
+                        break;
+                    case CoreDataType.DECIMAL:
+                        sb.Append("0.0");
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+                if(attr != ifa.NonCalculatedAttributes.Last()) {
+                    sb.Append(", ");
+                }
+            }
+            sb.Append("))\n");
+
 
             return sb.ToString();
         }
