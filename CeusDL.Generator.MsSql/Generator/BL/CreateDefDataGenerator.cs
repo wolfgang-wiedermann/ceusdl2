@@ -77,6 +77,40 @@ namespace KDV.CeusDL.Generator.BL {
 
             sb.Append($"\nprint(\"set identity_insert {def.FullName} on;\")\n\n");
             sb.Append("# Write your code here with for example a loop to create the content of your def table.\n\n");
+            
+            // Einen Beispielsatz mit -1 generieren
+            sb.Append("print(SQL_TEMPLATE.format(");
+            foreach(var a in sortedAttributes) {
+                switch(a.DataType) {
+                    case CoreDataType.INT:
+                        sb.Append("-1");
+                        break;
+                    case CoreDataType.VARCHAR:
+                        if(a.Name.Contains("BEZ") || a.Name.Contains("DESC")) {
+                            sb.Append("'unbekannt'");
+                        } else {
+                            sb.Append("'-1'");
+                        }
+                        break;
+                    case CoreDataType.DATE:
+                    case CoreDataType.DATETIME:
+                        sb.Append("'2000-01-01'");
+                        break;
+                    case CoreDataType.TIME:
+                        sb.Append("'00:00:00'");
+                        break;
+                    case CoreDataType.DECIMAL:
+                        sb.Append("0.0");
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+                if(a != sortedAttributes.Last()) {
+                    sb.Append(", ");
+                }
+            }
+            sb.Append("))\n");
+            
             sb.Append($"\nprint(\"set identity_insert {def.FullName} off;\")\n");
             return sb.ToString();
         }

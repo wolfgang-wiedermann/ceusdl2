@@ -63,8 +63,8 @@ namespace KDV.CeusDL.Generator.IL {
                         sb.Append("-1");
                         break;
                     case CoreDataType.VARCHAR:
-                        if(attr.Name.Contains("BEZ")) {
-                            sb.Append("'Unbekannt'");
+                        if(attr.Name.Contains("BEZ") || attr.Name.Contains("DESC")) {
+                            sb.Append("'unbekannt'");
                         } else {
                             sb.Append("'-1'");
                         }
