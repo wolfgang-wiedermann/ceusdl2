@@ -17,7 +17,30 @@ namespace KDV.CeusDL.Generator.IL {
             var result = new List<GeneratorResult>();
             result.Add(new GeneratorResult("IInterfaceLayerLoader.cs", GenerateInterface()));
             result.AddRange(GenerateLoadCsvClasses());
+            result.Add(new GeneratorResult("InterfaceLayerLoaderCollection.cs", GenerateLoaderCollection()));
             return result;
+        }
+
+        private string GenerateLoaderCollection()
+        {
+            string code = "using System;\n";
+            code += "using System.Collections.Generic;\n";
+
+            code += $"using {model.Namespace};\n\n";
+
+            code += "namespace Kdv.Loader {\n";
+            code += "public class InterfaceLayerLoaderCollection {\n".Indent(1);
+            code += "    public static List<IInterfaceLayerLoader> GetLoaders(string directory) {\n".Indent(1);
+            code += "        var lst = new List<IInterfaceLayerLoader>();\n".Indent(1);
+            foreach(var ifa in model.Interfaces.Where(i => i.IsILRelevant())) {
+                code += $"lst.Add(new {ifa.ShortName}Loader(directory));\n".Indent(3);
+            }
+            code += "        return lst;\n".Indent(1);
+            code += "    }\n".Indent(1);
+            code += "}\n".Indent(1);
+            code += "}";
+
+            return code;
         }
 
         private string GenerateInterface()
@@ -25,7 +48,7 @@ namespace KDV.CeusDL.Generator.IL {
             string code = "using System.Data.Common;\n\n";
             
             code += "namespace Kdv.Loader {\n";
-            code += "    public interface IInterfacelayerLoader {\n";
+            code += "    public interface IInterfaceLayerLoader {\n";
             code += "        void Execute(DbConnection con);\n";
             code += "    }\n";
             code += "}\n";
@@ -74,7 +97,7 @@ namespace KDV.CeusDL.Generator.IL {
 
         private string GenerateParserClass(ILInterface ifa)
         {
-            string code = $"    public class {ifa.ShortName}Loader : IInterfacelayerLoader {{\n";
+            string code = $"    public class {ifa.ShortName}Loader : IInterfaceLayerLoader {{\n";
             // 
             // Properties
             //
