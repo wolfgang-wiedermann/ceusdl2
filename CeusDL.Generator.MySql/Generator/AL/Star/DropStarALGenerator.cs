@@ -2,11 +2,11 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using KDV.CeusDL.Model.Core;
-using KDV.CeusDL.Model.AL;
-using KDV.CeusDL.Model.AL.Star;
+using KDV.CeusDL.Model.MySql.AL;
+using KDV.CeusDL.Model.MySql.AL.Star;
 using System.Text;
 
-namespace KDV.CeusDL.Generator.AL.Star {
+namespace KDV.CeusDL.Generator.MySql.AL.Star {
     public class DropStarALGenerator : IGenerator
     {
         private StarALModel model;

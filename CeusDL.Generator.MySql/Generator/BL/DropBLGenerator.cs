@@ -2,9 +2,9 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using KDV.CeusDL.Model.Core;
-using KDV.CeusDL.Model.BL;
+using KDV.CeusDL.Model.MySql.BL;
 
-namespace KDV.CeusDL.Generator.BL {
+namespace KDV.CeusDL.Generator.MySql.BL {
     public class DropBLGenerator : IGenerator
     {
         private BLModel model;
