@@ -42,7 +42,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         }
 
         private string GenerateUnbekannt(IBLInterface ifa) {
-            string code = $"set identity_insert {ifa.FullName} on;\n";
+            string code = $"";
             code += $"insert into {ifa.FullName} ";            
             string attributeList = "";
             string valuesList = "";
@@ -55,7 +55,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
                 } else if(attr.DataType == CoreDataType.VARCHAR) { // Alle anderen textuellen Felder
                     valuesList += "'UNBEKANNT'";
                 } else if(attr.DataType == CoreDataType.DATE || attr.DataType == CoreDataType.DATETIME) { // Datumsfelder auf aktuelles Datum
-                    valuesList += "GETDATE()";
+                    valuesList += "NOW()";
                 } else if(attr.Name == "T_Ladelauf_NR") { // Ladelauf 0
                     valuesList += "0";
                 } else { // Ansonsten versuchen wir es mal mit NULL ;-) evtl geht das aber nicht immer?
@@ -67,7 +67,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
                 }
             }
             code += $"(\n{attributeList.Indent(1)}\n) values (\n{valuesList.Indent(1)}\n);\n";
-            code += $"set identity_insert {ifa.FullName} off;\n\n";
+            code += $"\n";
             return code;
         }
     }

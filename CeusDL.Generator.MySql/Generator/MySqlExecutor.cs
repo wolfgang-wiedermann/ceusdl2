@@ -32,11 +32,15 @@ namespace CeusDL.Generator.MsSql.Generator
             if (File.Exists(sqlFileName))
             {
                 var sql = File.ReadAllText(sqlFileName);                                
-                var scripts = Regex.Split(sql, @"[ \n\r\t]*[gG][oO][ \n\r\t]*", RegexOptions.Multiline);
+                var scripts = Regex.Split(sql, @"[ \n\r\t]*;\n\n[ \n\r\t]*", RegexOptions.Multiline);
                 using(var cmd = con.CreateCommand()) {
                     foreach(var script in scripts.Where(s => !string.IsNullOrWhiteSpace(s))) {
                         cmd.CommandText = script;
-                        cmd.ExecuteNonQuery();
+                        try {
+                            cmd.ExecuteNonQuery();
+                        } catch(Exception ex) {
+                            Console.WriteLine("ERROR: "+ ex.Message);
+                        }
                     }
                 }
             }

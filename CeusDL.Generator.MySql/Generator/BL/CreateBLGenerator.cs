@@ -180,7 +180,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         /// Generiert den Standard-Kopf für DimTableViews in der BL
         ///
         private string GenerateDefaultDimTableViewTop(IBLInterface ifa) {
-            string code = $"go\ncreate view {ifa.ViewName} as\n";
+            string code = $";\n\n\ncreate view {ifa.ViewName} as\n";
             code += $"select\n";
             foreach(var attr in ifa.Attributes) {
                 if(!attr.IsTechnicalAttribute) {
@@ -286,7 +286,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
                     code += $" and il.{attr.Name} = bl.{attr.Name}\n".Indent("    ");
                 }
             }            
-            code += ";\ngo\n\n";
+            code += ";\n\n";
             return code;
         }
 
@@ -313,10 +313,9 @@ namespace KDV.CeusDL.Generator.MySql.BL {
                 }
             }            
             // ACHTUNG: so kann ich das nicht stehen lassen, das multipliziert evtl. Sätze!!!
-            code += $" and (bl.{ifa.HistoryAttribute.Name} is null or bl.{ifa.HistoryAttribute.Name} > dbo.GetCurrentTimeForHistory())".Indent("    ");
+            code += $" and (bl.{ifa.HistoryAttribute.Name} is null or bl.{ifa.HistoryAttribute.Name} > GetCurrentTimeForHistory())".Indent("    ");
             // /Achtung
-            code += ";\ngo\n\n";
-            code += "go\n\n";
+            code += ";\n\n\n";
             return code;
         }
 
@@ -333,13 +332,14 @@ namespace KDV.CeusDL.Generator.MySql.BL {
             string type = finestTimeAttribute.DataType + finestTimeAttribute.DataTypeParameters.Replace("not null", "");
 
             var code = "--\n-- Funktion zur Bestimmung des aktuellen Zeitpunkts für die Historisierung\n--\n";
-            code += "drop function if exists GetCurrentTimeForHistory;\n\n";
-            code += "DELIMITER $$\n\n";
+            code +=  "drop function if exists GetCurrentTimeForHistory;\n\n";
+           // code +=  "DELIMITER $$\n\n";
             code +=  "create function GetCurrentTimeForHistory()\n";
             code += $"returns {type}\n";
-            code += "begin\n";
+            code +=  "begin\n";
             code += $"declare val {type.TrimEnd()};\n{GenerateGetCurrentTimeForHistorySql()}return val;\n".Indent("    ");
-            code += "end\n$$\n\nDELIMITER ;\n";
+            code +=  "end\n;\n\n";
+           // code +=  "DELIMITER ;\n";
 
             return code;
         }

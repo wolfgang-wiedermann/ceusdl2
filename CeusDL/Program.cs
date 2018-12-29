@@ -61,7 +61,7 @@ namespace CeusDL2
                     dbConnectionFileName = @"/Users/wiw39784/develop/dotnet/ceusdl2/Test/Data/connection_mac.txt";
                     options.GenerateMySql = true;
                     options.GenerateMsSql = false;
-                    options.ExecuteReplace = false;
+                    options.ExecuteReplace = true;
                     options.ExecuteUpdate = false;
                 }
 
@@ -270,7 +270,7 @@ namespace CeusDL2
                 UpdateSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.UpdateBLGenerator(model, conStr), GENERATED_SQL));
             }
             ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.CreateDefDataGenerator(model), GENERATED_PYCODE);
-
+/* 
             // BT generieren
             CoreBTSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BT.DropBTGenerator(model), GENERATED_SQL));
             CoreBTSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BT.CreateBTGenerator(model), GENERATED_SQL));
@@ -293,6 +293,7 @@ namespace CeusDL2
                 SnowflakeSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Snowflake.CreateSnowflakeALGenerator(model), GENERATED_SQL));
                 ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Snowflake.LoadSnowflakeALGenerator(model), GENERATED_SQL);
             }
+            */
         }
 
         private static void ExecuteGenerationMsSql(GenerationOptions options, string conStr, CoreModel model)

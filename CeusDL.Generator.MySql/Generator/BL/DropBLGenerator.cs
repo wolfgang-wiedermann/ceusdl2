@@ -21,12 +21,12 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         }
 
         internal string GenerateDropBLTablesAndViews() {
-            string code = "--\n-- BaseLayer-Tabellen aus der Datenbank entfernen\n--\n";
-            code += $"use {model.Config.BLDatabase}\nGO\n\n";
+            string code = "/*\n * BaseLayer-Tabellen aus der Datenbank entfernen\n*/\n";
+            code += $"use {model.Config.BLDatabase};\n\n";
 
             // Constraints entfernen
             foreach(var ifa in model.Interfaces.Where(i => i.Attributes.Where(a => a is RefBLAttribute).Count() > 0)) {
-                code += $"\n-- FKs von {ifa.FullName} löschen\n--\n";
+                code += $"\n/* FKs von {ifa.FullName} löschen */\n";
                 // Nur die Ref-Attribute durchlaufen
                 foreach(var attr in ifa.Attributes.Where(a => a is RefBLAttribute)) {
                     var refAttr = (RefBLAttribute)attr;                
@@ -35,9 +35,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
                     if(refAttr.ReferencedAttribute.ParentInterface.InterfaceType != CoreInterfaceType.FACT_TABLE
                         && refAttr.ReferencedAttribute.ParentInterface.InterfaceType != CoreInterfaceType.DIM_VIEW) {
                         string fkName = $"{attr.ParentInterface.Name}_{attr.Name}_FK";
-                        code += $"IF (OBJECT_ID('{fkName}', 'F') IS NOT NULL) BEGIN \n";
-                        code += $"    alter table {ifa.FullName} drop constraint {fkName};\n";
-                        code += "END\n\n";
+                        code += $"alter table {ifa.FullName} drop foreign key if exists {fkName};\n";
                     }
                 }
             }
@@ -45,7 +43,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
             // Tabellen löschen
             // TODO: Einschränken, die Tabellen zu den DimViews sollten nicht entfernt werden!
             foreach(var ifa in model.Interfaces.Where(i => i.InterfaceType != CoreInterfaceType.DIM_VIEW)) {
-                code += $"-- Tabelle und View zu {ifa.ShortName} entfernen\n";
+                code += $"/* Tabelle und View zu {ifa.ShortName} entfernen */\n";
                 // View löschen
                 code += $"drop view if exists {ifa.ViewName};\n";
                 // Tabelle löschen
