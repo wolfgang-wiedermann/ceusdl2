@@ -70,6 +70,8 @@ namespace CeusDL2
                 var ceusdlOpt = cla.Option("-c | --ceusdl <ceusdlfile>", "Path to the ceusdl file to compile", CommandOptionType.SingleValue);
                 var dirOpt = cla.Option("-d | --directory <target_directory>", "Path to store the result of compilation.", CommandOptionType.SingleValue);
                 var conOpt = cla.Option("--connection <connectionfile>", "Textfile containing connection string to Database", CommandOptionType.SingleValue);
+                var mssqlOpt = cla.Option("--mssql", "Generate for Microsoft SQL Server", CommandOptionType.NoValue);
+                var mysqlOpt = cla.Option("--mysql", "Generate for MySQL and MariaDB", CommandOptionType.NoValue);
                 var starOpt = cla.Option("--star", "Generate analytical layer as star scheme", CommandOptionType.NoValue);
                 var snowflakeOpt = cla.Option("--snowflake", "Generate analytical layer as snowflake scheme", CommandOptionType.NoValue);
                 var executeUpdate = cla.Option("--update", "Update Baselayer, Replace everything else", CommandOptionType.NoValue);

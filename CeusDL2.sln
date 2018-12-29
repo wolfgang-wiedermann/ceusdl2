@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 15.0.26124.0
@@ -11,6 +11,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CeusDL.Parser.Test", "CeusDL.Parser.Test\CeusDL.Parser.Test.csproj", "{B91B4DE1-EA23-49DA-8E00-A3AAFDD56812}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CeusDL.Generator.MsSql.Test", "CeusDL.Generator.MsSql.Test\CeusDL.Generator.MsSql.Test.csproj", "{94B3CF3B-CC5B-4425-B4DD-DADE7C6836B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CeusDL.Generator.MySql", "CeusDL.Generator.MySql\CeusDL.Generator.MySql.csproj", "{5B6C220B-D0CB-438F-9561-5B12910C7482}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -82,6 +84,18 @@ Global
 		{94B3CF3B-CC5B-4425-B4DD-DADE7C6836B2}.Release|x64.Build.0 = Release|Any CPU
 		{94B3CF3B-CC5B-4425-B4DD-DADE7C6836B2}.Release|x86.ActiveCfg = Release|Any CPU
 		{94B3CF3B-CC5B-4425-B4DD-DADE7C6836B2}.Release|x86.Build.0 = Release|Any CPU
+		{5B6C220B-D0CB-438F-9561-5B12910C7482}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B6C220B-D0CB-438F-9561-5B12910C7482}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B6C220B-D0CB-438F-9561-5B12910C7482}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5B6C220B-D0CB-438F-9561-5B12910C7482}.Debug|x64.Build.0 = Debug|Any CPU
+		{5B6C220B-D0CB-438F-9561-5B12910C7482}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5B6C220B-D0CB-438F-9561-5B12910C7482}.Debug|x86.Build.0 = Debug|Any CPU
+		{5B6C220B-D0CB-438F-9561-5B12910C7482}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B6C220B-D0CB-438F-9561-5B12910C7482}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B6C220B-D0CB-438F-9561-5B12910C7482}.Release|x64.ActiveCfg = Release|Any CPU
+		{5B6C220B-D0CB-438F-9561-5B12910C7482}.Release|x64.Build.0 = Release|Any CPU
+		{5B6C220B-D0CB-438F-9561-5B12910C7482}.Release|x86.ActiveCfg = Release|Any CPU
+		{5B6C220B-D0CB-438F-9561-5B12910C7482}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

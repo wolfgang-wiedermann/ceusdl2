@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace KDV.CeusDL.Model.Exceptions
 {
     [Serializable]
-    internal class InvalidCountException : Exception
+    public class InvalidCountException : Exception
     {
         public InvalidCountException()
         {

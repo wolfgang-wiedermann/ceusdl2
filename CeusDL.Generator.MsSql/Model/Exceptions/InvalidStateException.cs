@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace KDV.CeusDL.Model.Exceptions
 {
     [Serializable]
-    internal class InvalidStateException : Exception
+    public class InvalidStateException : Exception
     {
         public InvalidStateException()
         {
