@@ -1,0 +1,1 @@
+Server=localhost;User ID=root;Database=FH_EXT_BaseLayer

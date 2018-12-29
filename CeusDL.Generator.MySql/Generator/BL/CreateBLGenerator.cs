@@ -25,7 +25,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         }
 
         private string GenerateCreateTables() {
-            string code = "--\n-- BaseLayer \n--\n";
+            string code = "--\n-- BaseLayer (MySql) \n--\n";
             
             if(!string.IsNullOrEmpty(model.Config.BLDatabase)) {
                 code += $"\nuse {model.Config.BLDatabase};\n\n";
@@ -83,7 +83,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         internal string GenerateUniqueKeyConstraint(IBLInterface ifa) {
             // Create Unique-Key-Constraint
             var code = $"alter table {ifa.FullName} \n";
-            code += $"add constraint {ifa.Name}_UK unique nonclustered (\n";
+            code += $"add constraint {ifa.Name}_UK unique (\n";
             foreach(var attr in ifa.UniqueKeyAttributes) {
                 code += $"    {attr.Name} ASC";
                 if(ifa.UniqueKeyAttributes.Last() != attr) {
@@ -333,11 +333,13 @@ namespace KDV.CeusDL.Generator.MySql.BL {
             string type = finestTimeAttribute.DataType + finestTimeAttribute.DataTypeParameters.Replace("not null", "");
 
             var code = "--\n-- Funktion zur Bestimmung des aktuellen Zeitpunkts für die Historisierung\n--\n";
-            code += "go\ncreate or alter function dbo.GetCurrentTimeForHistory() \n";
+            code += "drop function if exists GetCurrentTimeForHistory;\n\n";
+            code += "DELIMITER $$\n\n";
+            code +=  "create function GetCurrentTimeForHistory()\n";
             code += $"returns {type}\n";
             code += "begin\n";
-            code += $"declare @value {type};\n{GenerateGetCurrentTimeForHistorySql()}return @value;\n".Indent("    ");
-            code += "end;\ngo\n";
+            code += $"declare val {type.TrimEnd()};\n{GenerateGetCurrentTimeForHistorySql()}return val;\n".Indent("    ");
+            code += "end\n$$\n\nDELIMITER ;\n";
 
             return code;
         }
@@ -350,7 +352,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
             var finestTimeAttribute = this.model.FinestTimeAttribute.GetILInterface().PrimaryKeyAttributes.First();
             var relevantTables = this.model.FactTableInterfaces.Where(f => f.IsHistorized);
 
-            string code = $"select @value = max({finestTimeAttribute.Name}) from (\n";
+            string code = $"select max({finestTimeAttribute.Name}) into val from (\n";
             foreach(var table in relevantTables) {
                 code += $"select max({finestTimeAttribute.Name}) as {finestTimeAttribute.Name} from {table.GetILInterface().FullName}\n";
                 if(table != relevantTables.Last()) {

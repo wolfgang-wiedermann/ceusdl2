@@ -53,12 +53,16 @@ namespace CeusDL2
                 string dbConnectionFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\connection.txt";
                 options.GenerateMySql = false;
                 options.GenerateMsSql = true;
+                options.ExecuteReplace = false;
+                options.ExecuteUpdate = true;
 
                 if(IsUnix) {
                     ceusdlFileName = @"/Users/wiw39784/develop/dotnet/ceusdl2/Test/Data/ext_main.ceusdl";
                     dbConnectionFileName = @"/Users/wiw39784/develop/dotnet/ceusdl2/Test/Data/connection_mac.txt";
                     options.GenerateMySql = true;
                     options.GenerateMsSql = false;
+                    options.ExecuteReplace = false;
+                    options.ExecuteUpdate = false;
                 }
 
                 string rootFolder = "."; 
@@ -67,8 +71,6 @@ namespace CeusDL2
                 options.DbConnectionString = File.ReadAllText(dbConnectionFileName);
                 //options.GenerateSnowflake = true;
                 options.GenerateStar = true;
-                options.ExecuteReplace = false;
-                options.ExecuteUpdate = true;
                 ExecuteCompilation(ceusdlFileName, options);
                 if (!string.IsNullOrWhiteSpace(options.DbConnectionString) && options.ExecuteUpdate) {
                     ExecuteUpdate(GENERATED_SQL, options);
@@ -347,33 +349,48 @@ namespace CeusDL2
                 throw new InvalidOperationException("ExecuteUpdate ist nur mit Datenbankverbindung zulässig");
             }
 
-            using (IExecutor exec = new SqlServerExecutor(options.DbConnectionString, GENERATED_SQL))
+            if(options.GenerateMsSql) 
             {
-                foreach (var stm in CoreILSQLStatements)
+                using (IExecutor exec = new SqlServerExecutor(options.DbConnectionString, GENERATED_SQL))
+                {
+                    ExecuteReplaceInternal(options, exec);
+                }
+            }
+            else if(options.GenerateMySql)
+            {
+                using (IExecutor exec = new MySqlExecutor(options.DbConnectionString, GENERATED_SQL))
+                {
+                    ExecuteReplaceInternal(options, exec);
+                }
+            }
+        }
+
+        private static void ExecuteReplaceInternal(GenerationOptions options, IExecutor exec)
+        {
+            foreach (var stm in CoreILSQLStatements)
+            {
+                exec.ExecuteSQL(stm.FileName);
+            }
+            foreach (var stm in ReplaceSQLStatements)
+            {
+                exec.ExecuteSQL(stm.FileName);
+            }
+            foreach (var stm in CoreBTSQLStatements)
+            {
+                exec.ExecuteSQL(stm.FileName);
+            }
+            if (options.GenerateSnowflake)
+            {
+                foreach (var stm in SnowflakeSQLStatements)
                 {
                     exec.ExecuteSQL(stm.FileName);
                 }
-                foreach (var stm in ReplaceSQLStatements)
+            }
+            else if (options.GenerateStar)
+            {
+                foreach (var stm in StarSQLStatements)
                 {
                     exec.ExecuteSQL(stm.FileName);
-                }
-                foreach (var stm in CoreBTSQLStatements)
-                {
-                    exec.ExecuteSQL(stm.FileName);
-                }
-                if (options.GenerateSnowflake)
-                {
-                    foreach (var stm in SnowflakeSQLStatements)
-                    {
-                        exec.ExecuteSQL(stm.FileName);
-                    }
-                }
-                else if (options.GenerateStar)
-                {
-                    foreach (var stm in StarSQLStatements)
-                    {
-                        exec.ExecuteSQL(stm.FileName);
-                    }
                 }
             }
         }
@@ -385,35 +402,50 @@ namespace CeusDL2
                 throw new InvalidOperationException("ExecuteUpdate ist nur mit Datenbankverbindung zulässig");
             }
 
-            using (IExecutor exec = new SqlServerExecutor(options.DbConnectionString, GENERATED_SQL))
+            if(options.GenerateMsSql) 
             {
-                foreach(var stm in CoreILSQLStatements)
+                using (IExecutor exec = new SqlServerExecutor(options.DbConnectionString, GENERATED_SQL))
+                {
+                    ExecuteUpdateInternal(options, exec);
+                }
+            }
+            else if(options.GenerateMySql) 
+            {
+                using (IExecutor exec = new MySqlExecutor(options.DbConnectionString, GENERATED_SQL))
+                {
+                    ExecuteUpdateInternal(options, exec);
+                }
+            }
+        }
+
+        private static void ExecuteUpdateInternal(GenerationOptions options, IExecutor exec)
+        {
+            foreach (var stm in CoreILSQLStatements)
+            {
+                exec.ExecuteSQL(stm.FileName);
+            }
+            exec.ExecuteSQL("BL_Drop_FKs.sql");
+            foreach (var stm in UpdateSQLStatements)
+            {
+                exec.ExecuteSQL(stm.FileName);
+            }
+            exec.ExecuteSQL("BL_Create_FKs.sql");
+            foreach (var stm in CoreBTSQLStatements)
+            {
+                exec.ExecuteSQL(stm.FileName);
+            }
+            if (options.GenerateSnowflake)
+            {
+                foreach (var stm in SnowflakeSQLStatements)
                 {
                     exec.ExecuteSQL(stm.FileName);
                 }
-                exec.ExecuteSQL("BL_Drop_FKs.sql");
-                foreach (var stm in UpdateSQLStatements)
+            }
+            else if (options.GenerateStar)
+            {
+                foreach (var stm in StarSQLStatements)
                 {
                     exec.ExecuteSQL(stm.FileName);
-                }
-                exec.ExecuteSQL("BL_Create_FKs.sql");
-                foreach (var stm in CoreBTSQLStatements)
-                {
-                    exec.ExecuteSQL(stm.FileName);
-                }
-                if (options.GenerateSnowflake)
-                {
-                    foreach (var stm in SnowflakeSQLStatements)
-                    {
-                        exec.ExecuteSQL(stm.FileName);
-                    }
-                }
-                else if(options.GenerateStar)
-                {
-                    foreach (var stm in StarSQLStatements)
-                    {
-                        exec.ExecuteSQL(stm.FileName);
-                    }
                 }
             }
         }

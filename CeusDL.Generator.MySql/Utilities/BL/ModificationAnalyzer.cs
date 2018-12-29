@@ -72,8 +72,8 @@ namespace KDV.CeusDL.Utilities.MySql.BL {
             List<string> result = new List<string>();
             AssureOpenConnection();
             using(var cmd = con.CreateCommand()) {
-                cmd.CommandText = $"select table_name from {model.Config.BLDatabase}.information_schema.tables ";
-                cmd.CommandText += "where table_catalog = @table_catalog and table_schema = 'dbo' ";
+                cmd.CommandText = $"select table_name from information_schema.tables ";
+                cmd.CommandText += "where table_catalog = @table_catalog ";
                 cmd.CommandText += "and (table_name like @name_filter1 or table_name like @name_filter2) and table_type = 'BASE TABLE'";
 
                 cmd.Prepare();

@@ -30,9 +30,9 @@ namespace KDV.CeusDL.Model.MySql.BL
         public string FullName {
             get {
                 if(ParentModel?.Config?.BLDatabase != null) {
-                    return $"{ParentModel.Config.BLDatabase}.dbo.{Name}";
+                    return $"{ParentModel.Config.BLDatabase}.{Name}";
                 } else {
-                    return $"dbo.{Name}";
+                    return $"{Name}";
                 }
             }
         }
@@ -44,9 +44,9 @@ namespace KDV.CeusDL.Model.MySql.BL
             get {
                 if(FormerName == null) return null;
                 if(ParentModel?.Config?.BLDatabase != null) {
-                    return $"{ParentModel.Config.BLDatabase}.dbo.{FormerName}";
+                    return $"{ParentModel.Config.BLDatabase}.{FormerName}";
                 } else {
-                    return $"dbo.{FormerName}";
+                    return $"{FormerName}";
                 }
             }
         }

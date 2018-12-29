@@ -47,13 +47,9 @@ namespace KDV.CeusDL.Generator.MySql.BL {
             foreach(var ifa in model.Interfaces.Where(i => i.InterfaceType != CoreInterfaceType.DIM_VIEW)) {
                 code += $"-- Tabelle und View zu {ifa.ShortName} entfernen\n";
                 // View löschen
-                code += $"IF OBJECT_ID(N'{ifa.ViewName}', N'V') IS NOT NULL\n";
-                code += $"DROP VIEW {ifa.ViewName}\n";
-                code += "go\n\n";
+                code += $"drop view if exists {ifa.ViewName};\n";
                 // Tabelle löschen
-                code += $"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{ifa.Name}]') AND type in (N'U'))\n";
-                code += $"drop table {ifa.FullName}\n";
-                code += "go\n\n";
+                code += $"drop table if exists {ifa.FullName};\n\n";
             }
 
             return code;
@@ -62,19 +58,13 @@ namespace KDV.CeusDL.Generator.MySql.BL {
 
         internal string GenerateDropForeignKeys() {
             string code = "--\n-- Fremdschlüssel der BaseLayer-Tabellen aus der Datenbank entfernen\n--\n";
-            code += $"use {model.Config.BLDatabase}\nGO\n\n";
+            code += $"use {model.Config.BLDatabase}\n;\n\n";
 
             foreach(var ifa in model.Interfaces) {
                 foreach(var attr in ifa.Attributes.Where(a => a is RefBLAttribute)) {
                     var refAttr = (RefBLAttribute)attr;
                     string constraintName = $"{attr.ParentInterface.Name}_{attr.Name}_FK";
-                    code += "if exists (\n";
-                    code += "select constraint_name from information_schema.referential_constraints \n".Indent("    ");
-                    code += $"where constraint_catalog = '{model.Config.BLDatabase}'\n".Indent("    ");
-                    code += "and constraint_schema = 'dbo'\n".Indent("    ");
-                    code += $"and constraint_name = '{constraintName}'\n".Indent("    ");
-                    code += ")\n";
-                    code += $"alter table {attr.ParentInterface.FullName} drop constraint {constraintName};\n\n";
+                    code += $"alter table {attr.ParentInterface.Name} drop foreign key if exists {constraintName};\n\n";
                 }
             }
 

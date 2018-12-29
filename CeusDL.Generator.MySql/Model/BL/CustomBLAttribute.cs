@@ -224,7 +224,7 @@ namespace KDV.CeusDL.Model.MySql.BL {
                 result += " primary key";
             }
             if(IsIdentity) {
-                result += " identity";
+                result += " auto_increment";
             }
             if(IsNotNull || IsPrimaryKey) {
                 result += " not null";
