@@ -45,8 +45,8 @@ namespace CeusDL2
                 // Dieser Code wird bei F5 in Visual Studio ausgeführt
                 //string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\split_main.ceusdl";
                 //string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\sp_main.ceusdl";
-                string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\ext_main.ceusdl";
-                string dbConnectionFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\connection.txt";
+                string ceusdlFileName = @"/Users/wiw39784/develop/dotnet/ceusdl2/Test/Data/ext_main.ceusdl";
+                string dbConnectionFileName = @"/Users/wiw39784/develop/dotnet/ceusdl2/Test/Data/connection_mac.txt";
                 string rootFolder = "."; 
                 PrepareEnvironment(rootFolder);
 
@@ -56,10 +56,10 @@ namespace CeusDL2
                 options.ExecuteReplace = false;
                 options.ExecuteUpdate = true;
                 ExecuteCompilation(ceusdlFileName, options);
-                if (!string.IsNullOrEmpty(options.DbConnectionString) && options.ExecuteUpdate) {
+                if (!string.IsNullOrWhiteSpace(options.DbConnectionString) && options.ExecuteUpdate) {
                     ExecuteUpdate(GENERATED_SQL, options);
                 }
-                else if (!string.IsNullOrEmpty(options.DbConnectionString) && options.ExecuteReplace)
+                else if (!string.IsNullOrWhiteSpace(options.DbConnectionString) && options.ExecuteReplace)
                 {
                     ExecuteReplace(GENERATED_SQL, options);
                 }
@@ -231,7 +231,7 @@ namespace CeusDL2
             ReplaceSQLStatements.AddRange(ExecuteStep(new InitialDefaultValuesGenerator(model), GENERATED_SQL));            
             ExecuteStep(new GraphvizBLGenerator(model), GENERATED_GRAPHVIZ);
             ExecuteStep(new LoadBLGenerator(model), GENERATED_SQL);            
-            if(conStr != null) {
+            if(!string.IsNullOrEmpty(conStr)) {
                 // Aktualisierung nur generieren, wenn eine Verbindung zur Datenbank angegeben wurde.
                 UpdateSQLStatements.AddRange(ExecuteStep(new UpdateBLGenerator(model, conStr), GENERATED_SQL));
             }
