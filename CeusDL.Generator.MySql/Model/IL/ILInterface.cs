@@ -17,7 +17,7 @@ namespace KDV.CeusDL.Model.MySql.IL {
         }
 
         public string ShortName {get; private set;}
-        public string FullName {get => string.IsNullOrEmpty(coreModel.Config.ILDatabase)?Name:$"{coreModel.Config.ILDatabase}.dbo.{Name}";}
+        public string FullName {get => string.IsNullOrEmpty(coreModel.Config.ILDatabase)?Name:$"{coreModel.Config.ILDatabase}.{Name}";}
 
         public List<ILAttribute> Attributes {get; private set;}
         public List<ILAttribute> NonCalculatedAttributes {

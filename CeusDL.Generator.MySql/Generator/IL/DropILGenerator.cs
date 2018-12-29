@@ -15,15 +15,13 @@ namespace KDV.CeusDL.Generator.MySql.IL {
 
         public List<GeneratorResult> GenerateCode()
         {
-            string code = "--\n-- InterfaceLayer-Tabellen aus der Datenbank entfernen\n--\n\n";
+            string code = "--\n-- InterfaceLayer-Tabellen aus der MySQL-Datenbank entfernen\n--\n\n";
             if(!string.IsNullOrEmpty(model.Database)) {
-                code += $"use [{model.Database}]\nGO\n\n";
+                code += $"use {model.Database};\n\n";
             }
 
             foreach(var ifa in model.Interfaces.Where(i => i.IsILRelevant())) {
-                code += $"IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{ifa.Name}]') AND type in (N'U'))\n";
-                code += $"DROP TABLE [dbo].[{ifa.Name}]\n";
-                code += "GO\n\n";
+                code += $"DROP TABLE IF EXISTS {ifa.FullName};\n";
             }
             
             var result = new List<GeneratorResult>();

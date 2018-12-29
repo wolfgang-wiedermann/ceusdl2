@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CeusDL.Parser\CeusDL.Parser.csproj" />
     <ProjectReference Include="..\CeusDL.Generator.MsSql\CeusDL.Generator.MsSql.csproj" />
+    <ProjectReference Include="..\CeusDL.Generator.MySql\CeusDL.Generator.MySql.csproj" />
   </ItemGroup>
 
 

@@ -13,6 +13,7 @@ using Microsoft.Extensions.CommandLineUtils;
 using KDV.CeusDL.Validator;
 using CeusDL.Generator.MsSql.Generator;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace CeusDL2
 {
@@ -37,6 +38,9 @@ namespace CeusDL2
         static List<GeneratorResult> StarSQLStatements = new List<GeneratorResult>();       // AL
         static List<GeneratorResult> SnowflakeSQLStatements = new List<GeneratorResult>();  // AL
 
+        public static bool IsUnix => RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+        public static bool IsWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
         static void Main(string[] args)
         {
             GenerationOptions options = new GenerationOptions();
@@ -45,8 +49,18 @@ namespace CeusDL2
                 // Dieser Code wird bei F5 in Visual Studio ausgeführt
                 //string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\split_main.ceusdl";
                 //string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\sp_main.ceusdl";
-                string ceusdlFileName = @"/Users/wiw39784/develop/dotnet/ceusdl2/Test/Data/ext_main.ceusdl";
-                string dbConnectionFileName = @"/Users/wiw39784/develop/dotnet/ceusdl2/Test/Data/connection_mac.txt";
+                string ceusdlFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\ext_main.ceusdl";
+                string dbConnectionFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\connection.txt";
+                options.GenerateMySql = false;
+                options.GenerateMsSql = true;
+
+                if(IsUnix) {
+                    ceusdlFileName = @"/Users/wiw39784/develop/dotnet/ceusdl2/Test/Data/ext_main.ceusdl";
+                    dbConnectionFileName = @"/Users/wiw39784/develop/dotnet/ceusdl2/Test/Data/connection_mac.txt";
+                    options.GenerateMySql = true;
+                    options.GenerateMsSql = false;
+                }
+
                 string rootFolder = "."; 
                 PrepareEnvironment(rootFolder);
 
@@ -101,6 +115,8 @@ namespace CeusDL2
 
                     options.GenerateStar = starOpt.HasValue();
                     options.GenerateSnowflake = snowflakeOpt.HasValue();
+                    options.GenerateMySql = mysqlOpt.HasValue() && (!mssqlOpt.HasValue());
+                    options.GenerateMsSql = (!mysqlOpt.HasValue()) || mssqlOpt.HasValue();
                     options.ExecuteUpdate = executeUpdate.HasValue();
                     options.ExecuteReplace = executeReplace.HasValue();
 
@@ -199,19 +215,22 @@ namespace CeusDL2
             GENERATED_CSV = generatedCsv;
         }
 
-        static void ExecuteCompilation(string srcFile, GenerationOptions options) {
+        static void ExecuteCompilation(string srcFile, GenerationOptions options)
+        {
             string conStr = null;
-            if(options != null) {
+            if (options != null)
+            {
                 conStr = options.DbConnectionString;
             }
-            var data = new ParsableData(System.IO.File.ReadAllText(srcFile), srcFile);            
+            var data = new ParsableData(System.IO.File.ReadAllText(srcFile), srcFile);
             var p = new FileParser(data);
             var result = p.Parse();
             var model = new CoreModel(result);
 
             var validationResult = CoreModelValidator.Validate(model);
             validationResult.Print();
-            if(validationResult.ContainsErrors()) {
+            if (validationResult.ContainsErrors())
+            {
                 Console.WriteLine("ERROR: Compilation stopped by validation errors");
                 return;
             }
@@ -219,9 +238,66 @@ namespace CeusDL2
             // CeusDL generieren.
             ExecuteStep(new CeusDLGenerator(model), GENERATED_CEUSDL);
 
+            // Code generieren
+            if(options.GenerateMySql) {
+                ExecuteGenerationMySql(options, conStr, model);
+            } else {
+                ExecuteGenerationMsSql(options, conStr, model);
+            }
+        }
+
+        private static void ExecuteGenerationMySql(GenerationOptions options, string conStr, CoreModel model)
+        {
+            // IL generieren.
+            CoreILSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.IL.DropILGenerator(model), GENERATED_SQL));
+            CoreILSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.IL.CreateILGenerator(model), GENERATED_SQL));
+            ExecuteStep(new KDV.CeusDL.Generator.MySql.IL.LoadILGenerator(model), GENERATED_CODE);
+            ExecuteStep(new KDV.CeusDL.Generator.MySql.IL.GraphvizILGenerator(model), GENERATED_GRAPHVIZ);
+            ExecuteStep(new DummyDataILGenerator(model), GENERATED_CSV);
+            ExecuteStep(new DummyILPythonGenerator(model), GENERATED_PYCODE);
+
+            // BL generieren
+            ReplaceSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.DropBLGenerator(model), GENERATED_SQL));
+            ReplaceSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.CreateBLGenerator(model), GENERATED_SQL));
+            ReplaceSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.InitialDefaultValuesGenerator(model), GENERATED_SQL));
+            ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.GraphvizBLGenerator(model), GENERATED_GRAPHVIZ);
+            ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.LoadBLGenerator(model), GENERATED_SQL);
+            if (!string.IsNullOrEmpty(conStr))
+            {
+                // Aktualisierung nur generieren, wenn eine Verbindung zur Datenbank angegeben wurde.
+                UpdateSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.UpdateBLGenerator(model, conStr), GENERATED_SQL));
+            }
+            ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.CreateDefDataGenerator(model), GENERATED_PYCODE);
+
+            // BT generieren
+            CoreBTSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BT.DropBTGenerator(model), GENERATED_SQL));
+            CoreBTSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BT.CreateBTGenerator(model), GENERATED_SQL));
+            ExecuteStep(new KDV.CeusDL.Generator.MySql.BT.LoadBTGenerator(model), GENERATED_SQL);
+            ExecuteStep(new KDV.CeusDL.Generator.MySql.BT.GraphvizBTGenerator(model), GENERATED_GRAPHVIZ);
+
+            // AL generieren (Starschema)
+            if (options.GenerateStar)
+            {
+                StarSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.DropStarALGenerator(model), GENERATED_SQL));
+                StarSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.CreateStarALGenerator(model), GENERATED_SQL));
+                ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.LoadStarALGenerator(model), GENERATED_SQL);
+                ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.CopyStarALGenerator(model), GENERATED_SQL);
+            }
+
+            // AL generieren (Snowflake-Schema)
+            if (options.GenerateSnowflake)
+            {
+                SnowflakeSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Snowflake.DropSnowflakeALGenerator(model), GENERATED_SQL));
+                SnowflakeSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Snowflake.CreateSnowflakeALGenerator(model), GENERATED_SQL));
+                ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Snowflake.LoadSnowflakeALGenerator(model), GENERATED_SQL);
+            }
+        }
+
+        private static void ExecuteGenerationMsSql(GenerationOptions options, string conStr, CoreModel model)
+        {
             // IL generieren.
             CoreILSQLStatements.AddRange(ExecuteStep(new DropILGenerator(model), GENERATED_SQL));
-            CoreILSQLStatements.AddRange(ExecuteStep(new CreateILGenerator(model), GENERATED_SQL));            
+            CoreILSQLStatements.AddRange(ExecuteStep(new CreateILGenerator(model), GENERATED_SQL));
             ExecuteStep(new LoadILGenerator(model), GENERATED_CODE);
             ExecuteStep(new GraphvizILGenerator(model), GENERATED_GRAPHVIZ);
             ExecuteStep(new DummyDataILGenerator(model), GENERATED_CSV);
@@ -230,10 +306,11 @@ namespace CeusDL2
             // BL generieren
             ReplaceSQLStatements.AddRange(ExecuteStep(new DropBLGenerator(model), GENERATED_SQL));
             ReplaceSQLStatements.AddRange(ExecuteStep(new CreateBLGenerator(model), GENERATED_SQL));
-            ReplaceSQLStatements.AddRange(ExecuteStep(new InitialDefaultValuesGenerator(model), GENERATED_SQL));            
+            ReplaceSQLStatements.AddRange(ExecuteStep(new InitialDefaultValuesGenerator(model), GENERATED_SQL));
             ExecuteStep(new GraphvizBLGenerator(model), GENERATED_GRAPHVIZ);
-            ExecuteStep(new LoadBLGenerator(model), GENERATED_SQL);            
-            if(!string.IsNullOrEmpty(conStr)) {
+            ExecuteStep(new LoadBLGenerator(model), GENERATED_SQL);
+            if (!string.IsNullOrEmpty(conStr))
+            {
                 // Aktualisierung nur generieren, wenn eine Verbindung zur Datenbank angegeben wurde.
                 UpdateSQLStatements.AddRange(ExecuteStep(new UpdateBLGenerator(model, conStr), GENERATED_SQL));
             }
@@ -244,17 +321,19 @@ namespace CeusDL2
             CoreBTSQLStatements.AddRange(ExecuteStep(new CreateBTGenerator(model), GENERATED_SQL));
             ExecuteStep(new LoadBTGenerator(model), GENERATED_SQL);
             ExecuteStep(new GraphvizBTGenerator(model), GENERATED_GRAPHVIZ);
-            
+
             // AL generieren (Starschema)
-            if(options.GenerateStar) {
+            if (options.GenerateStar)
+            {
                 StarSQLStatements.AddRange(ExecuteStep(new DropStarALGenerator(model), GENERATED_SQL));
                 StarSQLStatements.AddRange(ExecuteStep(new CreateStarALGenerator(model), GENERATED_SQL));
                 ExecuteStep(new LoadStarALGenerator(model), GENERATED_SQL);
                 ExecuteStep(new CopyStarALGenerator(model), GENERATED_SQL);
             }
-            
+
             // AL generieren (Snowflake-Schema)
-            if(options.GenerateSnowflake) {
+            if (options.GenerateSnowflake)
+            {
                 SnowflakeSQLStatements.AddRange(ExecuteStep(new DropSnowflakeALGenerator(model), GENERATED_SQL));
                 SnowflakeSQLStatements.AddRange(ExecuteStep(new CreateSnowflakeALGenerator(model), GENERATED_SQL));
                 ExecuteStep(new LoadSnowflakeALGenerator(model), GENERATED_SQL);
