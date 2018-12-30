@@ -180,7 +180,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         /// Generiert den Standard-Kopf für DimTableViews in der BL
         ///
         private string GenerateDefaultDimTableViewTop(IBLInterface ifa) {
-            string code = $";\n\n\ncreate view {ifa.ViewName} as\n";
+            string code = $"\ncreate view {ifa.ViewName} as\n";
             code += $"select\n";
             foreach(var attr in ifa.Attributes) {
                 if(!attr.IsTechnicalAttribute) {
@@ -319,27 +319,19 @@ namespace KDV.CeusDL.Generator.MySql.BL {
             return code;
         }
 
-        /**
-         * Hinweis: create or alter function funktioniert mit SqlServer 2012 noch nicht
-         *          mit dem 2017er auf meinem Notebook gehts aber.
-         * ggf. hilft auch sowas:
-         * IF OBJECT_ID (N'dbo.ufnGetInventoryStock', N'FN') IS NOT NULL  
-         *      DROP FUNCTION ufnGetInventoryStock;  
-         * GO  
-         */
         private string GenerateGetCurrentTimeForHistory() {
             var finestTimeAttribute = this.model.FinestTimeAttribute.GetILInterface().PrimaryKeyAttributes.First();
             string type = finestTimeAttribute.DataType + finestTimeAttribute.DataTypeParameters.Replace("not null", "");
 
             var code = "--\n-- Funktion zur Bestimmung des aktuellen Zeitpunkts für die Historisierung\n--\n";
             code +=  "drop function if exists GetCurrentTimeForHistory;\n\n";
-           // code +=  "DELIMITER $$\n\n";
+            code +=  "-- Uncomment for manual run: \n-- DELIMITER $$\n\n";
             code +=  "create function GetCurrentTimeForHistory()\n";
             code += $"returns {type}\n";
             code +=  "begin\n";
             code += $"declare val {type.TrimEnd()};\n{GenerateGetCurrentTimeForHistorySql()}return val;\n".Indent("    ");
             code +=  "end\n;\n\n";
-           // code +=  "DELIMITER ;\n";
+            code +=  "-- Uncomment for manual run: \n-- DELIMITER ;\n";
 
             return code;
         }

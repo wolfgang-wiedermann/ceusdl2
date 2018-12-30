@@ -53,8 +53,8 @@ namespace CeusDL2
                 string dbConnectionFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\connection.txt";
                 options.GenerateMySql = false;
                 options.GenerateMsSql = true;
-                options.ExecuteReplace = false;
-                options.ExecuteUpdate = true;
+                options.ExecuteReplace = true;
+                options.ExecuteUpdate = false;
 
                 if(IsUnix) {
                     ceusdlFileName = @"/Users/wiw39784/develop/dotnet/ceusdl2/Test/Data/ext_main.ceusdl";
