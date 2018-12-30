@@ -12,7 +12,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
     public class UpdateBLGenerator : IGenerator
     {
         private BLModel model;
-        private ModificationAnalyzer analyzer;
+        private MySqlModificationAnalyzer analyzer;
         private CreateBLGenerator createGenerator;        
         public List<IBLInterface> MissingTables { get; private set; }
         public List<IBLInterface> ModifiedTables { get; private set; }
@@ -25,7 +25,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         public UpdateBLGenerator(CoreModel model, string conStr) {
             this.model = new BLModel(model);
             this.createGenerator = new CreateBLGenerator(this.model);            
-            this.analyzer = new ModificationAnalyzer(this.model, GetConnection(conStr));            
+            this.analyzer = new MySqlModificationAnalyzer(this.model, GetConnection(conStr));            
             // Hier noch keinen Analysecode aufrufen, der gehört nach GenerateCode
         }
 
@@ -36,7 +36,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         public UpdateBLGenerator(BLModel model, string conStr) {
             this.model = model;
             this.createGenerator = new CreateBLGenerator(this.model);
-            this.analyzer = new ModificationAnalyzer(this.model, GetConnection(conStr));
+            this.analyzer = new MySqlModificationAnalyzer(this.model, GetConnection(conStr));
             // Hier noch keinen Analysecode aufrufen, der gehört nach GenerateCode            
         }
 
@@ -81,12 +81,12 @@ namespace KDV.CeusDL.Generator.MySql.BL {
 
         private string GetCommitTransaction()
         {
-            return "COMMIT TRANSACTION bl_modification_transaction;\n\n";
+            return "COMMIT;\n\n"; //"COMMIT TRANSACTION bl_modification_transaction;\n\n";
         }
 
         private string GetBeginTransaction()
         {
-            return "BEGIN TRANSACTION bl_modification_transaction;\n\n";            
+            return "START TRANSACTION;\n\n"; //"BEGIN TRANSACTION bl_modification_transaction;\n\n";            
         }
 
         private string GenerateCreateNewTables() {
@@ -140,8 +140,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         {
             sb.Append("/*\n * Aktualisierte Tabelle wieder mit den gesicherten Daten befüllen\n */\n");
             foreach(var ifa in ModifiedTables) {
-                sb.Append($"set identity_insert {ifa.FullName} on;\n");
-                sb.Append($"insert into {ifa.FullName} (\n");
+                sb.Append($"insert into {ifa.Name} (\n");
                 foreach(var attr in ifa.Attributes.Where(a => a.RealFormerName != null)) {
                     sb.Append(attr.Name.Indent("    "));
                     if(ifa.Attributes.Last() != attr) {
@@ -157,8 +156,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
                     }
                     sb.Append("\n");
                 }
-                sb.Append($"from {ifa.RealFormerName}_BAK;\n");
-                sb.Append($"set identity_insert {ifa.FullName} off;\n\n");
+                sb.Append($"from {ifa.RealFormerName}_BAK;\n\n");
             }
         }
 
@@ -166,9 +164,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         {
             sb.Append("\n/*\n * Alte Versionen der veränderten Tabellen löschen\n */\n");
             foreach(var ifa in ModifiedTables) {
-                sb.Append($"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{ifa.RealFormerName}]') AND type in (N'U'))\n");
-                sb.Append($"drop table {ifa.RealFormerName}\n");                
-                sb.Append("go\n\n");
+                sb.Append($"drop table if exists {ifa.RealFormerName};\n");                
             }
         }
 
@@ -183,8 +179,9 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         private void GenerateSelectInto(StringBuilder sb)
         {
             sb.Append("\n/*\n * Veränderte Tabellen sichern\n */\n");
-            foreach(var ifa in ModifiedTables) {                
-                sb.Append($"select * into {ifa.DatabaseName}.dbo.{ifa.RealFormerName}_BAK from {ifa.DatabaseName}.dbo.{ifa.RealFormerName};\n\n");              
+            foreach(var ifa in ModifiedTables) {     
+                // Select into table wird in MySQL nicht unterstützt ...           
+                sb.Append($"create table {ifa.RealFormerName}_BAK select * from {ifa.RealFormerName};\n\n");              
             }
         }
 
@@ -194,13 +191,9 @@ namespace KDV.CeusDL.Generator.MySql.BL {
             foreach(var ifa in model.Interfaces.Where(i => i.InterfaceType != CoreInterfaceType.DIM_VIEW && i.InterfaceType != CoreInterfaceType.DEF_TABLE)) {
                 sb.Append($"-- View zu {ifa.ShortName} entfernen\n");
                 // View löschen
-                sb.Append($"IF OBJECT_ID(N'{ifa.ViewName}', N'V') IS NOT NULL\n");
-                sb.Append($"DROP VIEW {ifa.ViewName}\n");
-                sb.Append("go\n\n");
+                sb.Append($"drop view if exists {ifa.ViewName};\n");
                 if(ifa.FormerName != null) {
-                    sb.Append($"IF OBJECT_ID(N'{ifa.FormerName}_VW', N'V') IS NOT NULL\n");
-                    sb.Append($"DROP VIEW {ifa.FormerName}_VW\n");
-                    sb.Append("go\n\n");
+                    sb.Append($"drop view if exists {ifa.FormerName}_VW;\n");
                 }
             }
             return sb.ToString();
@@ -227,9 +220,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
             StringBuilder sb = new StringBuilder();
             sb.Append("/*\n * Löschen der Tabellen, deren Interfaces nicht mehr im ceusdl-Code enthalten sind.\n */\n");
             foreach(var table in DeletedTables) {
-                sb.Append($"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{table}]') AND type in (N'U'))\n");
-                sb.Append($"drop table {table}\n");                
-                sb.Append("go\n\n");
+                sb.Append($"drop table if exists {table};\n");                
             }
             return sb.ToString();
         }
@@ -241,7 +232,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         private List<IBLInterface> GetMissingTables() {
             List<IBLInterface> temp = new List<IBLInterface>();
             foreach(var i in model.Interfaces.Where(i => i.InterfaceType != CoreInterfaceType.DIM_VIEW)) {
-                if(!analyzer.TableWithNameExists(i.Name) && !analyzer.InterfaceRenamed(i)) {                
+                if(!analyzer.TableWithNameExists(i.Name, i.ParentModel.Config.BLDatabase) && !analyzer.InterfaceRenamed(i)) {                
                     // Tabelle existiert weder mit ihrem aktuellen noch dem früheren Namen in der Datenbank
                     // => sie fehlt.
                     temp.Add(i);
@@ -264,9 +255,9 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         private string WrapWithCast(IBLAttribute attr, string name) {
             switch(attr.DataType) {
                 case CoreDataType.VARCHAR:
-                    return $"cast ({name} as varchar({attr.Length})) as {name}";
+                    return $"cast({name} as varchar({attr.Length})) as {name}";
                 case CoreDataType.DECIMAL:
-                    return $"cast ({name} as decimal({attr.Length}, {attr.Decimals})) as {name}";
+                    return $"cast({name} as decimal({attr.Length}, {attr.Decimals})) as {name}";
                 default:
                     // TODO: Prüfen ob das für die anderen Typen auch relevant ist und wie ich 
                     //       das dann am besten umsetze.

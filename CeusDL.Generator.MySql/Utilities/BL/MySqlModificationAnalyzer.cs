@@ -8,12 +8,12 @@ using KDV.CeusDL.Model.Core;
 using KDV.CeusDL.Model.MySql.BL;
 
 namespace KDV.CeusDL.Utilities.MySql.BL {
-    public class ModificationAnalyzer {
-        private BLModel model = null;
+    public class MySqlModificationAnalyzer {
+        private BLModel mysqlModel = null;
         private DbConnection con = null;
 
-        public ModificationAnalyzer(BLModel model, MySqlConnection con) {
-            this.model = model;
+        public MySqlModificationAnalyzer(BLModel model, MySqlConnection con) {
+            this.mysqlModel = model;
             this.con = con;
         }
 
@@ -22,10 +22,10 @@ namespace KDV.CeusDL.Utilities.MySql.BL {
         #region complex operations
 
         public bool InterfaceRenamed(IBLInterface ifa) {
-            if(TableWithNameExists(ifa.Name)) {
+            if(TableWithNameExists(ifa.Name, ifa.ParentModel.Config.BLDatabase)) {
                 return false;
             }
-            if(!TableWithNameExists(ifa.FormerName)) {
+            if(!TableWithNameExists(ifa.FormerName, ifa.ParentModel.Config.BLDatabase)) {
                 return false;
             }                       
 
@@ -34,7 +34,7 @@ namespace KDV.CeusDL.Utilities.MySql.BL {
 
         // TODO:für TableExistsModified brauch ich noch Testfälle
         public bool TableExistsModified(IBLInterface ifa) {
-            if(!TableWithNameExists(ifa.Name)) {
+            if(!TableWithNameExists(ifa.Name, ifa.ParentModel.Config.BLDatabase)) {
                 return false;
             }
 
@@ -59,8 +59,8 @@ namespace KDV.CeusDL.Utilities.MySql.BL {
         public List<string> ListDeletedInterfaceNames(BLModel model) {
             var tablesDB = FindAllBLAndDefTablesInDB(model);
             var tablesCEUSDL = model.Interfaces
-                                .Select(i => i.Name)
-                                .Union(model.Interfaces.Select(i => i.FormerName))
+                                .Select(i => i.Name.ToLower())
+                                .Union(model.Interfaces.Select(i => i.FormerName?.ToLower()))
                                 .ToList<string>();
 
             return tablesDB.Where(t => !tablesCEUSDL.Contains(t)).ToList<string>();
@@ -73,18 +73,18 @@ namespace KDV.CeusDL.Utilities.MySql.BL {
             AssureOpenConnection();
             using(var cmd = con.CreateCommand()) {
                 cmd.CommandText = $"select table_name from information_schema.tables ";
-                cmd.CommandText += "where table_catalog = @table_catalog ";
+                cmd.CommandText += "where table_schema = @table_catalog ";
                 cmd.CommandText += "and (table_name like @name_filter1 or table_name like @name_filter2) and table_type = 'BASE TABLE'";
 
                 cmd.Prepare();
 
                 cmd.Parameters.Add(new MySqlParameter("table_catalog", model.Config.BLDatabase));
-                cmd.Parameters.Add(new MySqlParameter("name_filter1", $"{model.Config.Prefix}_BL_%"));
-                cmd.Parameters.Add(new MySqlParameter("name_filter2", $"{model.Config.Prefix}_def_%"));
+                cmd.Parameters.Add(new MySqlParameter("name_filter1", $"{model.Config.Prefix}_BL_%".ToLower()));
+                cmd.Parameters.Add(new MySqlParameter("name_filter2", $"{model.Config.Prefix}_def_%".ToLower()));
 
                 using(var rdr = cmd.ExecuteReader()) {
                     while(rdr.Read()) {
-                        result.Add(rdr.GetString(0));
+                        result.Add(rdr.GetString(0).ToLower());
                     }
                 }
             }
@@ -94,7 +94,7 @@ namespace KDV.CeusDL.Utilities.MySql.BL {
         // Prüft, ob in der Datenbank noch Spalten vorhanden sind, die im ceusdl-Code
         // schon entfernt wurden.
         private bool HasRemovedColums(IBLInterface ifa) {
-            if(TableWithNameExists(ifa.Name)) {
+            if(TableWithNameExists(ifa.Name, ifa.ParentModel.Config.BLDatabase)) {
                 var dbCols = GetColumnNamesFromDb(ifa.Name);
                 var cdlCols = ifa.Attributes.Select(a => a.Name).ToList<string>();
                 foreach(var dbcol in dbCols) {
@@ -111,7 +111,7 @@ namespace KDV.CeusDL.Utilities.MySql.BL {
             AssureOpenConnection();
             using(var cmd = con.CreateCommand()) {
                 List<MySqlParameter> openParams = new List<MySqlParameter>();
-                cmd.CommandText =  "select 1 from information_schema.columns where table_name = @table_name and table_schema = 'dbo' ";
+                cmd.CommandText =  "select 1 from information_schema.columns where table_name = @table_name and table_schema = @database_name ";
                 cmd.CommandText += "and column_name = @column_name and data_type = @data_type ";
                 switch(attr.DataType) {
                     case CoreDataType.VARCHAR:
@@ -125,6 +125,7 @@ namespace KDV.CeusDL.Utilities.MySql.BL {
                         break;
                 }
                 cmd.Prepare();
+                cmd.Parameters.Add(new MySqlParameter("database_name", mysqlModel.Config.BLDatabase));
                 cmd.Parameters.Add(new MySqlParameter("table_name", attr.ParentInterface.Name));
                 cmd.Parameters.Add(new MySqlParameter("column_name", attr.Name));
                 cmd.Parameters.Add(new MySqlParameter("data_type", BLDataType.GetSqlDataType(attr)));
@@ -138,7 +139,7 @@ namespace KDV.CeusDL.Utilities.MySql.BL {
 
         #endregion complex operations
         #region simple operations
-        public bool TableWithNameExists(string tableName)
+        public bool TableWithNameExists(string tableName, string databaseName)
         {
             if (tableName == null)
             {
@@ -147,9 +148,10 @@ namespace KDV.CeusDL.Utilities.MySql.BL {
             AssureOpenConnection();
             using (var cmd = con.CreateCommand())
             {
-                cmd.CommandText = "select 1 from information_schema.tables where table_name = @table_name and table_schema = 'dbo'";
+                cmd.CommandText = "select 1 from information_schema.tables where table_name = @table_name and table_schema = @database_name";
                 cmd.Prepare();
                 cmd.Parameters.Add(new MySqlParameter("table_name", tableName));
+                cmd.Parameters.Add(new MySqlParameter("database_name", databaseName));
                 object result = cmd.ExecuteScalar();
                 return result != null;
             }
@@ -180,10 +182,11 @@ namespace KDV.CeusDL.Utilities.MySql.BL {
             }
             AssureOpenConnection();
             using(var cmd = con.CreateCommand()) {
-                cmd.CommandText = "select 1 from information_schema.columns where table_name = @table_name and table_schema = 'dbo' and column_name = @column_name";
+                cmd.CommandText = "select 1 from information_schema.columns where table_name = @table_name and table_schema = @database_name and column_name = @column_name";
                 cmd.Prepare();
                 cmd.Parameters.Add(new MySqlParameter("table_name", tableName));
                 cmd.Parameters.Add(new MySqlParameter("column_name", columnName));
+                cmd.Parameters.Add(new MySqlParameter("database_name", mysqlModel.Config.BLDatabase));
                 object result = cmd.ExecuteScalar();
                 return result != null;
             }            
@@ -195,7 +198,7 @@ namespace KDV.CeusDL.Utilities.MySql.BL {
             }
             AssureOpenConnection();
             using(var cmd = con.CreateCommand()) {
-                cmd.CommandText = "select count(*) from information_schema.CONSTRAINT_COLUMN_USAGE "
+                cmd.CommandText = "select count(*) from information_schema.KEY_COLUMN_USAGE "
                     +"where table_name = @table_name "
                     +"and constraint_name = @constraint_name "
                     +"and column_name in (";                
@@ -213,14 +216,14 @@ namespace KDV.CeusDL.Utilities.MySql.BL {
                     cmd.Parameters.Add(new MySqlParameter($"field{i}", fields[i]));
                 }
                 object result = cmd.ExecuteScalar();
-                return result != null && ((int)result) == fields.Count;
+                return result != null && ((long)result) == fields.Count;
             }
         }
 
         public bool TableRenamed(string name, string formerName) {
-            if(TableWithNameExists(name)) {
+            if(TableWithNameExists(name, mysqlModel.Config.BLDatabase)) {
                 return false;
-            } else if(TableWithNameExists(formerName)) {               
+            } else if(TableWithNameExists(formerName, mysqlModel.Config.BLDatabase)) {               
                 return true;
             } else {
                 return false;

@@ -40,6 +40,9 @@ namespace CeusDL.Generator.MsSql.Generator
                             cmd.ExecuteNonQuery();
                         } catch(Exception ex) {
                             Console.WriteLine("ERROR: "+ ex.Message);
+                            if(!script.Contains("alter table")) {
+                                Console.WriteLine($"SQL to ERROR: {script}");
+                            }
                         }
                     }
                 }
