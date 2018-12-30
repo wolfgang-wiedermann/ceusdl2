@@ -274,9 +274,9 @@ namespace CeusDL2
             // BT generieren
             CoreBTSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BT.DropBTGenerator(model), GENERATED_SQL));            
             CoreBTSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BT.CreateBTGenerator(model), GENERATED_SQL));
-            /* 
             ExecuteStep(new KDV.CeusDL.Generator.MySql.BT.LoadBTGenerator(model), GENERATED_SQL);
             ExecuteStep(new KDV.CeusDL.Generator.MySql.BT.GraphvizBTGenerator(model), GENERATED_GRAPHVIZ);
+            /* 
 
             // AL generieren (Starschema)
             if (options.GenerateStar)

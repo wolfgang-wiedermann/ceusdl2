@@ -83,7 +83,7 @@ namespace KDV.CeusDL.Generator.MySql.BT {
                     GenerateHistoryCondition(sb, attr, ifa);
                 }
             }   
-            sb.Append("\n"); 
+            sb.Append(";\n\n"); 
         }
 
         private void GenerateHistoryCondition(StringBuilder sb, RefBTAttribute attr, BTInterface ifa)
@@ -126,12 +126,12 @@ namespace KDV.CeusDL.Generator.MySql.BT {
 
         private void GenerateTruncate(StringBuilder sb, BTInterface ifa)
         {
-            sb.Append($"truncate table {ifa.FullName}\ngo\n\n");
+            sb.Append($"truncate table {ifa.FullName};\n\n");
         }
 
         private void CreateUsing(StringBuilder sb) {
             if(!string.IsNullOrEmpty(model.Config.BTDatabase)) {
-                sb.Append($"use {model.Config.BTDatabase}\n\n");
+                sb.Append($"use {model.Config.BTDatabase};\n\n");
             }
         }
     }
