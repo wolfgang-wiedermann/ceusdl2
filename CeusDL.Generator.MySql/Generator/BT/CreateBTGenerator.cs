@@ -37,7 +37,7 @@ namespace KDV.CeusDL.Generator.MySql.BT {
 
         private void CreateUsing(StringBuilder sb) {
             if(!string.IsNullOrEmpty(model.Config.BTDatabase)) {
-                sb.Append($"use {model.Config.BTDatabase}\n\n");
+                sb.Append($"use {model.Config.BTDatabase};\n\n");
             }
         }
         
@@ -67,7 +67,7 @@ namespace KDV.CeusDL.Generator.MySql.BT {
                 }
             }
 
-            sb.Append(")\n\n");
+            sb.Append(");\n\n");
         }
     }
 }
