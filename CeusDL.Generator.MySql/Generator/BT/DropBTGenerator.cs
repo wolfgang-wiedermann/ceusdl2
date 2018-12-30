@@ -37,15 +37,13 @@ namespace KDV.CeusDL.Generator.MySql.BT {
 
         private void CreateUsing(StringBuilder sb) {
             if(!string.IsNullOrEmpty(model.Config.BTDatabase)) {
-                sb.Append($"use {model.Config.BTDatabase}\n\n");
+                sb.Append($"use {model.Config.BTDatabase};\n\n");
             }
         }
         
         private void CreateDropTable(StringBuilder sb, BTInterface ifa)
         {
-            sb.Append($"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{ifa.Name}]') AND type in (N'U'))\n");
-            sb.Append($"drop table {ifa.FullName}\n");
-            sb.Append("go\n\n");
+            sb.Append($"drop table if exists {ifa.FullName};\n");
         }
     }
 }

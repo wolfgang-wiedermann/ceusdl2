@@ -95,7 +95,7 @@ namespace KDV.CeusDL.Model.MySql.BT {
                 if(!string.IsNullOrEmpty(ParentModel.Config.BTDatabase)) {
                     db = $"{ParentModel.Config.BTDatabase}.";
                 }
-                return $"{db}dbo.{this.Name}";
+                return $"{db}{this.Name}";
             }
         }
 
