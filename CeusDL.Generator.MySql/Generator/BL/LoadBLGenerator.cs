@@ -127,10 +127,10 @@ namespace KDV.CeusDL.Generator.MySql.BL {
             }
             sb.Append("'I' as T_Modifikation,\n".Indent(1));
             sb.Append($"cast('Cascaded for {reference.FullName}' as varchar(100)) as T_Bemerkung,\n".Indent(1));
-            sb.Append("SYSTEM_USER as T_Benutzer,\n".Indent(1));
+            sb.Append("CURRENT_USER() as T_Benutzer,\n".Indent(1));
             sb.Append("'H' as T_System,\n".Indent(1));
             sb.Append($"mv.{childIfa.HistoryAttribute.Name} as {parentIfa.HistoryAttribute.Name},\n".Indent(1));
-            sb.Append("GETDATE() as T_Erst_Dat,\nGETDATE() as T_Aend_Dat,\n".Indent(1));
+            sb.Append("now() as T_Erst_Dat,\now() as T_Aend_Dat,\n".Indent(1));
             sb.Append("t1.T_Ladelauf_NR\n".Indent(1));
             sb.Append($"from {parentIfa.FullName} as t1\n");
             sb.Append($"inner join missing_versions as mv\n");
@@ -209,16 +209,16 @@ namespace KDV.CeusDL.Generator.MySql.BL {
                             code += "'Insert bei Ladelauf'".Indent("    ");
                             break;
                         case "T_Benutzer":
-                            code += "SYSTEM_USER".Indent("    ");
+                            code += "CURRENT_USER()".Indent("    ");
                             break;
                         case "T_System":
                             code += "'SRC'".Indent("    ");
                             break;
                         case "T_Erst_Dat":
-                            code += "GETDATE()".Indent("    ");
+                            code += "now()".Indent("    ");
                             break;
                         case "T_Aend_Dat":
-                            code += "GETDATE()".Indent("    ");
+                            code += "now()".Indent("    ");
                             break;
                         case "T_Ladelauf_NR":
                             // TODO: Echte Ermittlung einer LadelaufNr einbauen:
@@ -234,7 +234,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
                     code += ", \n";
                 }
             }
-            code += $"\nfrom {ifa.GetILInterface().FullName}\n\n";
+            code += $"\nfrom {ifa.GetILInterface().FullName};\n\n";
             return code;
         }
 
@@ -242,7 +242,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
             string code = $"-- Löschen der neu zu ladenden Inhalte von {ifa.FullName}\n";
             code += $"delete from {ifa.FullName} \n";                        
             code += GenerateFactRelevantTimeSelector(ifa);
-            code += "\n";
+            code += ";\n";
             return code;
         }
 
@@ -276,13 +276,12 @@ namespace KDV.CeusDL.Generator.MySql.BL {
 
             StringBuilder sb = new StringBuilder();
             sb.Append($"-- Update for non historized table: {ifa.FullName}\n");
-            sb.Append("update t set\n");            
+            sb.Append($"update {ifa.FullName} t\ninner join {ifa.FullViewName} v\n");
+            sb.Append($"on t.{idAttribute.Name} = v.{idAttribute.Name}\n    and v.T_Modifikation = 'U'\nset ");            
             foreach(var attr in ifa.UpdateCheckAttributes) {
                 sb.Append($"t.{attr.Name} = v.{attr.Name},\n".Indent("    "));
             }
-            sb.Append("t.T_Modifikation = 'U',\nt.T_Aend_Dat = GETDATE(),\nt.T_Benutzer = SYSTEM_USER\n".Indent("    "));
-            sb.Append($"from {ifa.FullName} t\ninner join {ifa.FullViewName} v\n");
-            sb.Append($"on t.{idAttribute.Name} = v.{idAttribute.Name}\n    and v.T_Modifikation = 'U'\n\n");
+            sb.Append("t.T_Modifikation = 'U',\nt.T_Aend_Dat = now(),\nt.T_Benutzer = CURRENT_USER();\n\n".Indent("    "));
             return sb.ToString();
         }
 
@@ -306,7 +305,9 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         ///
         private void GenerateInTimeUpdateForDimTableWithHistory(IBLInterface ifa, StringBuilder sb) {
             var idAttribute = ifa.Attributes.Where(a => a.IsIdentity).First();
-            sb.Append("update t\n");
+            sb.Append($"update {ifa.FullName} t\n");
+            sb.Append($"inner join {ifa.FullViewName} v\n");
+            sb.Append($"on t.{idAttribute.Name} = v.{idAttribute.Name} \nand v.T_Modifikation = 'U'\n".Indent("    "));
             sb.Append("set\n");
             foreach(var attr in ifa.UpdateCheckAttributes) {
                 sb.Append($"t.{attr.Name} = v.{attr.Name}".Indent("    "));
@@ -315,9 +316,6 @@ namespace KDV.CeusDL.Generator.MySql.BL {
                 }
                 sb.Append("\n");
             }
-            sb.Append($"from {ifa.FullName} t\n");
-            sb.Append($"inner join {ifa.FullViewName} v\n");
-            sb.Append($"on t.{idAttribute.Name} = v.{idAttribute.Name} \nand v.T_Modifikation = 'U'\n".Indent("    "));
             sb.Append("where exists (\n");
 
             sb.Append($"select t1.{idAttribute.Name}\nfrom {ifa.FullName} as t1\n".Indent("    "));
@@ -327,7 +325,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
             }
             sb.Append($"t1.{ifa.HistoryAttribute.Name} = dbo.GetCurrentTimeForHistory()\n");
 
-            sb.Append(")\n");
+            sb.Append(");\n\n");
         }
 
         ///
@@ -341,10 +339,11 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         private void GeneratePastTimeUpdateForDimTableWithHistory(IBLInterface ifa, StringBuilder sb) {
             var idAttribute = ifa.Attributes.Where(a => a.IsIdentity).First();            
             sb.Append($"-- Update historized table: {ifa.FullName}\n");
-            sb.Append("update t \nset t.T_Gueltig_Bis_Dat = dbo.GetCurrentTimeForHistory()\n");
-            sb.Append($"from {ifa.FullName} t\n");
+            sb.Append($"update {ifa.FullName} as t\n");
             sb.Append($"inner join {ifa.FullViewName} v\n");
-            sb.Append($"on t.{idAttribute.Name} = v.{idAttribute.Name} \nand v.T_Modifikation = 'U'\n\n".Indent("    "));
+            sb.Append($"on t.{idAttribute.Name} = v.{idAttribute.Name} \nand v.T_Modifikation = 'U'\n".Indent("    "));
+            sb.Append($"set t.T_Gueltig_Bis_Dat = dbo.GetCurrentTimeForHistory();\n\n");
+            
         }
 
         // 
@@ -360,12 +359,12 @@ namespace KDV.CeusDL.Generator.MySql.BL {
             }
 
             var upperFieldList = fieldList + "T_Ladelauf_NR, \nT_Benutzer, \nT_System, \nT_Erst_Dat, \nT_Aend_Dat";
-            var lowerFieldList = fieldList + "0, \nSYSTEM_USER, \n'H', \nGETDATE(), \nGETDATE()";
+            var lowerFieldList = fieldList + "0, \nCURRENT_USER(), \n'H', \nnow(), \nnow()";
 
             string code = $"-- Insert {ifa.FullName}\n";
             code += $"insert into {ifa.FullName} (\n{upperFieldList.Indent("    ")}\n)\n";
             code += $"select \n{lowerFieldList.Indent("    ")} \nfrom {ifa.FullViewName}\n";
-            code += "where T_Modifikation = 'I'\n";
+            code += "where T_Modifikation = 'I';\n";
             code += "\n";
             return code;
         }
