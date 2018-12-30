@@ -28,6 +28,7 @@ namespace KDV.CeusDL.Generator.MySql.AL.Star {
 
         private string GenerateCreateTables() {
             StringBuilder sb = new StringBuilder();
+            GenerateCreateDatabase(sb);
             GenerateUseStatement(sb);
             // Löschen
             foreach(var ifa in model.FactInterfaces) {
@@ -87,7 +88,7 @@ namespace KDV.CeusDL.Generator.MySql.AL.Star {
                 sb.Append($"left join {ifaRef.ReferencedBTInterface.FullName} as {ifaRef.JoinAlias}\n");
                 sb.Append($"on {ifaRef.JoinAlias}.{ifaRef.ReferencedRefColumnName} = {ifaRef.ParentJoinAlias}.{ifaRef.ParentRefColumnName}\n".Indent(1));
             }
-            sb.Append("\n");            
+            sb.Append(";\n\n");            
         }
 
         private void GenerateLoadFactInterface(StringBuilder sb, FactALInterface ifa)
@@ -118,7 +119,13 @@ namespace KDV.CeusDL.Generator.MySql.AL.Star {
                 sb.Append($"inner join {fref.BTInterface.FullName} as {fref.JoinAlias}\n".Indent(1));
                 sb.Append($"on t0.{fref.RefColumnName} = {fref.JoinAlias}.{fref.RefColumnName}".Indent(1));
             }
-            sb.Append("\n\n");
+            sb.Append(";\n\n");
+        }
+
+        private void GenerateCreateDatabase(StringBuilder sb) {
+            if(!string.IsNullOrEmpty(model.Config.ALDatabase)) {
+                sb.Append($"create database if not exists {model.Config.ALDatabase};\n\n");
+            }
         }
 
         private void GenerateUseStatement(StringBuilder sb) {
