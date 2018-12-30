@@ -28,6 +28,7 @@ namespace KDV.CeusDL.Generator.MySql.BT {
         private string GenerateCreateTables() {
             StringBuilder sb = new StringBuilder();
             sb.Append("--\n-- Tabellen für BaseLayer Transformation (BT) anlegen\n--\n\n");
+            CreateDatabase(sb);
             CreateUsing(sb);
             foreach(var ifa in model.Interfaces) {
                 CreateCreateTable(sb, ifa);
@@ -38,6 +39,12 @@ namespace KDV.CeusDL.Generator.MySql.BT {
         private void CreateUsing(StringBuilder sb) {
             if(!string.IsNullOrEmpty(model.Config.BTDatabase)) {
                 sb.Append($"use {model.Config.BTDatabase};\n\n");
+            }
+        }
+
+        private void CreateDatabase(StringBuilder sb) {
+            if(!string.IsNullOrEmpty(model.Config.BTDatabase)) {
+                sb.Append($"create database if not exists {model.Config.BTDatabase};\n\n");
             }
         }
         

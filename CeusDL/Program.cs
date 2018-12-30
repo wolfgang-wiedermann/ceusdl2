@@ -276,17 +276,17 @@ namespace CeusDL2
             CoreBTSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BT.CreateBTGenerator(model), GENERATED_SQL));
             ExecuteStep(new KDV.CeusDL.Generator.MySql.BT.LoadBTGenerator(model), GENERATED_SQL);
             ExecuteStep(new KDV.CeusDL.Generator.MySql.BT.GraphvizBTGenerator(model), GENERATED_GRAPHVIZ);
-            /* 
+             
 
             // AL generieren (Starschema)
             if (options.GenerateStar)
             {
                 StarSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.DropStarALGenerator(model), GENERATED_SQL));
-                StarSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.CreateStarALGenerator(model), GENERATED_SQL));
+                //StarSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.CreateStarALGenerator(model), GENERATED_SQL));
                 ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.LoadStarALGenerator(model), GENERATED_SQL);
                 ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.CopyStarALGenerator(model), GENERATED_SQL);
             }
-
+            /* 
             // AL generieren (Snowflake-Schema)
             if (options.GenerateSnowflake)
             {

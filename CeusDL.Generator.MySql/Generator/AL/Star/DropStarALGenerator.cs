@@ -39,16 +39,12 @@ namespace KDV.CeusDL.Generator.MySql.AL.Star {
 
         private void GenerateFactInterface(StringBuilder sb, FactALInterface ifa)
         {
-            sb.Append($"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{ifa.Name}]') AND type in (N'U'))\n");
-            sb.Append($"drop table {ifa.Name}\n".Indent(1));
-            sb.Append("go\n\n");
+            sb.Append($"drop table if exists {ifa.Name};\n");
         }
 
         private void GenerateDimensionInterface(StringBuilder sb, StarDimensionTable ifa)
         {
-            sb.Append($"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{ifa.Name}]') AND type in (N'U'))\n");
-            sb.Append($"drop table {ifa.Name}\n".Indent(1));
-            sb.Append("go\n\n");
+            sb.Append($"drop table if exists {ifa.Name};\n");
         }
 
         private void GenerateUseStatement(StringBuilder sb) {
