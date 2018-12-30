@@ -282,7 +282,7 @@ namespace CeusDL2
             if (options.GenerateStar)
             {
                 StarSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.DropStarALGenerator(model), GENERATED_SQL));
-                //StarSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.CreateStarALGenerator(model), GENERATED_SQL));
+                StarSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.CreateStarALGenerator(model), GENERATED_SQL));
                 ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.LoadStarALGenerator(model), GENERATED_SQL);
                 ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.CopyStarALGenerator(model), GENERATED_SQL);
             }
