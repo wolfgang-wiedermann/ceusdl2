@@ -50,7 +50,7 @@ namespace KDV.CeusDL.Generator.BL {
                 attributeList += attr.Name;
                 if(attr.IsIdentity) {
                     valuesList += "-1";
-                } else if(attr.IsPartOfUniqueKey) { // KNZ und ggf. Mandant_KNZ
+                } else if(attr.IsPartOfUniqueKey || attr is RefBLAttribute) { // KNZ und ggf. Mandant_KNZ
                     valuesList += "'-1'";
                 } else if(attr.DataType == CoreDataType.VARCHAR) { // Alle anderen textuellen Felder
                     valuesList += "'UNBEKANNT'";
