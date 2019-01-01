@@ -1,0 +1,46 @@
+config {
+     prefix="AGG";
+     il_database="AGG_InterfaceLayer";
+     bl_database="AGG_BaseLayer";
+     bt_database="AGG_BaseLayer";
+     al_database="AGG_AnalyticLayer";          
+}
+
+interface Day : TemporalTable(finest_time_attribute="true") { 
+    base SID:varchar(len="50", primary_key="true");
+    base DESC:varchar(len="100");    
+    ref Term.SID;
+}
+
+interface Term : TemporalTable {
+    base SID:varchar(len="50", primary_key="true");
+    base DESC:varchar(len="100"); 
+}
+
+interface Gender : DimTable {
+    base SID:varchar(len="50", primary_key="true");
+    base DESC:varchar(len="100");    
+}
+
+interface Students : FactTable {
+    base Matrikelnummer:varchar(len="12", primary_key="true");
+    ref Day.SID(primary_key="true");
+    ref Gender.SID;
+    fact Number_F:int;    
+}
+
+/*
+* New Idea: Aggregation as an additional language element (should support full SQL standard syntax based
+*           on the ceusdl defined objects)
+*/
+aggregation StudentsByTerm {
+    select 
+        d.Term.SID,                   // automatically recognized as RefAttribute
+        s.Gender.SID,                 // automatically recognized as RefAttribute
+        sum(s.Number_F) as Number_F   // automatically recognized as Fact
+    from Students as s                // Source Interface for the Data used in Aggregation
+    inner join Day as d
+      on s.Day.SID = d.SID            // Die join-Bedingung könnte auch automatisch aus dem Modell abgeleitet werden, wäre
+                                      // also verzichtbar.???.
+    group by d.Term.SID, s.Gender.SID // The group by Items will automatically be the primary key of the aggregation
+}

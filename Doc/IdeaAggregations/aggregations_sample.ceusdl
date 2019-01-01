@@ -1,0 +1,47 @@
+config {
+     prefix="AGG";
+     il_database="AGG_InterfaceLayer";
+     bl_database="AGG_BaseLayer";
+     bt_database="AGG_BaseLayer";
+     al_database="AGG_AnalyticLayer";          
+}
+
+interface Term : TemporalTable { 
+    base SID:varchar(len="50", primary_key="true");
+    base DESC:varchar(len="100");    
+}
+
+interface Gender : DimTable {
+    base SID:varchar(len="50", primary_key="true");
+    base DESC:varchar(len="100");    
+}
+
+interface Students : FactTable {
+    base Matrikelnummer:varchar(len="12", primary_key="true");
+    ref Term.SID(primary_key="true");
+    ref Gender.SID;
+    fact Number_F:int;    
+}
+
+/*
+* New Idea: Aggregation as an additional language element (should support full SQL standard syntax based
+*           on the ceusdl defined objects)
+*/
+aggregation StudentsByTerm {
+    select 
+        Term.SID,                   // automatically recognized as RefAttribute
+        Gender.SID,                 // automatically recognized as RefAttribute
+        sum(Number_F) as Number_F   // automatically recognized as Fact
+    from Students                   // Source Interface for the Data used in Aggregation
+    group by Term.SID, Gender.SID   // The group by Items will automatically be the primary key of the aggregation
+}
+
+/*
+Überlegungen:
+-------------
+
+Ist das dann am Ende flexibel genug. Insbesondere im Bereich der Ref-Attribute die auf
+Dimensionen verweisen könnte der Ansatz noch etwas unflexibel sein??? Ich kann die Werte 
+von ref-Attributen in der Aggregation nicht dynamisch berechnen??? (es sei denn,
+ich löse sie hierarchisch über einen Join mit den zugehörigen Dim-Interfaces auf...)
+*/
