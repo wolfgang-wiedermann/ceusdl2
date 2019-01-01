@@ -1,0 +1,55 @@
+/*
+Dieses Beispiel lehnt sich an die für eine Lambdaarchitektur empfohlene
+Art der Speicherung von Rohdaten an (im FriendLinkEvent).
+Die Abbildung der Accounts und ihre Gültigkeit könnte natürlich auch ereignisbasiert sein...
+*/
+config {
+     prefix="AGG";
+     il_database="AGG_InterfaceLayer";
+     bl_database="AGG_BaseLayer";
+     bt_database="AGG_BaseLayer";
+     al_database="AGG_AnalyticLayer";          
+}
+
+interface Timestamp:TemporalTable {
+    base SID:datetime(primary_key="true");
+    base DESC:varchar(len="50");
+}
+
+interface Account:DimTable {
+    base Username:varchar(len="200", primary_key="true");
+}
+
+interface EventType:DefTable {
+    base DESC:varchar(len="10"); // EventTypes: 'add' and 'remove'
+}
+
+interface FriendLinkEvent:FactTable(immutable="true") {
+    ref Account.Username(primary_key="true") as Adder;
+    ref Account.Username(primary_key="true") as Added;
+    ref Timestamp.SID(primary_key="true");
+    ref EventType.DESC;
+}
+
+/*
+Aggregation die alle aktuell gültigen Freundschaftsbeziehungen ermittelt
+*/
+aggregation CurrentFriends {
+    select last_add.Adder.Username, last_add.Added.Username, 1 as IsFriend
+    from (
+        select Adder.Username, Added.Username, max(Timestamp.SID), EventType.DESC
+        from FriendLinkEvent
+        where EventType.DESC = 'add'
+        group by Adder.Username, Added.Username, EventType.DESC
+    ) as last_add
+    left join (
+        select Adder.Username, Added.Username, max(Timestamp.SID), EventType.DESC
+        from FriendLinkEvent
+        where EventType.DESC = 'remove'
+        group by Adder.Username, Added.Username, EventType.DESC
+    ) as last_remove
+    on last_add.Adder.Username = last_remove.Adder.Username
+        and last_add.Added.Username = last_remove.Added.Username
+        and last_add.Timestamp.SID > last_remove.Timestamp.SID
+    where last_remove.Timestamp.SID is null
+}
