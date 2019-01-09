@@ -8,19 +8,24 @@ namespace KDV.CeusDL.Generator.BL {
     public class CreateBLGenerator : IGenerator
     {
         private BLModel model;
+        private bool generateConstraints;
 
-        public CreateBLGenerator(CoreModel model) {
+        public CreateBLGenerator(CoreModel model, bool generateConstraints) {
+            this.generateConstraints = generateConstraints;
             this.model = new BLModel(model);
         }
 
-        public CreateBLGenerator(BLModel model) {
+        public CreateBLGenerator(BLModel model, bool generateConstraints) {
+            this.generateConstraints = generateConstraints;
             this.model = model;
         }
 
         public List<GeneratorResult> GenerateCode() {
             var result = new List<GeneratorResult>();
             result.Add(new GeneratorResult("BL_Create.sql", GenerateCreateTables()));
-            result.Add(new GeneratorResult("BL_Create_FKs.sql", GenerateAllForeignKeyConstraints()));
+            if(generateConstraints) {
+                result.Add(new GeneratorResult("BL_Create_FKs.sql", GenerateAllForeignKeyConstraints()));
+            }
             return result;
         }
 

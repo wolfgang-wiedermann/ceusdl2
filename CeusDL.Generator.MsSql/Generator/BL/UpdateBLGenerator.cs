@@ -18,13 +18,16 @@ namespace KDV.CeusDL.Generator.BL {
         public List<IBLInterface> ModifiedTables { get; private set; }
         public List<string> DeletedTables { get; private set; }
 
+        public bool WithGenerateConstraints { get; set; }
+
         ///
         /// @param model => CoreModel
         /// @param conStr => Connectionstring zu einer BaseLayer-Datenbank
         ///
-        public UpdateBLGenerator(CoreModel model, string conStr) {
+        public UpdateBLGenerator(CoreModel model, string conStr, bool generateConstraints) {
+            this.WithGenerateConstraints = generateConstraints;
             this.model = new BLModel(model);
-            this.createGenerator = new CreateBLGenerator(this.model);            
+            this.createGenerator = new CreateBLGenerator(this.model, this.WithGenerateConstraints);            
             this.analyzer = new ModificationAnalyzer(this.model, GetConnection(conStr));            
             // Hier noch keinen Analysecode aufrufen, der gehört nach GenerateCode
         }
@@ -33,9 +36,10 @@ namespace KDV.CeusDL.Generator.BL {
         /// @param model => BaseLayer Model
         /// @param conStr => Connectionstring zu einer BaseLayer-Datenbank
         ///
-        public UpdateBLGenerator(BLModel model, string conStr) {
+        public UpdateBLGenerator(BLModel model, string conStr, bool generateConstraints) {
+            this.WithGenerateConstraints = generateConstraints;
             this.model = model;
-            this.createGenerator = new CreateBLGenerator(this.model);
+            this.createGenerator = new CreateBLGenerator(this.model, this.WithGenerateConstraints);
             this.analyzer = new ModificationAnalyzer(this.model, GetConnection(conStr));
             // Hier noch keinen Analysecode aufrufen, der gehört nach GenerateCode            
         }
@@ -54,15 +58,20 @@ namespace KDV.CeusDL.Generator.BL {
             // 0. Use-Direktive generieren
             sb.Append(GenerateUse());
             sb.Append(GetBeginTransaction());
+            // 0. Constraints entfernen
+            if(WithGenerateConstraints) {
+                // TODO: FKs müssten vor den Änderungen an den Tabellen für die ganze BL gedroppt werden!
+            }
             // 1. Tabellen, die nicht mehr als ceusdl Interface definiert sind löschen
             sb.Append(GenerateDeleteObsoleteTables());
             // 2. Neue Tabellen hinzufügen
             sb.Append(GenerateCreateNewTables());
             // 3. Veränderte Tabellen anpassen: select into -> drop -> create -> insert into select
             sb.Append(GenerateModifyTables());
-            // 4. Constraints anlegen (FKs sind derzeit auskommentiert!!!)            
-            // TODO: FKs müssten vor den Änderungen an den Tabellen für die ganze BL gedroppt werden!
-            sb.Append(GenerateConstraints());
+            // 4. Constraints anlegen (FKs sind derzeit auskommentiert!!!)                        
+            if(WithGenerateConstraints) {
+                sb.Append(GenerateConstraints());
+            }
             sb.Append(GetCommitTransaction());
             // 4. Alle BL-Views droppen
             sb.Append(GenerateDropViews());

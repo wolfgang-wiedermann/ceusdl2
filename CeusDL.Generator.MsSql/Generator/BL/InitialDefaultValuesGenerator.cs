@@ -53,7 +53,7 @@ namespace KDV.CeusDL.Generator.BL {
                 } else if(attr.IsPartOfUniqueKey || attr is RefBLAttribute) { // KNZ und ggf. Mandant_KNZ
                     valuesList += "'-1'";
                 } else if(attr.DataType == CoreDataType.VARCHAR) { // Alle anderen textuellen Felder
-                    valuesList += "'UNBEKANNT'";
+                    valuesList += $"'{"UNBEKANNT".Shorten(attr.Length)}'";
                 } else if(attr.DataType == CoreDataType.DATE || attr.DataType == CoreDataType.DATETIME) { // Datumsfelder auf aktuelles Datum
                     valuesList += "GETDATE()";
                 } else if(attr.Name == "T_Ladelauf_NR") { // Ladelauf 0

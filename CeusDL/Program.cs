@@ -55,6 +55,7 @@ namespace CeusDL2
                 options.GenerateMsSql = true;
                 options.ExecuteReplace = false;
                 options.ExecuteUpdate = true;
+                options.GenerateConstraints = false;
 
                 if(IsUnix) {
                     ceusdlFileName = @"/Users/wiw39784/develop/dotnet/ceusdl2/Test/Data/ext_main.ceusdl";
@@ -92,6 +93,7 @@ namespace CeusDL2
                 var snowflakeOpt = cla.Option("--snowflake", "Generate analytical layer as snowflake scheme", CommandOptionType.NoValue);
                 var executeUpdate = cla.Option("--update", "Update Baselayer, Replace everything else", CommandOptionType.NoValue);
                 var executeReplace = cla.Option("--replace", "Replace all Layers (deletes all Data)", CommandOptionType.NoValue);
+                var generateConstraints = cla.Option("--generate-constraints", "Generate SQL-Constraints for BaseLayer", CommandOptionType.NoValue);
                 var help = cla.HelpOption("-? | --help");
 
                 cla.OnExecute(() => {
@@ -115,6 +117,7 @@ namespace CeusDL2
                     }
                     options.DbConnectionString = conStr;
 
+                    options.GenerateConstraints = generateConstraints.HasValue();
                     options.GenerateStar = starOpt.HasValue();
                     options.GenerateSnowflake = snowflakeOpt.HasValue();
                     options.GenerateMySql = mysqlOpt.HasValue() && (!mssqlOpt.HasValue());
@@ -309,14 +312,14 @@ namespace CeusDL2
 
             // BL generieren
             ReplaceSQLStatements.AddRange(ExecuteStep(new DropBLGenerator(model), GENERATED_SQL));
-            ReplaceSQLStatements.AddRange(ExecuteStep(new CreateBLGenerator(model), GENERATED_SQL));
+            ReplaceSQLStatements.AddRange(ExecuteStep(new CreateBLGenerator(model, options.GenerateConstraints), GENERATED_SQL));
             ReplaceSQLStatements.AddRange(ExecuteStep(new InitialDefaultValuesGenerator(model), GENERATED_SQL));
             ExecuteStep(new GraphvizBLGenerator(model), GENERATED_GRAPHVIZ);
             ExecuteStep(new LoadBLGenerator(model), GENERATED_SQL);
             if (!string.IsNullOrEmpty(conStr))
             {
                 // Aktualisierung nur generieren, wenn eine Verbindung zur Datenbank angegeben wurde.
-                UpdateSQLStatements.AddRange(ExecuteStep(new UpdateBLGenerator(model, conStr), GENERATED_SQL));
+                UpdateSQLStatements.AddRange(ExecuteStep(new UpdateBLGenerator(model, conStr, options.GenerateConstraints), GENERATED_SQL));
             }
             ExecuteStep(new CreateDefDataGenerator(model), GENERATED_PYCODE);
 
@@ -431,7 +434,9 @@ namespace CeusDL2
             {
                 exec.ExecuteSQL(stm.FileName);
             }
-            exec.ExecuteSQL("BL_Create_FKs.sql");
+            if(options.GenerateConstraints) {
+                exec.ExecuteSQL("BL_Create_FKs.sql");
+            }
             foreach (var stm in CoreBTSQLStatements)
             {
                 exec.ExecuteSQL(stm.FileName);
