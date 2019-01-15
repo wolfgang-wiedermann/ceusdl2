@@ -22,9 +22,9 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         /// @param model => CoreModel
         /// @param conStr => Connectionstring zu einer BaseLayer-Datenbank
         ///
-        public UpdateBLGenerator(CoreModel model, string conStr) {
+        public UpdateBLGenerator(CoreModel model, string conStr, bool generateConstraints) {
             this.model = new BLModel(model);
-            this.createGenerator = new CreateBLGenerator(this.model);            
+            this.createGenerator = new CreateBLGenerator(this.model, generateConstraints);            
             this.analyzer = new MySqlModificationAnalyzer(this.model, GetConnection(conStr));            
             // Hier noch keinen Analysecode aufrufen, der gehört nach GenerateCode
         }
@@ -33,9 +33,9 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         /// @param model => BaseLayer Model
         /// @param conStr => Connectionstring zu einer BaseLayer-Datenbank
         ///
-        public UpdateBLGenerator(BLModel model, string conStr) {
+        public UpdateBLGenerator(BLModel model, string conStr, bool generateConstraints) {
             this.model = model;
-            this.createGenerator = new CreateBLGenerator(this.model);
+            this.createGenerator = new CreateBLGenerator(this.model, generateConstraints);
             this.analyzer = new MySqlModificationAnalyzer(this.model, GetConnection(conStr));
             // Hier noch keinen Analysecode aufrufen, der gehört nach GenerateCode            
         }

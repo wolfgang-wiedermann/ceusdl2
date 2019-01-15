@@ -263,14 +263,14 @@ namespace CeusDL2
 
             // BL generieren
             ReplaceSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.DropBLGenerator(model), GENERATED_SQL));
-            ReplaceSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.CreateBLGenerator(model), GENERATED_SQL));
+            ReplaceSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.CreateBLGenerator(model, options.GenerateConstraints), GENERATED_SQL));
             ReplaceSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.InitialDefaultValuesGenerator(model), GENERATED_SQL));
             ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.GraphvizBLGenerator(model), GENERATED_GRAPHVIZ);
             ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.LoadBLGenerator(model), GENERATED_SQL);
             if (!string.IsNullOrEmpty(conStr))
             {
                 // Aktualisierung nur generieren, wenn eine Verbindung zur Datenbank angegeben wurde.
-                UpdateSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.UpdateBLGenerator(model, conStr), GENERATED_SQL));
+                UpdateSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.UpdateBLGenerator(model, conStr, options.GenerateConstraints), GENERATED_SQL));
             }
             ExecuteStep(new KDV.CeusDL.Generator.MySql.BL.CreateDefDataGenerator(model), GENERATED_PYCODE);
  
