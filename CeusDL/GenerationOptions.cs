@@ -5,6 +5,7 @@ public class GenerationOptions {
         GenerateSnowflake = false;
         DbConnectionString = null;
         ExecuteUpdate = false;
+        ExecuteUpdateWithReload = false;
         ExecuteReplace = false;
         GenerateMsSql = true;
         GenerateMySql = false;
@@ -16,6 +17,7 @@ public class GenerationOptions {
     public bool GenerateConstraints { get; set; }
     public bool GenerateMsSql { get; set; }
     public bool ExecuteUpdate { get; set; }
+    public bool ExecuteUpdateWithReload { get; set; }
     public bool ExecuteReplace { get; set; }
     public string DbConnectionString { get; set; }
 }
