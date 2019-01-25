@@ -55,6 +55,7 @@ namespace CeusDL2
                 options.GenerateMsSql = true;
                 options.ExecuteReplace = false;
                 options.ExecuteUpdate = true;
+                options.ExecuteUpdateWithReload = true;
                 options.GenerateConstraints = false;
 
                 if(IsUnix) {
@@ -64,6 +65,7 @@ namespace CeusDL2
                     options.GenerateMsSql = false;
                     options.ExecuteReplace = true;
                     options.ExecuteUpdate = false;
+                    options.ExecuteUpdateWithReload = false;
                 }
 
                 string rootFolder = "."; 
@@ -92,6 +94,7 @@ namespace CeusDL2
                 var starOpt = cla.Option("--star", "Generate analytical layer as star scheme", CommandOptionType.NoValue);
                 var snowflakeOpt = cla.Option("--snowflake", "Generate analytical layer as snowflake scheme", CommandOptionType.NoValue);
                 var executeUpdate = cla.Option("--update", "Update Baselayer, Replace everything else", CommandOptionType.NoValue);
+                var executeUpdateWithReload = cla.Option("--update-with-reload", "Update BaseLayer like --update and reload data to bt and al", CommandOptionType.NoValue);
                 var executeReplace = cla.Option("--replace", "Replace all Layers (deletes all Data)", CommandOptionType.NoValue);
                 var generateConstraints = cla.Option("--generate-constraints", "Generate SQL-Constraints for BaseLayer", CommandOptionType.NoValue);
                 var help = cla.HelpOption("-? | --help");
@@ -122,7 +125,8 @@ namespace CeusDL2
                     options.GenerateSnowflake = snowflakeOpt.HasValue();
                     options.GenerateMySql = mysqlOpt.HasValue() && (!mssqlOpt.HasValue());
                     options.GenerateMsSql = (!mysqlOpt.HasValue()) || mssqlOpt.HasValue();
-                    options.ExecuteUpdate = executeUpdate.HasValue();
+                    options.ExecuteUpdate = executeUpdate.HasValue() || executeUpdateWithReload.HasValue();
+                    options.ExecuteUpdateWithReload = executeUpdateWithReload.HasValue();
                     options.ExecuteReplace = executeReplace.HasValue();
 
                     int result = CheckOptions(options);
@@ -326,7 +330,11 @@ namespace CeusDL2
             // BT generieren
             CoreBTSQLStatements.AddRange(ExecuteStep(new DropBTGenerator(model), GENERATED_SQL));
             CoreBTSQLStatements.AddRange(ExecuteStep(new CreateBTGenerator(model), GENERATED_SQL));
-            ExecuteStep(new LoadBTGenerator(model), GENERATED_SQL);
+            if(options.ExecuteUpdateWithReload) {
+                CoreBTSQLStatements.AddRange(ExecuteStep(new LoadBTGenerator(model), GENERATED_SQL));
+            } else {
+                ExecuteStep(new LoadBTGenerator(model), GENERATED_SQL);
+            }
             ExecuteStep(new GraphvizBTGenerator(model), GENERATED_GRAPHVIZ);
 
             // AL generieren (Starschema)
@@ -334,7 +342,11 @@ namespace CeusDL2
             {
                 StarSQLStatements.AddRange(ExecuteStep(new DropStarALGenerator(model), GENERATED_SQL));
                 StarSQLStatements.AddRange(ExecuteStep(new CreateStarALGenerator(model), GENERATED_SQL));
-                ExecuteStep(new LoadStarALGenerator(model), GENERATED_SQL);
+                if(options.ExecuteUpdateWithReload) {
+                    StarSQLStatements.AddRange(ExecuteStep(new LoadStarALGenerator(model), GENERATED_SQL));
+                } else {
+                    ExecuteStep(new LoadStarALGenerator(model), GENERATED_SQL);
+                }
                 ExecuteStep(new CopyStarALGenerator(model), GENERATED_SQL);
             }
 
@@ -343,7 +355,11 @@ namespace CeusDL2
             {
                 SnowflakeSQLStatements.AddRange(ExecuteStep(new DropSnowflakeALGenerator(model), GENERATED_SQL));
                 SnowflakeSQLStatements.AddRange(ExecuteStep(new CreateSnowflakeALGenerator(model), GENERATED_SQL));
-                ExecuteStep(new LoadSnowflakeALGenerator(model), GENERATED_SQL);
+                if(options.ExecuteUpdateWithReload) {
+                    SnowflakeSQLStatements.AddRange(ExecuteStep(new LoadSnowflakeALGenerator(model), GENERATED_SQL));
+                } else {
+                    ExecuteStep(new LoadSnowflakeALGenerator(model), GENERATED_SQL);
+                }
             }
         }
 

@@ -39,7 +39,7 @@ namespace KDV.CeusDL.Generator.AL.Star {
 
         private void GenerateFactInterface(StringBuilder sb, FactALInterface ifa)
         {
-            sb.Append($"set identity_insert {ifa.Model.Config.ALDatabase}.dbo.{ifa.Name} on\n");
+            sb.Append($"truncate table {ifa.Model.Config.ALDatabase}.dbo.{ifa.Name} \n");
             sb.Append($"insert into {ifa.Model.Config.ALDatabase}.dbo.{ifa.Name} (\n");
             foreach (var a in ifa.Attributes)
             {
@@ -60,14 +60,13 @@ namespace KDV.CeusDL.Generator.AL.Star {
                 }
                 sb.Append("\n");
             }
-            sb.Append($"from [{ifa.Model.Config.EtlDbServer}].{ifa.Model.Config.ALDatabase}.dbo.{ifa.Name};\n");
-            sb.Append($"set identity_insert {ifa.Model.Config.ALDatabase}.dbo.{ifa.Name} off\n");
+            sb.Append($"from [{ifa.Model.Config.EtlDbServer}].{ifa.Model.Config.ALDatabase}.dbo.{ifa.Name};\n");            
             sb.Append("\n");
         }
 
         private void GenerateDimensionInterface(StringBuilder sb, StarDimensionTable ifa)
         {
-            sb.Append($"set identity_insert {ifa.Config.ALDatabase}.dbo.{ifa.Name} on\n");
+            sb.Append($"truncate table {ifa.Config.ALDatabase}.dbo.{ifa.Name} \n");
             sb.Append($"insert into {ifa.Config.ALDatabase}.dbo.{ifa.Name} (\n");
             foreach (var a in ifa.Attributes)
             {
@@ -88,8 +87,7 @@ namespace KDV.CeusDL.Generator.AL.Star {
                 }
                 sb.Append("\n");
             }
-            sb.Append($"from [{ifa.Config.EtlDbServer}].{ifa.Config.ALDatabase}.dbo.{ifa.Name};\n");
-            sb.Append($"set identity_insert {ifa.Config.ALDatabase}.dbo.{ifa.Name} off\n");
+            sb.Append($"from [{ifa.Config.EtlDbServer}].{ifa.Config.ALDatabase}.dbo.{ifa.Name};\n");            
             sb.Append("\n");
         }
 
