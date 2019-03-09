@@ -131,8 +131,9 @@ namespace KDV.CeusDL.Generator.MySql.BT {
 
         private void CreateUsing(StringBuilder sb) {
             if(!string.IsNullOrEmpty(model.Config.BTDatabase)) {
-                sb.Append($"use {model.Config.BTDatabase};\n\n");
+                sb.Append($"use {model.Config.BTDatabase};\n");
             }
+            sb.Append("SET SQL_SAFE_UPDATES = 0;\n\n");
         }
     }
 }

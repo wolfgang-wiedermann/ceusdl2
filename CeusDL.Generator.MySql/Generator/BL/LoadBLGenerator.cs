@@ -29,8 +29,9 @@ namespace KDV.CeusDL.Generator.MySql.BL {
             var sb = new StringBuilder();
 
             if(!string.IsNullOrEmpty(model.Config.BLDatabase)) {
-                sb.Append($"\nuse {model.Config.BLDatabase};\n\n");
+                sb.Append($"\nuse {model.Config.BLDatabase};\n");
             }
+            sb.Append("SET SQL_SAFE_UPDATES = 0;\n\n");
 
             // Dimensionen
             foreach(var ifa in model.DimTableInterfaces) {

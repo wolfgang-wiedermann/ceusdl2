@@ -130,8 +130,9 @@ namespace KDV.CeusDL.Generator.MySql.AL.Star {
 
         private void GenerateUseStatement(StringBuilder sb) {
             if(!string.IsNullOrEmpty(model.Config.ALDatabase)) {
-                sb.Append($"use {model.Config.ALDatabase};\n\n");
+                sb.Append($"use {model.Config.ALDatabase};\n");
             }
+            sb.Append("SET SQL_SAFE_UPDATES = 0;\n\n");
         }
 
         private object GetBTName(IBTAttribute btAttribute)
