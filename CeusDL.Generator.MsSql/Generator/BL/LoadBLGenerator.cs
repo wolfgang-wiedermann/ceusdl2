@@ -96,7 +96,7 @@ namespace KDV.CeusDL.Generator.BL {
 
             // Ermittlung der im parentIfa fehlenden Versionen
             sb.Append("with missing_versions as (\n");
-            sb.Append("select\n".Indent(1));
+            sb.Append("select distinct \n".Indent(1));
             foreach(var uk in childIfa.UniqueKeyAttributes.Where(a => childIfa.HistoryAttribute != a)) {
                 sb.Append($"t2.{uk.Name},\n".Indent(2));
             }
@@ -121,7 +121,7 @@ namespace KDV.CeusDL.Generator.BL {
                 sb.Append("\n");
             }
             sb.Append(")\n");
-            sb.Append("select\n");
+            sb.Append("select distinct \n");
             foreach(var attr in parentNonIdentityAttributes.Where(a => !a.IsTechnicalAttribute)) {
                 sb.Append($"t1.{attr.Name},\n".Indent(1));
             }
