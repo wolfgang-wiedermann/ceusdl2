@@ -58,7 +58,6 @@ namespace KDV.CeusDL.Generator.MySql.BL {
                 .OrderByDescending(i => i.MaxReferenceDepth) // Wichtig!
                 .Select(i => (DerivedBLInterface)i);
 
-            sb.Append(";\n"); // Ohne dass die vorherigen Anwendungen mit ; abgeschlossen sind geht die CTE in CascadeVersions nicht!
             foreach(var ifa in ifaForCascade) {
                 sb.Append(GenerateCascadeVersions(ifa));
             }
@@ -95,23 +94,6 @@ namespace KDV.CeusDL.Generator.MySql.BL {
             sb.Append($"-- Cascade Versions for {parentIfa.Name} -> {reference.ReferencedAttribute.FullName}\n");            
             sb.Append($"-- {childIfa.Name}\n");
 
-            // Ermittlung der im parentIfa fehlenden Versionen
-            sb.Append("with missing_versions as (\n");
-            sb.Append("select\n".Indent(1));
-            foreach(var uk in childIfa.UniqueKeyAttributes.Where(a => childIfa.HistoryAttribute != a)) {
-                sb.Append($"t2.{uk.Name},\n".Indent(2));
-            }
-            sb.Append($"t2.{reference.Name} as {reference.ReferencedAttribute.Name},\n".Indent(2));
-            sb.Append($"t2.{childIfa.HistoryAttribute.Name}\n".Indent(2));
-            sb.Append($"from {childIfa.FullName} as t2\nleft outer join {parentIfa.FullName} as t1\n".Indent(1));
-            sb.Append($"on t2.{reference.Name} = t1.{reference.ReferencedAttribute.Name}\n".Indent(2));
-            if(childIfa.IsMandant && parentIfa.IsMandant) {
-                sb.Append($"and t2.Mandant_KNZ = t1.Mandant_KNZ\n".Indent(2));
-            }
-            sb.Append($"and coalesce(t1.{parentIfa.HistoryAttribute.Name}, 'NOW') = coalesce(t2.{childIfa.HistoryAttribute.Name}, 'NOW')\n".Indent(2));
-            sb.Append($"where t1.{parentIfa.PrimaryKeyAttributes.First().Name} is null\n".Indent(1));
-            sb.Append(")\n");
-
             // Einfügen der fehlenden Versionen in die BL-Tabelle zu parrentIfa
             sb.Append($"insert into {parentIfa.FullName} (\n");            
             foreach(var attr in parentNonIdentityAttributes) {                
@@ -131,10 +113,29 @@ namespace KDV.CeusDL.Generator.MySql.BL {
             sb.Append("CURRENT_USER() as T_Benutzer,\n".Indent(1));
             sb.Append("'H' as T_System,\n".Indent(1));
             sb.Append($"mv.{childIfa.HistoryAttribute.Name} as {parentIfa.HistoryAttribute.Name},\n".Indent(1));
-            sb.Append("now() as T_Erst_Dat,\now() as T_Aend_Dat,\n".Indent(1));
+            sb.Append("now() as T_Erst_Dat,\nnow() as T_Aend_Dat,\n".Indent(1));
             sb.Append("t1.T_Ladelauf_NR\n".Indent(1));
             sb.Append($"from {parentIfa.FullName} as t1\n");
-            sb.Append($"inner join missing_versions as mv\n");
+            sb.Append($"inner join "); 
+            
+            // Ermittlung der im parentIfa fehlenden Versionen
+            sb.Append("(\n");
+            sb.Append("select\n".Indent(1));
+            foreach(var uk in childIfa.UniqueKeyAttributes.Where(a => childIfa.HistoryAttribute != a)) {
+                sb.Append($"t2.{uk.Name},\n".Indent(2));
+            }
+            sb.Append($"t2.{reference.Name} as {reference.ReferencedAttribute.Name},\n".Indent(2));
+            sb.Append($"t2.{childIfa.HistoryAttribute.Name}\n".Indent(2));
+            sb.Append($"from {childIfa.FullName} as t2\nleft outer join {parentIfa.FullName} as t1\n".Indent(1));
+            sb.Append($"on t2.{reference.Name} = t1.{reference.ReferencedAttribute.Name}\n".Indent(2));
+            if(childIfa.IsMandant && parentIfa.IsMandant) {
+                sb.Append($"and t2.Mandant_KNZ = t1.Mandant_KNZ\n".Indent(2));
+            }
+            sb.Append($"and coalesce(t1.{parentIfa.HistoryAttribute.Name}, 'NOW') = coalesce(t2.{childIfa.HistoryAttribute.Name}, 'NOW')\n".Indent(2));
+            sb.Append($"where t1.{parentIfa.PrimaryKeyAttributes.First().Name} is null\n".Indent(1));
+            sb.Append(")");
+            
+            sb.Append(" as mv\n");
             var parentUkWithoutHistory = parentIfa.UniqueKeyAttributes.Where(a => parentIfa.HistoryAttribute != a);
             foreach(var uk in parentUkWithoutHistory) {
                 if(uk == parentUkWithoutHistory.First()) {
@@ -324,7 +325,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
             foreach(var uk in ifa.UniqueKeyAttributes.Where(a => ifa.HistoryAttribute != a)) {
                 sb.Append($"t1.{uk.Name} = t.{uk.Name} and\n          ");
             }
-            sb.Append($"t1.{ifa.HistoryAttribute.Name} = dbo.GetCurrentTimeForHistory()\n");
+            sb.Append($"t1.{ifa.HistoryAttribute.Name} = GetCurrentTimeForHistory()\n");
 
             sb.Append(");\n\n");
         }
@@ -343,7 +344,7 @@ namespace KDV.CeusDL.Generator.MySql.BL {
             sb.Append($"update {ifa.FullName} as t\n");
             sb.Append($"inner join {ifa.FullViewName} v\n");
             sb.Append($"on t.{idAttribute.Name} = v.{idAttribute.Name} \nand v.T_Modifikation = 'U'\n".Indent("    "));
-            sb.Append($"set t.T_Gueltig_Bis_Dat = dbo.GetCurrentTimeForHistory();\n\n");
+            sb.Append($"set t.T_Gueltig_Bis_Dat = GetCurrentTimeForHistory();\n\n");
             
         }
 
