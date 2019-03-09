@@ -1,0 +1,31 @@
+/*
+ * Studiengangsdimensionen zu "Beispiel zur Umsetzung einer stark vereinfachten Studenten Domäne 
+ * für die Masterarbeit"
+ */
+
+interface Studiengang : DimTable(mandant="true", history="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    ref Fakultaet.KNZ;
+    ref Studienfach.KNZ;
+    ref Abschluss.KNZ;
+}
+
+interface Fakultaet : DimTable(mandant="true", history="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+interface Studienfach : DimTable(mandant="true", history="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+interface Abschluss : DimTable(mandant="true", history="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}

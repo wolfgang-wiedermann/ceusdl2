@@ -1,0 +1,22 @@
+/*
+ * Prüfungsdimensionen zu "Beispiel zur Umsetzung einer stark vereinfachten Studenten Domäne 
+ * für die Masterarbeit"
+ */
+
+interface Pruefung : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base BEZ:varchar(len="100");
+    base Credits:int;
+    ref Pruefer.KNZ;
+    ref Modul.KNZ;
+}
+
+interface Pruefer : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base BEZ:varchar(len="100");
+}
+
+interface Modul : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base BEZ:varchar(len="100");
+}

@@ -1,0 +1,43 @@
+/*
+ * Beispiel zur Umsetzung einer stark vereinfachten Studenten Domäne 
+ * für die Masterarbeit
+ */
+
+config {
+    prefix="MA";
+    il_database="MA_IL";
+    bl_database="MA_BL";
+    bt_database="MA_BT";
+    al_database="MA_AL";     
+}
+
+import "ma_part_zeit.ceusdl"
+import "ma_part_studiengang.ceusdl"
+import "ma_part_pruefung.ceusdl"
+
+interface Studienverlauf : FactTable(mandant="true", history="true") {
+    base Matrikelnummer:varchar(len="50");
+    ref Person.KNZ(primary_key="true");
+    ref Semester.KNZ(primary_key="true");
+    ref Studiengang.KNZ(primary_key="true");
+    fact Anzahl_F:int(calculated="true");
+    fact Credits_Sem_F:int(calculated="true"); // In diesem Semester erreichte Credit-Points
+    fact Alter_F:int(calculated="true"); // Alter am ersten Tag des Semesters
+}
+
+interface Leistungen : FactTable(mandant="true") {
+    ref Person.KNZ(primary_key="true");
+    ref Semester.KNZ(primary_key="true");
+    ref Studiengang.KNZ(primary_key="true");
+    ref Pruefung.KNZ(primary_key="true");
+    fact Note_F:int; // Note * 100; => 1,0 = 100, 1,3 = 130 etc.
+    fact Credit_F:int; // Anzahl Credit-Points
+}
+
+interface Person : DimTable(mandant="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base Vorname:varchar(len="50");
+    base Nachname:varchar(len="50");
+    base BEZ:varchar(len="101", calculated="true");
+    base Geburtsdatum:date;
+}

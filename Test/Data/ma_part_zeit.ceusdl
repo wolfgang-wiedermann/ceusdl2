@@ -1,0 +1,22 @@
+/*
+ * Zeitdimensionen zu "Beispiel zur Umsetzung einer stark vereinfachten Studenten Domäne 
+ * für die Masterarbeit"
+ */
+
+interface Semester:TemporalTable(finest_time_attribute="true") {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    ref Jahr.KNZ as Studienjahr;
+    ref Jahr.KNZ as Pruefungsjahr;
+}
+
+interface Jahr : TemporalTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base BEZ:varchar(len="100");
+}
+
+interface Anzahl : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base BEZ:varchar(len="100");
+}

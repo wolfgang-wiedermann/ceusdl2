@@ -59,7 +59,7 @@ namespace CeusDL2
                 options.GenerateConstraints = false;
 
                 if(IsUnix) {
-                    ceusdlFileName = @"/Users/wiw39784/develop/dotnet/ceusdl2/Test/Data/ext_main.ceusdl";
+                    ceusdlFileName = @"/Users/wiw39784/develop/dotnet/ceusdl2/Test/Data/ma_main.ceusdl";
                     dbConnectionFileName = @"/Users/wiw39784/develop/dotnet/ceusdl2/Test/Data/connection_mac.txt";
                     options.GenerateMySql = true;
                     options.GenerateMsSql = false;
