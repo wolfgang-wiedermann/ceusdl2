@@ -63,7 +63,7 @@ namespace CeusDL2
                     dbConnectionFileName = @"/Users/wiw39784/develop/dotnet/ceusdl2/Test/Data/connection_mac.txt";
                     options.GenerateMySql = true;
                     options.GenerateMsSql = false;
-                    options.ExecuteReplace = true;
+                    options.ExecuteReplace = false;
                     options.ExecuteUpdate = false;
                     options.ExecuteUpdateWithReload = false;
                 }

@@ -88,55 +88,56 @@ namespace KDV.CeusDL.Generator.MySql.BL {
         ///
         private void GenerateCascadeVersions(DerivedBLInterface childIfa, RefBLAttribute reference, StringBuilder sb) {
             var parentIfa = GetDerivedForDefault(reference.ReferencedAttribute.ParentInterface);
-            var parentNonIdentityAttributes = parentIfa.Attributes.Where(a => !a.IsIdentity);
+            var childNonIdentityAttributes = childIfa.Attributes.Where(a => !a.IsIdentity);
             var max = GetMaxValueForHistoryAttribute(parentIfa.HistoryAttribute);
 
             sb.Append($"-- Cascade Versions for {parentIfa.Name} -> {reference.ReferencedAttribute.FullName}\n");            
             sb.Append($"-- {childIfa.Name}\n");
 
             // Einfügen der fehlenden Versionen in die BL-Tabelle zu parrentIfa
-            sb.Append($"insert into {parentIfa.FullName} (\n");            
-            foreach(var attr in parentNonIdentityAttributes) {                
+            sb.Append($"insert into {childIfa.FullName} (\n");            
+            foreach(var attr in childNonIdentityAttributes) {                
                 sb.Append(attr.Name.Indent(1));
-                if(attr != parentNonIdentityAttributes.Last()) {
+                if(attr != childNonIdentityAttributes.Last()) {
                     sb.Append(",");
                 }
                 sb.Append("\n");
             }
             sb.Append(")\n");
             sb.Append("select distinct \n");
-            foreach(var attr in parentNonIdentityAttributes.Where(a => !a.IsTechnicalAttribute)) {
+            foreach(var attr in childNonIdentityAttributes.Where(a => !a.IsTechnicalAttribute)) {
                 sb.Append($"t1.{attr.Name},\n".Indent(1));
             }
             sb.Append("'I' as T_Modifikation,\n".Indent(1));
             sb.Append($"cast('Cascaded for {reference.FullName}' as varchar(100)) as T_Bemerkung,\n".Indent(1));
             sb.Append("CURRENT_USER() as T_Benutzer,\n".Indent(1));
             sb.Append("'H' as T_System,\n".Indent(1));
-            sb.Append($"mv.{childIfa.HistoryAttribute.Name} as {parentIfa.HistoryAttribute.Name},\n".Indent(1));
+            sb.Append($"mv.{parentIfa.HistoryAttribute.Name} as {childIfa.HistoryAttribute.Name},\n".Indent(1));
             sb.Append("now() as T_Erst_Dat,\nnow() as T_Aend_Dat,\n".Indent(1));
             sb.Append("t1.T_Ladelauf_NR\n".Indent(1));
-            sb.Append($"from {parentIfa.FullName} as t1\n");
+            sb.Append($"from {childIfa.FullName} as t1\n");
             sb.Append($"inner join "); 
             
             // Ermittlung der im parentIfa fehlenden Versionen
             sb.Append("(\n");
             sb.Append("select distinct \n".Indent(1));
-            foreach(var uk in childIfa.UniqueKeyAttributes.Where(a => childIfa.HistoryAttribute != a)) {
-                sb.Append($"t2.{uk.Name},\n".Indent(2));
+            foreach(var uk in parentIfa.UniqueKeyAttributes.Where(a => parentIfa.HistoryAttribute != a)) {
+                sb.Append($"tt2.{uk.Name},\n".Indent(2));
             }
-            sb.Append($"t2.{reference.Name} as {reference.ReferencedAttribute.Name},\n".Indent(2));
-            sb.Append($"t2.{childIfa.HistoryAttribute.Name}\n".Indent(2));
-            sb.Append($"from {childIfa.FullName} as t2\nleft outer join {parentIfa.FullName} as t1\n".Indent(1));
-            sb.Append($"on t2.{reference.Name} = t1.{reference.ReferencedAttribute.Name}\n".Indent(2));
+            sb.Append($"tt2.{parentIfa.HistoryAttribute.Name}\n".Indent(2));
+            sb.Append($"from {parentIfa.FullName} as tt2\nleft outer join {childIfa.FullName} as tt1\n".Indent(1));
+            sb.Append($"on tt2.{reference.ReferencedAttribute.Name} = tt1.{reference.Name}\n".Indent(2));
             if(childIfa.IsMandant && parentIfa.IsMandant) {
-                sb.Append($"and t2.Mandant_KNZ = t1.Mandant_KNZ\n".Indent(2));
+                sb.Append($"and tt2.Mandant_KNZ = tt1.Mandant_KNZ\n".Indent(2));
             }
-            sb.Append($"and coalesce(t1.{parentIfa.HistoryAttribute.Name}, 'NOW') = coalesce(t2.{childIfa.HistoryAttribute.Name}, 'NOW')\n".Indent(2));
-            sb.Append($"where t1.{parentIfa.PrimaryKeyAttributes.First().Name} is null\n".Indent(1));
+            sb.Append($"and coalesce(tt1.{childIfa.HistoryAttribute.Name}, 'NOW') = coalesce(tt2.{parentIfa.HistoryAttribute.Name}, 'NOW')\n".Indent(2));
+            sb.Append($"where tt1.{childIfa.PrimaryKeyAttributes.First().Name} is null\n".Indent(1));
             sb.Append(")");
             
             sb.Append(" as mv\n");
+            var childUkWithoutHistory = childIfa.UniqueKeyAttributes.Where(a => childIfa.HistoryAttribute != a);
             var parentUkWithoutHistory = parentIfa.UniqueKeyAttributes.Where(a => parentIfa.HistoryAttribute != a);
+
             foreach(var uk in parentUkWithoutHistory) {
                 if(uk == parentUkWithoutHistory.First()) {
                     sb.Append($"on t1.{uk.Name} = mv.{uk.Name}\n".Indent(1));
@@ -144,17 +145,17 @@ namespace KDV.CeusDL.Generator.MySql.BL {
                     sb.Append($"and t1.{uk.Name} = mv.{uk.Name}\n".Indent(1));
                 }                
             }            
-            sb.Append($"and coalesce(t1.{parentIfa.HistoryAttribute.Name}, '{max}') = (\n".Indent(1));
-            sb.Append($"select min(coalesce(z.{parentIfa.HistoryAttribute.Name}, '{max}'))\n".Indent(2));
-            sb.Append($"from {parentIfa.FullName} as z\n".Indent(2));
-            foreach(var uk in parentUkWithoutHistory) {
-                if(uk == parentUkWithoutHistory.First()) {
+            sb.Append($"and coalesce(t1.{childIfa.HistoryAttribute.Name}, '{max}') = (\n".Indent(1));
+            sb.Append($"select min(coalesce(z.{childIfa.HistoryAttribute.Name}, '{max}'))\n".Indent(2));
+            sb.Append($"from {childIfa.FullName} as z\n".Indent(2));
+            foreach(var uk in childUkWithoutHistory) {
+                if(uk == childUkWithoutHistory.First()) {
                     sb.Append($"where z.{uk.Name} = t1.{uk.Name}\n".Indent(2));
                 } else {
                     sb.Append($"and z.{uk.Name} = t1.{uk.Name}\n".Indent("          "));
                 }
             }
-            sb.Append($"and coalesce(z.{parentIfa.HistoryAttribute.Name}, '{max}') >= coalesce(mv.{parentIfa.HistoryAttribute.Name}, '{max}')\n".Indent("          "));
+            sb.Append($"and coalesce(z.{childIfa.HistoryAttribute.Name}, '{max}') >= coalesce(mv.{childIfa.HistoryAttribute.Name}, '{max}')\n".Indent("          "));
             sb.Append(")\n".Indent(1));
             sb.Append(";\n");
         }

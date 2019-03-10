@@ -25,7 +25,7 @@ interface Studienverlauf : FactTable(mandant="true", history="true") {
     fact Alter_F:int(calculated="true"); // Alter am ersten Tag des Semesters
 }
 
-interface Leistungen : FactTable(mandant="true") {
+interface Leistungen : FactTable(mandant="true", history="true") {
     ref Person.KNZ(primary_key="true");
     ref Semester.KNZ(primary_key="true");
     ref Studiengang.KNZ(primary_key="true");
