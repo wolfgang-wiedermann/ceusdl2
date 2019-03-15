@@ -114,7 +114,7 @@ namespace KDV.CeusDL.Generator.MySql.BT {
                 sb.Append($"and tx.Mandant_KNZ = {attr.JoinAlias}.Mandant_KNZ\n".Indent(2));
             }
             // TODO: 99991231 noch durch Typbezogene Werte wie in BL beim Cascade ersetzen!!
-            sb.Append($"and coalesce(tx.{attr.ReferencedBLInterface.HistoryAttribute.Name}, '{max}') > ".Indent(2));
+            sb.Append($"and coalesce(tx.{attr.ReferencedBLInterface.HistoryAttribute.Name}, '{max}') >= ".Indent(2));
             sb.Append($"coalesce(t.{attr.ParentInterface.blInterface.HistoryAttribute.Name}, '{max}')\n");            
             sb.Append(")\n".Indent(1));
         }
