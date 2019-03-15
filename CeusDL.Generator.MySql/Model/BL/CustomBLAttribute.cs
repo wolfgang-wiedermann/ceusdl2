@@ -223,7 +223,7 @@ namespace KDV.CeusDL.Model.MySql.BL {
             if(IsPrimaryKey) {
                 result += " primary key";
             }
-            if(IsIdentity) {
+            if(IsIdentity && ParentInterface.GetCoreInterface().Type != Core.CoreInterfaceType.DEF_TABLE) {
                 result += " auto_increment";
             }
             if(IsNotNull || IsPrimaryKey) {
