@@ -64,7 +64,7 @@ namespace CeusDL2
                     options.GenerateMySql = true;
                     options.GenerateMsSql = false;
                     options.ExecuteReplace = false;
-                    options.ExecuteUpdate = false;
+                    options.ExecuteUpdate = true;
                     options.ExecuteUpdateWithReload = false;
                 }
 

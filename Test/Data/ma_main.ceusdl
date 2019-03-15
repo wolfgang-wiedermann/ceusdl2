@@ -30,6 +30,7 @@ interface Leistungen : FactTable(mandant="true", history="true") {
     ref Semester.KNZ(primary_key="true");
     ref Studiengang.KNZ(primary_key="true");
     ref Pruefung.KNZ(primary_key="true");
+    ref Anzahl.KNZ(calculated="true") as Versuch; // Prüfungsversuch
     fact Note_F:int; // Note * 100; => 1,0 = 100, 1,3 = 130 etc.
     fact Credit_F:int; // Anzahl Credit-Points
 }
