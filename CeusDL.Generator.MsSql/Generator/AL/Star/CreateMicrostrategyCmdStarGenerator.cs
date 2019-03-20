@@ -79,7 +79,10 @@ namespace KDV.CeusDL.Generator.AL.Star {
                 }
                 sb.Append($"SORT ASC EXPRESSION \"{attrIfa.IdColumn.Name}\"\n");
                 sb.Append($"MAPPINGMODE AUTOMATIC\n");
-                sb.Append($"LOOKUPTABLE \"{attrIfa.Name}\"\n");
+                // DAS PASST BEI STAR NOCH NICHT!
+                // DA MUSS IMMER DAS _1_ Dim-Interface rein!
+                // Bei Snowflake müsste es passen
+                sb.Append($"LOOKUPTABLE \"{attrIfa.Name}\"\n"); 
                 sb.Append("FOR PROJECT \"PROJECTNAME_TO_REPLACE\";\n");
                 sb.Append("\n");
             }
