@@ -54,8 +54,8 @@ namespace CeusDL2
                 options.GenerateMySql = false;
                 options.GenerateMsSql = true;
                 options.ExecuteReplace = false;
-                options.ExecuteUpdate = true;
-                options.ExecuteUpdateWithReload = true;
+                options.ExecuteUpdate = false;
+                options.ExecuteUpdateWithReload = false;
                 options.GenerateConstraints = false;
 
                 if(IsUnix) {
@@ -292,6 +292,7 @@ namespace CeusDL2
                 StarSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.CreateStarALGenerator(model), GENERATED_SQL));
                 ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.LoadStarALGenerator(model), GENERATED_SQL);
                 ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.CopyStarALGenerator(model), GENERATED_SQL);
+                ExecuteStep(new KDV.CeusDL.Generator.AL.Star.CreateMicrostrategyCmdStarGenerator(model), GENERATED_SQL);
             }
             /* 
             // AL generieren (Snowflake-Schema)
@@ -300,6 +301,7 @@ namespace CeusDL2
                 SnowflakeSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Snowflake.DropSnowflakeALGenerator(model), GENERATED_SQL));
                 SnowflakeSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Snowflake.CreateSnowflakeALGenerator(model), GENERATED_SQL));
                 ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Snowflake.LoadSnowflakeALGenerator(model), GENERATED_SQL);
+                ExecuteStep(new KDV.CeusDL.Generator.AL.Snowflake.CreateMicrostrategyCmdSnowflakeGenerator(model), GENERATED_SQL);
             }
             */
         }
@@ -348,6 +350,7 @@ namespace CeusDL2
                     ExecuteStep(new LoadStarALGenerator(model), GENERATED_SQL);
                 }
                 ExecuteStep(new CopyStarALGenerator(model), GENERATED_SQL);
+                ExecuteStep(new KDV.CeusDL.Generator.AL.Star.CreateMicrostrategyCmdStarGenerator(model), GENERATED_SQL);
             }
 
             // AL generieren (Snowflake-Schema)
@@ -360,6 +363,7 @@ namespace CeusDL2
                 } else {
                     ExecuteStep(new LoadSnowflakeALGenerator(model), GENERATED_SQL);
                 }
+                ExecuteStep(new KDV.CeusDL.Generator.AL.Snowflake.CreateMicrostrategyCmdSnowflakeGenerator(model), GENERATED_SQL);
             }
         }
 
