@@ -25,6 +25,7 @@ namespace CeusDL2
     class Program
     {
         static string GENERATED_SQL;
+        static string GENERATED_SCP;
         static string GENERATED_CEUSDL;
         static string GENERATED_CODE;
         static string GENERATED_PYCODE;
@@ -54,8 +55,8 @@ namespace CeusDL2
                 options.GenerateMySql = false;
                 options.GenerateMsSql = true;
                 options.ExecuteReplace = false;
-                options.ExecuteUpdate = true;
-                options.ExecuteUpdateWithReload = true;
+                options.ExecuteUpdate = false;
+                options.ExecuteUpdateWithReload = false;
                 options.GenerateConstraints = false;
 
                 if(IsUnix) {
@@ -179,6 +180,7 @@ namespace CeusDL2
         static void PrepareEnvironment(string rootFolder) {
             var generated = Path.Combine(rootFolder, "Generated");
             var generatedSQL = Path.Combine(generated, "SQL");
+            var generatedSCP = Path.Combine(generated, "Microstrategy");
             var generatedCeusDL = Path.Combine(generated, "CeusDL");            
             var generatedCode = Path.Combine(generated, "CSharp");
             var generatedPyCode = Path.Combine(generated, "Python");
@@ -194,6 +196,10 @@ namespace CeusDL2
 
             if(!Directory.Exists(generatedSQL)) {
                 Directory.CreateDirectory(generatedSQL);   
+            }
+
+            if(!Directory.Exists(generatedSCP)) {
+                Directory.CreateDirectory(generatedSCP);   
             }
 
             if(!Directory.Exists(generatedCeusDL)) {
@@ -217,6 +223,7 @@ namespace CeusDL2
             }
 
             GENERATED_SQL = generatedSQL;
+            GENERATED_SCP = generatedSCP;
             GENERATED_CEUSDL = generatedCeusDL;
             GENERATED_CODE = generatedCode;
             GENERATED_PYCODE = generatedPyCode;
@@ -292,6 +299,7 @@ namespace CeusDL2
                 StarSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.CreateStarALGenerator(model), GENERATED_SQL));
                 ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.LoadStarALGenerator(model), GENERATED_SQL);
                 ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Star.CopyStarALGenerator(model), GENERATED_SQL);
+                ExecuteStep(new KDV.CeusDL.Generator.AL.Star.CreateMicrostrategyCmdStarGenerator(model), GENERATED_SCP);
             }
             /* 
             // AL generieren (Snowflake-Schema)
@@ -300,6 +308,7 @@ namespace CeusDL2
                 SnowflakeSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Snowflake.DropSnowflakeALGenerator(model), GENERATED_SQL));
                 SnowflakeSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Snowflake.CreateSnowflakeALGenerator(model), GENERATED_SQL));
                 ExecuteStep(new KDV.CeusDL.Generator.MySql.AL.Snowflake.LoadSnowflakeALGenerator(model), GENERATED_SQL);
+                ExecuteStep(new KDV.CeusDL.Generator.AL.Snowflake.CreateMicrostrategyCmdSnowflakeGenerator(model), GENERATED_SCP);
             }
             */
         }
@@ -348,6 +357,7 @@ namespace CeusDL2
                     ExecuteStep(new LoadStarALGenerator(model), GENERATED_SQL);
                 }
                 ExecuteStep(new CopyStarALGenerator(model), GENERATED_SQL);
+                ExecuteStep(new KDV.CeusDL.Generator.AL.Star.CreateMicrostrategyCmdStarGenerator(model), GENERATED_SCP);
             }
 
             // AL generieren (Snowflake-Schema)
@@ -360,6 +370,7 @@ namespace CeusDL2
                 } else {
                     ExecuteStep(new LoadSnowflakeALGenerator(model), GENERATED_SQL);
                 }
+                ExecuteStep(new KDV.CeusDL.Generator.AL.Snowflake.CreateMicrostrategyCmdSnowflakeGenerator(model), GENERATED_SCP);
             }
         }
 
