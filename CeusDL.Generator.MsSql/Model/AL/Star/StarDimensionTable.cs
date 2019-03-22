@@ -59,6 +59,15 @@ namespace KDV.CeusDL.Model.AL.Star
 
         public BT.BTInterface MainBTInterface => dim.BTInterface;
 
+        public bool ConstainsDimInterface(IALInterface ifa) {
+            return this.dim.Name == ifa.Name 
+                || this.Attributes
+                       .Select(a => a.ParentInterface)
+                       .Distinct()
+                       .Where(i => i == ifa)
+                       .Count() > 0;
+        }
+
         private List<IALAttribute> RecurseDimensions(RefALAttribute r) {
             var result = new List<IALAttribute>();
             var currentJoinAlias = $"t{joinIdx}";
