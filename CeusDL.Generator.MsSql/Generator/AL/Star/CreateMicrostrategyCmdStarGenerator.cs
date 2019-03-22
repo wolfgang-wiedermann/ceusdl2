@@ -32,60 +32,65 @@ namespace KDV.CeusDL.Generator.AL.Star {
             var sb = new StringBuilder();
             foreach(var fi in model.FactInterfaces) {
                 foreach(var fa in fi.Attributes.Where(a => a.IsFact)) {
-                    sb.Append($"CREATE FACT \"{fa.ParentInterface.Core.Name} - {fa.Core.Name}\" IN FOLDER \"\\Schemaobjekte\\Fakten\" EXPRESSION \"{fa.Name}\" FOR PROJECT \"PROJECTNAME_TO_REPLACE\";\n");
+                    sb.Append($"CREATE FACT \"{fa.ParentInterface.Core.Name} - {fa.Core.Name}\"\n");
+                    sb.Append($"  IN FOLDER \"\\Schemaobjekte\\Fakten\"\n");
+                    sb.Append($"  EXPRESSION \"{fa.Name}\"\n");
+                    sb.Append($"  FOR PROJECT \"PROJECTNAME_TO_REPLACE\";\n\n");
                 }
             }            
             return sb.ToString();
         }
 
-        /*
-        Beispiel:
-        CREATE ATTRIBUTE "Month" 
-        IN FOLDER "\Schema Objects\Attributes" 
-        ATTRIBUTEFORM "ID" FORMDESC "Basic ID form" FORMTYPE TEXT 
-        SORT ASC EXPRESSION "[MONTH_ID]" LOOKUPTABLE "LU_MONTH" 
-        FOR PROJECT "MicroStrategy Tutorial";
-         */
         private string GenerateCreateAttributes() {
             var sb = new StringBuilder();
             foreach(var attrIfa in model.DimensionInterfaces) {
-                var sDim = model.StarDimensionTables.Where(s => s.ConstainsDimInterface(attrIfa)).SingleOrDefault();
+                var sDim = model.StarDimensionTables.Where(s => s.ConstainsDimInterface(attrIfa)).SingleOrDefault();            
 
                 if(sDim != null) {
-                    sb.Append($"CREATE ATTRIBUTE \"{attrIfa.Core.Name}\"\n");
-                    sb.Append("IN FOLDER \"\\Schemaobjekte\\Attribute\"\n");
+                    var attrName = attrIfa.ShortName;                    
+                    sb.Append($"// Attribut: {attrIfa.Name}\n");
+                    // Attribut anlegen
+                    sb.Append($"CREATE ATTRIBUTE \"{attrName}\"\n");
+                    sb.Append( "  IN FOLDER \"\\Schemaobjekte\\Attribute\"\n");                    
+                    sb.Append($"  ATTRIBUTEFORM \"{attrIfa.IdColumn.Name}\" ");                        
+                    sb.Append("FORMCATEGORY \"ID\" ");
+                    sb.Append("FORMTYPE NUMBER\n");                    
+                    sb.Append($"  EXPRESSION \"{attrIfa.IdColumn.Name}\"\n");
+                    sb.Append($"  MAPPINGMODE AUTOMATIC\n");                                    
+                    sb.Append($"  LOOKUPTABLE \"{sDim.Name}\"\n"); 
+                    sb.Append( "  FOR PROJECT \"PROJECTNAME_TO_REPLACE\";\n");
+                    sb.Append("\n");
+
+                    // Attributfelder hinzufügen
                     foreach(var a in attrIfa.Attributes
                                             .Where(a1 => a1 is BaseALAttribute)
                                             .Where(a1 => a1.Name != "Mandant_ID")
+                                            .Where(a1 => a1 != attrIfa.IdColumn)
                                             .Select(a1 => (BaseALAttribute)a1)) {
 
-                        sb.Append($"ATTRIBUTEFORM \"{a.Name}\" ");
-                        if(a == attrIfa.IdColumn) {
-                            sb.Append("FORMCATEGORY \"ID\" ");
-                            sb.Append("FORMTYPE NUMBER\n");
-                        } else {
-                            sb.Append($"FORMCATEGORY \"{a.Core.Name}\" ");
+                        sb.Append($"ADD ATTRIBUTEFORM \"{a.Core.Name}\" ");
+                        sb.Append($"FORMCATEGORY \"{a.Core.Name}\"\n  ");
 
-                            var t = ((CoreBaseAttribute)a.Core).DataType;
-                            if(t == CoreDataType.INT || t == CoreDataType.DECIMAL) {
-                                sb.Append("FORMTYPE NUMBER\n");
-                            } else if(t == CoreDataType.DATE) {
-                                sb.Append("FORMTYPE DATE\n");
-                            } else if(t == CoreDataType.DATETIME) {
-                                sb.Append("FORMTYPE DATETIME\n");
-                            } else if(t == CoreDataType.TIME) {
-                                sb.Append("FORMTYPE TIME\n");
-                            } else {
-                                sb.Append("FORMTYPE TEXT\n");
-                            }
+                        var t = ((CoreBaseAttribute)a.Core).DataType;
+                        if(t == CoreDataType.INT || t == CoreDataType.DECIMAL) {
+                            sb.Append("FORMTYPE NUMBER\n");
+                        } else if(t == CoreDataType.DATE) {
+                            sb.Append("FORMTYPE DATE\n");
+                        } else if(t == CoreDataType.DATETIME) {
+                            sb.Append("FORMTYPE DATETIME\n");
+                        } else if(t == CoreDataType.TIME) {
+                            sb.Append("FORMTYPE TIME\n");
+                        } else {
+                            sb.Append("FORMTYPE TEXT\n");
                         }
+
+                        sb.Append($"  EXPRESSION \"{a.Name}\"\n");
+                        sb.Append($"  LOOKUPTABLE \"{sDim.Name}\"\n");
+                        sb.Append($"  TO ATTRIBUTE \"{attrName}\" IN FOLDER \"\\Schemaobjekte\\Attribute\"\n");
+                        sb.Append( "  FOR PROJECT \"PROJECTNAME_TO_REPLACE\";\n");
+                        sb.Append("\n");
                     }
-                    sb.Append($"SORT ASC EXPRESSION \"{attrIfa.IdColumn.Name}\"\n");
-                    sb.Append($"MAPPINGMODE AUTOMATIC\n");                
-                    
-                    sb.Append($"LOOKUPTABLE \"{sDim.Name}\"\n"); 
-                    sb.Append("FOR PROJECT \"PROJECTNAME_TO_REPLACE\";\n");
-                    sb.Append("\n");
+
                 } else {
                     sb.Append($"// Die Dimension {attrIfa.Name} scheint in keiner StarDimension enthalten zu sein\n\n");
                 }
