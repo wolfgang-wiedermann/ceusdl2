@@ -20,9 +20,14 @@ interface Studienverlauf : FactTable(mandant="true", history="true") {
     ref Person.KNZ(primary_key="true");
     ref Semester.KNZ(primary_key="true");
     ref Studiengang.KNZ(primary_key="true");
+    // Berechnetes Attribut: Alter am ersten Tag des Semesters (Dimension)
+    ref Alter.KNZ(calculated="true"); 
+    // Berechneter Fakt: Konstanter Wert 1
     fact Anzahl_F:int(calculated="true");
-    fact Credits_Sem_F:int(calculated="true"); // In diesem Semester erreichte Credit-Points
-    fact Alter_F:int(calculated="true"); // Alter am ersten Tag des Semesters
+    // Berechneter Fakt: In diesem Semester erreichte Credit-Points
+    fact Credits_Sem_F:int(calculated="true");
+    // Berechneter Fakt: Alter am ersten Tag des Semesters (Fakt) 
+    fact Alter_F:int(calculated="true"); 
 }
 
 interface Leistungen : FactTable(mandant="true", history="true") {
@@ -30,9 +35,12 @@ interface Leistungen : FactTable(mandant="true", history="true") {
     ref Semester.KNZ(primary_key="true");
     ref Studiengang.KNZ(primary_key="true");
     ref Pruefung.KNZ(primary_key="true");
-    ref Anzahl.KNZ(calculated="true") as Versuch; // Prüfungsversuch
-    fact Note_F:int; // Note * 100; => 1,0 = 100, 1,3 = 130 etc.
-    fact Credit_F:int; // Anzahl Credit-Points
+    // Berechnetes Attribut: Prüfungsversuch
+    ref Anzahl.KNZ(calculated="true") as Versuch; 
+    // Berechneter Fakt: Note * 100; => 1,0 = 100, 1,3 = 130 etc.
+    fact Note_F:int; 
+    // Berechneter Fakt: Anzahl Credit-Points
+    fact Credit_F:int; 
 }
 
 interface Person : DimTable(mandant="true") {
