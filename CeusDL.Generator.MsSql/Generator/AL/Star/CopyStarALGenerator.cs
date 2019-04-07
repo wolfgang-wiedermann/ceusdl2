@@ -33,6 +33,9 @@ namespace KDV.CeusDL.Generator.AL.Star {
             }
             foreach(var i in model.FactInterfaces) {
                 GenerateFactInterface(sb, i);
+                if(i.IsWithNowTable) {
+                    GenerateNowInterface(sb, i);
+                }
             }       
             return sb.ToString();
         }
@@ -61,6 +64,43 @@ namespace KDV.CeusDL.Generator.AL.Star {
                 sb.Append("\n");
             }
             sb.Append($"from [{ifa.Model.Config.EtlDbServer}].{ifa.Model.Config.ALDatabase}.dbo.{ifa.Name};\n");            
+            sb.Append("\n");
+        }
+
+        private void GenerateNowInterface(StringBuilder sb, FactALInterface ifa)
+        {
+            sb.Append($"truncate table {ifa.Model.Config.ALDatabase}.dbo.{ifa.Name}_NOW \n");
+            sb.Append($"insert into {ifa.Model.Config.ALDatabase}.dbo.{ifa.Name}_NOW (\n");
+            foreach (var a in ifa.Attributes)
+            {
+                if(a.IsFact) {
+                    sb.Append($"{a.Name}_NOW".Indent(1)); 
+                } else {
+                    sb.Append($"{a.Name}".Indent(1)); 
+                }
+                          
+                if (a != ifa.Attributes.Last())
+                {
+                    sb.Append(",");
+                }
+                sb.Append("\n");
+            }
+            sb.Append(") select \n");
+            foreach (var a in ifa.Attributes)
+            {
+                if(a.IsFact) {
+                    sb.Append($"{a.Name}_NOW".Indent(1)); 
+                } else {
+                    sb.Append($"{a.Name}".Indent(1)); 
+                }
+
+                if (a != ifa.Attributes.Last())
+                {
+                    sb.Append(",");
+                }
+                sb.Append("\n");
+            }
+            sb.Append($"from [{ifa.Model.Config.EtlDbServer}].{ifa.Model.Config.ALDatabase}.dbo.{ifa.Name}_NOW;\n");            
             sb.Append("\n");
         }
 
