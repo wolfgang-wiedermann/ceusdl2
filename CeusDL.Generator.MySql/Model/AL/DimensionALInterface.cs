@@ -124,6 +124,8 @@ namespace KDV.CeusDL.Model.MySql.AL
         }
         public string Alias { get; set; }
 
+        public bool IsWithNowTable => false;
+
         public List<IALAttribute> Attributes { get; private set; }
     }
 }

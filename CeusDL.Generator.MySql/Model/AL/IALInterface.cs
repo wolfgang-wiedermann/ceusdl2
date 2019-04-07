@@ -10,6 +10,7 @@ namespace KDV.CeusDL.Model.MySql.AL {
         string ShortName { get; }
         string Name { get; }
         string FullName { get; }    
+        bool IsWithNowTable { get; }
         List<IALAttribute> Attributes { get; }
     }
 }

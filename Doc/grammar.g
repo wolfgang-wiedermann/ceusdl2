@@ -17,3 +17,20 @@ interface_param ::= (('mandant' | 'history' | 'with_nowtable' | 'finest_time_att
 interface_body ::= (attribute | comment)*
 comment ::= ( '//' COMMENT_TEXT | '/*' COMMENT_TEXT '*/' )
 attribute ::= base_attribute | ref_attribute | fact_attribute
+
+base_attribute ::= 'base' ATTRIBUTE_NAME ':' (
+    ('int' | 'date' | 'datetime' | 'time') ( '(' (('primary_key' | 'calculated') '=' ('"true"' | '"false"') )? ')' )? | 
+    ('varchar' '(' 'len' '=' '"' STR_LENGTH '"' ')') |
+    ('decimal' '(' 'len' '=' '"' DEC_LENGTH ',' DEC_DECIMALS ')' )
+) ';'
+
+ref_attribute ::= 'ref' REF_INTERFACE_NAME '.' REF_ATTRIBUTE_NAME 
+    ( '(' ('primary_key' | 'calculated') '=' ('"true"' | '"false"') ')' )?  
+    ( 'as' ALIAS )? 
+    ';'
+
+fact_attribute ::= 'fact' ATTRIBUTE_NAME ':' (
+    ('int' | 'date' | 'datetime' | 'time') ( '(' ('calculated' '=' ('"true"' | '"false"') )? ')' )? | 
+    ('varchar' '(' 'len' '=' '"' STR_LENGTH '"' ( ',' 'calculated' '=' ('"true"' | '"false"') )? ')') |
+    ('decimal' '(' 'len' '=' '"' DEC_LENGTH ',' DEC_DECIMALS '"' ( ',' 'calculated' '=' ('"true"' | '"false"') )? ')' )
+) ';'

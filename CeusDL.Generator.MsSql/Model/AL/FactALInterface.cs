@@ -56,6 +56,8 @@ namespace KDV.CeusDL.Model.AL
 
         public List<FactInterfaceReference> FactInterfaceReferences { get; private set; }   
 
+        public bool IsWithNowTable => this.Core != null?this.Core.IsWithNowTable:false;
+        
         private void PrepareAttributes()
         {
             Attributes = new List<IALAttribute>();

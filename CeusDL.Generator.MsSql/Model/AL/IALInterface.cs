@@ -9,7 +9,8 @@ namespace KDV.CeusDL.Model.AL {
         BT.BTInterface BTInterface { get; }
         string ShortName { get; }
         string Name { get; }
-        string FullName { get; }    
+        string FullName { get; }
+        bool IsWithNowTable { get; }
         List<IALAttribute> Attributes { get; }
     }
 }
