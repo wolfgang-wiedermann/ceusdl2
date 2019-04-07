@@ -33,8 +33,36 @@ namespace KDV.CeusDL.Generator.MySql.AL.Star {
             }
             foreach(var i in model.FactInterfaces) {
                 GenerateFactInterface(sb, i);
+                if(i.IsWithNowTable) {
+                    GenerateNowFactInterface(sb, i);
+                }
             }       
             return sb.ToString();
+        }
+
+        private void GenerateNowFactInterface(StringBuilder sb, FactALInterface ifa)
+        {
+            sb.Append($"-- Now-Table zu {ifa.Core.Name}\n");
+            sb.Append($"create table {ifa.Name}_NOW (\n");
+            foreach (var a in ifa.Attributes)
+            {
+                if(a.IsFact) {
+                    sb.Append($"{a.Name}_NOW {a.SqlType}".Indent(1));
+                } else {
+                    sb.Append($"{a.Name} {a.SqlType}".Indent(1));
+                }
+                if (a == ifa.IdColumn)
+                {
+                    sb.Append(" primary key not null");
+                }           
+                if (a != ifa.Attributes.Last())
+                {
+                    sb.Append(",");
+                }
+                sb.Append("\n");
+            }            
+            sb.Append(");\n");
+            sb.Append("\n");
         }
 
         private void GenerateFactInterface(StringBuilder sb, FactALInterface ifa)

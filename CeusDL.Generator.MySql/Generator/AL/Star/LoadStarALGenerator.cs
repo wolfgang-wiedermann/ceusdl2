@@ -46,6 +46,9 @@ namespace KDV.CeusDL.Generator.MySql.AL.Star {
             foreach(var ifa in model.FactInterfaces) {
                 GenerateLoadFactInterface(sb, ifa);
             }
+            foreach(var ifa in model.FactInterfaces.Where(f => f.IsWithNowTable)) {
+                GenerateLoadNowTable(sb, ifa);
+            }
             return sb.ToString();
         }
 
@@ -118,6 +121,40 @@ namespace KDV.CeusDL.Generator.MySql.AL.Star {
             foreach(var fref in ifa.FactInterfaceReferences) {
                 sb.Append($"inner join {fref.BTInterface.FullName} as {fref.JoinAlias}\n".Indent(1));
                 sb.Append($"on t0.{fref.RefColumnName} = {fref.JoinAlias}.{fref.RefColumnName}".Indent(1));
+            }
+            sb.Append(";\n\n");
+        }
+
+        private void GenerateLoadNowTable(StringBuilder sb, FactALInterface ifa) {
+            sb.Append($"-- Load NowTable for FactInteface {ifa.Core.Name}\n");
+            sb.Append($"truncate table {ifa.Name}_NOW;\n");
+            sb.Append($"insert into {ifa.Name}_NOW (\n");
+            foreach(var attr in ifa.Attributes) {
+                if(attr.IsFact) {
+                    sb.Append($"{attr.Name}_NOW".Indent(1));
+                } else {
+                    sb.Append($"{attr.Name}".Indent(1));
+                }
+                if(attr != ifa.Attributes.Last()) {
+                    sb.Append(",");
+                }
+                sb.Append("\n");
+            }
+            sb.Append(") \n");
+            
+            sb.Append("select\n");
+            foreach(var attr in ifa.Attributes) {
+                sb.Append($"{attr.Name}".Indent(1));
+                if(attr != ifa.Attributes.Last()) {
+                    sb.Append(",");
+                }
+                sb.Append("\n");
+            }
+            sb.Append($"from {ifa.Name} a\n");
+            if(ifa.Core.IsMandant) {
+                sb.Append($"where a.{ifa.HistoryAttribute.Name} = (select max({ifa.HistoryAttribute.Name}) from {ifa.Name} as i where i.Mandant_ID = a.Mandant_ID)");
+            } else {
+                sb.Append($"where a.{ifa.HistoryAttribute.Name} = (select max({ifa.HistoryAttribute.Name}) from {ifa.Name})");
             }
             sb.Append(";\n\n");
         }

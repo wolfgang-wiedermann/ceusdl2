@@ -33,6 +33,9 @@ namespace KDV.CeusDL.Generator.AL.Star {
             }
             foreach(var i in model.FactInterfaces) {
                 GenerateFactInterface(sb, i);
+                if(i.IsWithNowTable) {
+                    GenerateNowInterface(sb, i);
+                }
             }       
             return sb.ToString();
         }
@@ -41,6 +44,13 @@ namespace KDV.CeusDL.Generator.AL.Star {
         {
             sb.Append($"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{ifa.Name}]') AND type in (N'U'))\n");
             sb.Append($"drop table {ifa.Name}\n".Indent(1));
+            sb.Append("go\n\n");
+        }
+
+        private void GenerateNowInterface(StringBuilder sb, FactALInterface ifa)
+        {
+            sb.Append($"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{ifa.Name}]') AND type in (N'U'))\n");
+            sb.Append($"drop table {ifa.Name}_NOW\n".Indent(1));
             sb.Append("go\n\n");
         }
 

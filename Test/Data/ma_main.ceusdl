@@ -21,7 +21,7 @@ interface Test:DefTable(mandant="true") {
 }
 */
 
-interface Studienverlauf : FactTable(mandant="true", history="true") {
+interface Studienverlauf : FactTable(mandant="true", history="true", with_nowtable="true") {
     base Matrikelnummer:varchar(len="50");
     ref Person.KNZ(primary_key="true");
     ref Semester.KNZ(primary_key="true");

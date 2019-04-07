@@ -33,6 +33,9 @@ namespace KDV.CeusDL.Generator.MySql.AL.Star {
             }
             foreach(var i in model.FactInterfaces) {
                 GenerateFactInterface(sb, i);
+                if(i.IsWithNowTable) {
+                    GenerateNowInterface(sb, i);
+                }
             }       
             return sb.ToString();
         }
@@ -40,6 +43,11 @@ namespace KDV.CeusDL.Generator.MySql.AL.Star {
         private void GenerateFactInterface(StringBuilder sb, FactALInterface ifa)
         {
             sb.Append($"drop table if exists {ifa.Name};\n");
+        }
+
+        private void GenerateNowInterface(StringBuilder sb, FactALInterface ifa)
+        {
+            sb.Append($"drop table if exists {ifa.Name}_NOW;\n");
         }
 
         private void GenerateDimensionInterface(StringBuilder sb, StarDimensionTable ifa)
