@@ -19,18 +19,26 @@ comment ::= ( '//' COMMENT_TEXT | '/*' COMMENT_TEXT '*/' )
 attribute ::= base_attribute | ref_attribute | fact_attribute
 
 base_attribute ::= 'base' ATTRIBUTE_NAME ':' (
-    ('int' | 'date' | 'datetime' | 'time') ( '(' (('primary_key' | 'calculated') '=' ('"true"' | '"false"') )? ')' )? | 
-    ('varchar' '(' 'len' '=' '"' STR_LENGTH '"' ')') |
-    ('decimal' '(' 'len' '=' '"' DEC_LENGTH ',' DEC_DECIMALS ')' )
+    ('int' | 'date' | 'datetime' | 'time') ( '(' general_attribute_params ')' )? | 
+    ('varchar' '(' 'len' '=' '"' STR_LENGTH '"' (',' general_attribute_params)? ')') |
+    ('decimal' '(' 'len' '=' '"' DEC_LENGTH ',' DEC_DECIMALS '"' (',' general_attribute_params)? ')' )
 ) ';'
 
+general_attribute_params ::= general_attribute_param (',' general_attribute_param)*
+general_attribute_param ::= (('primary_key' | 'calculated') '=' ('"true"' | '"false"') ) 
+                        | ('former_name' '=' '"' FORMER_NAME '"')
+
 ref_attribute ::= 'ref' REF_INTERFACE_NAME '.' REF_ATTRIBUTE_NAME 
-    ( '(' ('primary_key' | 'calculated') '=' ('"true"' | '"false"') ')' )?  
+    ( '(' general_attribute_params ')' )?  
     ( 'as' ALIAS )? 
     ';'
 
 fact_attribute ::= 'fact' ATTRIBUTE_NAME ':' (
-    ('int' | 'date' | 'datetime' | 'time') ( '(' ('calculated' '=' ('"true"' | '"false"') )? ')' )? | 
-    ('varchar' '(' 'len' '=' '"' STR_LENGTH '"' ( ',' 'calculated' '=' ('"true"' | '"false"') )? ')') |
-    ('decimal' '(' 'len' '=' '"' DEC_LENGTH ',' DEC_DECIMALS '"' ( ',' 'calculated' '=' ('"true"' | '"false"') )? ')' )
+    ('int' | 'date' | 'datetime' | 'time') ( '(' general_fact_params ')' )? | 
+    ('varchar' '(' 'len' '=' '"' STR_LENGTH '"' ( ',' general_fact_params )? ')') |
+    ('decimal' '(' 'len' '=' '"' DEC_LENGTH ',' DEC_DECIMALS '"' ( ',' general_fact_params )? ')' )
 ) ';'
+
+general_fact_params ::= general_fact_param (',' general_fact_param)*
+general_fact_param ::= ( 'calculated' '=' ('"true"' | '"false"') ) 
+                        | ('former_name' '=' '"' FORMER_NAME '"')
