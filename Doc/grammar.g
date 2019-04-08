@@ -34,8 +34,7 @@ ref_attribute ::= 'ref' REF_INTERFACE_NAME '.' REF_ATTRIBUTE_NAME
     ';'
 
 fact_attribute ::= 'fact' ATTRIBUTE_NAME ':' (
-    ('int' | 'date' | 'datetime' | 'time') ( '(' general_fact_params ')' )? | 
-    ('varchar' '(' 'len' '=' '"' STR_LENGTH '"' ( ',' general_fact_params )? ')') |
+    ('int'  ( '(' general_fact_params ')' )? ) | 
     ('decimal' '(' 'len' '=' '"' DEC_LENGTH ',' DEC_DECIMALS '"' ( ',' general_fact_params )? ')' )
 ) ';'
 
