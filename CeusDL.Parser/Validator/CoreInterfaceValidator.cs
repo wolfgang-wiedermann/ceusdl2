@@ -24,6 +24,17 @@ namespace KDV.CeusDL.Validator {
             foreach(var duplicate in duplicateAttributes) {
                 repo.AddError($"Your code for {ifa.Name} contains more then one definition of {duplicate} as illegal duplicates", ValidationResult.OT_ATTRIBUTE);
             }
+
+            CheckFactsWithInvalidDataType(ifa, repo);
+        }
+
+        private static void CheckFactsWithInvalidDataType(CoreInterface ifa, ValidationResultRepository repo)
+        {
+            foreach(var attr in ifa.Attributes.Where(a => a is CoreFactAttribute).Select(a => (CoreFactAttribute)a)) {
+                if(attr.DataType != CoreDataType.INT && attr.DataType != CoreDataType.DATETIME) {
+                    repo.AddError($"The Fact {attr.Name} in {ifa.Name} has the DataType {attr.DataType} which is non numerical", ValidationResult.OT_ATTRIBUTE);
+                }
+            }
         }
 
         private static List<string> FindDuplicateAttributes(CoreInterface ifa, CoreModel m)
