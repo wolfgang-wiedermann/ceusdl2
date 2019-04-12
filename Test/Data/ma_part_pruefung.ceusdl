@@ -20,3 +20,14 @@ interface Modul : DimTable(mandant="true") {
     base KNZ:varchar(len="50", primary_key="true");
     base BEZ:varchar(len="100");
 }
+
+interface Note : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base VALUE:int; // Ganzzahlig Note * 100
+    ref Notengruppe.KNZ;
+}
+
+interface Notengruppe : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base BEZ:varchar(len="100");
+}

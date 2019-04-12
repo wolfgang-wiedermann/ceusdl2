@@ -56,3 +56,13 @@ interface Person : DimTable(mandant="true") {
     base BEZ:varchar(len="101", calculated="true");
     base Geburtsdatum:date;
 }
+
+/*
+* Ein einfaches Beispiel für ein calculated Interface
+*/
+interface DiplomaSupplement : FactTable(mandant="true", calculated="true") {
+    ref Studiengang.KNZ(primary_key="true");
+    ref Semester.KNZ(primary_key="true");
+    ref Notengruppe.KNZ(primary_key="true");
+    fact Anzahl_F:int;
+}
