@@ -79,6 +79,8 @@ namespace KDV.CeusDL.Model.BL {
             }
         }
 
+        public bool IsCalculated => this.coreInterface.IsCalculated;
+
         public List<IBLAttribute> PrimaryKeyAttributes {
             get {
                 return this.Attributes.Where(a => a.IsPrimaryKey).ToList<IBLAttribute>();

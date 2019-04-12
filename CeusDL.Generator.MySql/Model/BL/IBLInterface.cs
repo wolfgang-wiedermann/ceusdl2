@@ -29,6 +29,7 @@ namespace KDV.CeusDL.Model.MySql.BL {
         bool IsHistorized { get; }
         IBLAttribute HistoryAttribute { get; }
         bool IsMandant { get; }
+        bool IsCalculated { get; }
         List<IBLAttribute> PrimaryKeyAttributes { get; }
         List<IBLAttribute> UniqueKeyAttributes { get; }
         
