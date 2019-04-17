@@ -15,6 +15,8 @@ import "ma_part_zeit.ceusdl"
 import "ma_part_studiengang.ceusdl"
 import "ma_part_pruefung.ceusdl"
 
+import "common/common_geographie.ceusdl"
+
 /*
 interface Test:DefTable(mandant="true") {
     base ID:varchar(len="50", primary_key="true");

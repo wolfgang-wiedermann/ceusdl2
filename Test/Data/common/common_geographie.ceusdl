@@ -1,0 +1,26 @@
+/*
+Allgemeine Geografie-Dimension
+*/
+
+interface GeoTest:DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+}
+
+interface Entfernungskategorie:DefTable {
+    base KNZ:int(primary_key="true");
+    base BEZEICHNUNG:varchar(len="100");
+    base MIN_DISTANZ:int;
+    base MAX_DISTANZ:int;
+}
+
+interface Ort:DimTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base BEZEICHNUNG:varchar(len="256");
+    base POSTLEITZAHL:varchar(len="5");
+    // Ermittelt via Postleitzahl und OpenStreetMap WebApi
+    base LAENGENGRAD:decimal(len="10,8", calculated="true");
+    base BREITENGRAD:decimal(len="10,8", calculated="true");
+    // Entfernung zur Hochschule
+    ref  Entfernungskategorie.KNZ(calculated="true");
+}

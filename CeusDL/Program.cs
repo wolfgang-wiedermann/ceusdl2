@@ -508,7 +508,12 @@ namespace CeusDL2
             }
             
             foreach(var file in code) {
-                File.WriteAllText(Path.Combine(baseFolder, file.FileName), file.Content);
+                var path = Path.Combine(baseFolder, file.FileName.Replace('/', Path.DirectorySeparatorChar));
+                var f = new FileInfo(path);
+                if(!f.Directory.Exists) {
+                    f.Directory.Create();
+                }
+                File.WriteAllText(path, file.Content);
             }
 
             return code;
