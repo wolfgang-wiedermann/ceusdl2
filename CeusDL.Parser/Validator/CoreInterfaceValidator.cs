@@ -20,12 +20,27 @@ namespace KDV.CeusDL.Validator {
                 repo.AddError($"Your ceusdl code for {ifa.Name} must have a one attribute primary key", ValidationResult.OT_INTERFACE);
             }
 
+            foreach(var illegal in ContainsIllegalAttributeName(ifa)) {
+                repo.AddError($"The interface {ifa.Name} contains the illegal attribute name {illegal}, which "
+                    + "is preserved for the ceusdl generation process", ValidationResult.OT_ATTRIBUTE);
+            }
+
             var duplicateAttributes = FindDuplicateAttributes(ifa, m);
             foreach(var duplicate in duplicateAttributes) {
                 repo.AddError($"Your code for {ifa.Name} contains more then one definition of {duplicate} as illegal duplicates", ValidationResult.OT_ATTRIBUTE);
             }
 
             CheckFactsWithInvalidDataType(ifa, repo);
+        }
+
+        private static List<string> ContainsIllegalAttributeName(CoreInterface ifa)
+        {
+            var illegals = new string[]{"ID"};
+            return ifa.Attributes
+                      .Where(a => illegals.Contains(a.Name?.ToUpper()))
+                      .Select(a => a.Name)
+                      .Distinct()
+                      .ToList();
         }
 
         private static void CheckFactsWithInvalidDataType(CoreInterface ifa, ValidationResultRepository repo)
