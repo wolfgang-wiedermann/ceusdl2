@@ -1,5 +1,5 @@
 /*
- * Beispiel zur Umsetzung einer stark vereinfachten Studenten Domäne 
+ * Beispiel zur Umsetzung einer stark vereinfachten Studierenden-Domäne 
  * für die Masterarbeit
  */
 
@@ -17,7 +17,7 @@ import "ma_part_pruefung.ceusdl"
 
 /*
 interface Test:DefTable(mandant="true") {
-    base KNZ:varchar(len="50", primary_key="true");
+    base ID:varchar(len="50", primary_key="true");
 }
 */
 
@@ -41,11 +41,13 @@ interface Leistungen : FactTable(mandant="true", history="true") {
     ref Semester.KNZ(primary_key="true");
     ref Studiengang.KNZ(primary_key="true");
     ref Pruefung.KNZ(primary_key="true");
+    // Berechnet auf der Basis von Note_F
+    ref Note.KNZ(calculated="true");
     // Berechnetes Attribut: Prüfungsversuch
     ref Anzahl.KNZ(calculated="true") as Versuch; 
-    // Berechneter Fakt: Note * 100; => 1,0 = 100, 1,3 = 130 etc.
+    // Gelieferter Fakt: Note * 100; => 1,0 = 100, 1,3 = 130 etc.
     fact Note_F:int; 
-    // Berechneter Fakt: Anzahl Credit-Points
+    // Gelieferter Fakt: Anzahl Credit-Points
     fact Credit_F:int; 
 }
 
