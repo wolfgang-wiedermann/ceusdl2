@@ -29,7 +29,7 @@ namespace KDV.CeusDL.Validator {
                 repo.AddError($"The interface {ifa.Name} contains an attribute of type {illegal.GetType().Name}, which is illegal for a {ifa.Type} Interface", ValidationResult.OT_ATTRIBUTE);
             }
 
-            foreach(var illegal in ContainsIllegalReference(ifa, m)) {
+            foreach(var illegal in ContainsIllegalReference(ifa)) {
                 repo.AddError($"The interface {ifa.Name} ({ifa.Type}) contains an illegal reference "
                     + $"to {illegal.ReferencedInterface.Name}.{illegal.ReferencedAttribute.Name} ({illegal.ReferencedInterface.Type})", ValidationResult.OT_ATTRIBUTE);
             }
@@ -41,7 +41,7 @@ namespace KDV.CeusDL.Validator {
             CheckFactsWithInvalidDataType(ifa, repo);
         }
 
-        private static List<CoreRefAttribute> ContainsIllegalReference(CoreInterface ifa, CoreModel m)
+        private static List<CoreRefAttribute> ContainsIllegalReference(CoreInterface ifa)
         { 
             var result = new List<CoreRefAttribute>();
 
