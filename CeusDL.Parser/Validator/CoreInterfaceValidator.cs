@@ -25,12 +25,24 @@ namespace KDV.CeusDL.Validator {
                     + "is preserved for the ceusdl generation process", ValidationResult.OT_ATTRIBUTE);
             }
 
+            foreach(var illegal in ContainsIllegalAttributeType(ifa)) {
+                repo.AddError($"The interface {ifa.Name} contains an attribute of type {illegal.GetType().Name}, which is illegal for a {ifa.Type} Interface", ValidationResult.OT_ATTRIBUTE);
+            }
+
             var duplicateAttributes = FindDuplicateAttributes(ifa, m);
             foreach(var duplicate in duplicateAttributes) {
                 repo.AddError($"Your code for {ifa.Name} contains more then one definition of {duplicate} as illegal duplicates", ValidationResult.OT_ATTRIBUTE);
             }
 
             CheckFactsWithInvalidDataType(ifa, repo);
+        }
+
+        private static List<CoreAttribute> ContainsIllegalAttributeType(CoreInterface ifa) {
+            var result = new List<CoreAttribute>();
+            if(ifa.Type != CoreInterfaceType.FACT_TABLE) {
+                result.AddRange(ifa.Attributes.Where(a => a is CoreFactAttribute).ToList());
+            }
+            return result;
         }
 
         private static List<string> ContainsIllegalAttributeName(CoreInterface ifa)
