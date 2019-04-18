@@ -29,12 +29,43 @@ namespace KDV.CeusDL.Validator {
                 repo.AddError($"The interface {ifa.Name} contains an attribute of type {illegal.GetType().Name}, which is illegal for a {ifa.Type} Interface", ValidationResult.OT_ATTRIBUTE);
             }
 
-            var duplicateAttributes = FindDuplicateAttributes(ifa, m);
-            foreach(var duplicate in duplicateAttributes) {
+            foreach(var illegal in ContainsIllegalReference(ifa, m)) {
+                repo.AddError($"The interface {ifa.Name} ({ifa.Type}) contains an illegal reference "
+                    + $"to {illegal.ReferencedInterface.Name}.{illegal.ReferencedAttribute.Name} ({illegal.ReferencedInterface.Type})", ValidationResult.OT_ATTRIBUTE);
+            }
+
+            foreach(var duplicate in FindDuplicateAttributes(ifa, m)) {
                 repo.AddError($"Your code for {ifa.Name} contains more then one definition of {duplicate} as illegal duplicates", ValidationResult.OT_ATTRIBUTE);
             }
 
             CheckFactsWithInvalidDataType(ifa, repo);
+        }
+
+        private static List<CoreRefAttribute> ContainsIllegalReference(CoreInterface ifa, CoreModel m)
+        { 
+            var result = new List<CoreRefAttribute>();
+
+            // Abbruch, wenn keine Referenzen enthalten sind:
+            var refAttributes = ifa.Attributes.Where(a => a is CoreRefAttribute).Select(a => (CoreRefAttribute)a);
+            if(refAttributes.Count() == 0) {
+                return result;
+            }
+
+            switch(ifa.Type) {
+                case CoreInterfaceType.FACT_TABLE:
+                    break;
+                case CoreInterfaceType.DIM_TABLE:
+                case CoreInterfaceType.DIM_VIEW:
+                    result.AddRange(refAttributes.Where(a => a.ReferencedInterface.Type == CoreInterfaceType.FACT_TABLE).ToList());
+                    break;
+                case CoreInterfaceType.DEF_TABLE:
+                case CoreInterfaceType.TEMPORAL_TABLE:
+                    result.AddRange(refAttributes.Where(a => a.ReferencedInterface.Type == CoreInterfaceType.FACT_TABLE).ToList());
+                    result.AddRange(refAttributes.Where(a => a.ReferencedInterface.Type == CoreInterfaceType.DIM_TABLE).ToList());
+                    result.AddRange(refAttributes.Where(a => a.ReferencedInterface.Type == CoreInterfaceType.DIM_VIEW).ToList());
+                    break;
+            }
+            return result;
         }
 
         private static List<CoreAttribute> ContainsIllegalAttributeType(CoreInterface ifa) {
