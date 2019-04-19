@@ -89,7 +89,7 @@ namespace KDV.CeusDL.Validator {
         private static void CheckFactsWithInvalidDataType(CoreInterface ifa, ValidationResultRepository repo)
         {
             foreach(var attr in ifa.Attributes.Where(a => a is CoreFactAttribute).Select(a => (CoreFactAttribute)a)) {
-                if(attr.DataType != CoreDataType.INT && attr.DataType != CoreDataType.DATETIME) {
+                if(attr.DataType != CoreDataType.INT && attr.DataType != CoreDataType.DECIMAL) {
                     repo.AddError($"The Fact {attr.Name} in {ifa.Name} has the DataType {attr.DataType} which is non numerical", ValidationResult.OT_ATTRIBUTE);
                 }
             }
