@@ -48,6 +48,8 @@ namespace KDV.CeusDL.Model.BL {
 
         public string FullViewName => throw new NotImplementedException();
 
+        public bool IsCalculated => throw new NotImplementedException();
+
         #endregion
 
         public BLInterfaceMock() {

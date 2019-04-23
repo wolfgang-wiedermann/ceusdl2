@@ -15,6 +15,7 @@ namespace KDV.CeusDL.Model.Core {
         public CoreAttribute HistoryBy {get; private set;}
         public string FormerName { get; private set; }
         public bool IsHistorized { get; private set; }
+        public bool IsCalculated { get; private set; }
 
         public List<CoreItemLevelObject> ItemObjects {get; private set;}
         public List<CoreAttribute> Attributes {
@@ -57,6 +58,9 @@ namespace KDV.CeusDL.Model.Core {
             }
             if(tmp.Parameters != null && tmp.Parameters.Where(p => p.Name == "history" && p.Value == "true").Count() > 0) {
                 IsHistorized = true;
+            }
+            if(tmp.Parameters != null && tmp.Parameters.Where(p => p.Name == "calculated" && p.Value == "true").Count() > 0) {
+                IsCalculated = true;
             }
 
             // Prüfung semantischer Regeln der Sprache CEUSDL (ausfiltern ungültiger Parameterkombinationen)

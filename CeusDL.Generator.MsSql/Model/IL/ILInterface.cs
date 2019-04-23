@@ -27,13 +27,16 @@ namespace KDV.CeusDL.Model.IL {
         }
         public List<ILAttribute> PrimaryKeyAttributes {get; private set;}
 
+        public bool IsCalcualted => baseData.IsCalculated;
+
         ///
         /// Nur DimTable und FactTable gehören in die IL, der Rest beginnt
         /// ab BL zu existieren !!
         ///
         public bool IsILRelevant() {
-            return baseData.Type == CoreInterfaceType.DIM_TABLE 
-                || baseData.Type == CoreInterfaceType.FACT_TABLE;
+            return (baseData.Type == CoreInterfaceType.DIM_TABLE 
+                || baseData.Type == CoreInterfaceType.FACT_TABLE) 
+                && ! baseData.IsCalculated;
         }
 
         // TOOD: der 2. Parameter CoreModel kann jetzt über Property von CoreInterface ermittelt werden

@@ -79,6 +79,8 @@ namespace KDV.CeusDL.Model.MySql.BL
             }
         }
 
+        public bool IsCalculated => false;
+
         public List<IBLAttribute> PrimaryKeyAttributes { get; private set; }
 
         public List<IBLAttribute> UniqueKeyAttributes {           

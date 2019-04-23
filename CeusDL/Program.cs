@@ -75,13 +75,23 @@ namespace CeusDL2
                 options.DbConnectionString = File.ReadAllText(dbConnectionFileName);
                 //options.GenerateSnowflake = true;
                 options.GenerateStar = true;
-                ExecuteCompilation(ceusdlFileName, options);
-                if (!string.IsNullOrWhiteSpace(options.DbConnectionString) && options.ExecuteUpdate) {
-                    ExecuteUpdate(GENERATED_SQL, options);
-                }
-                else if (!string.IsNullOrWhiteSpace(options.DbConnectionString) && options.ExecuteReplace)
+
+                try
                 {
-                    ExecuteReplace(GENERATED_SQL, options);
+                    ExecuteCompilation(ceusdlFileName, options);
+
+                    if (!string.IsNullOrWhiteSpace(options.DbConnectionString) && options.ExecuteUpdate) {
+                        ExecuteUpdate(GENERATED_SQL, options);
+                    }
+                    else if (!string.IsNullOrWhiteSpace(options.DbConnectionString) && options.ExecuteReplace)
+                    {
+                        ExecuteReplace(GENERATED_SQL, options);
+                    }
+                }
+                catch(CeusdlCompilationException) 
+                {
+                    Console.WriteLine("Compilation canceled because of errors");
+                    return;
                 }
             } else {
                 // Dieser Code wird beim Aufruf über Commandline ausgeführt
@@ -140,19 +150,25 @@ namespace CeusDL2
                         Console.WriteLine("ERROR: you have to specify a !!EXISTING!! ceusdl file to start its compilation.");
                         return 2;
                     }
-
-                    ExecuteCompilation(srcFile, options);
-
-                    if (options.ExecuteUpdate)
+                    try 
                     {
-                        ExecuteUpdate(GENERATED_SQL, options);
-                    }
-                    else if (options.ExecuteReplace)
-                    {
-                        ExecuteReplace(GENERATED_SQL, options);
-                    }
+                        ExecuteCompilation(srcFile, options);
 
-                    return 0;
+                        if (options.ExecuteUpdate)
+                        {
+                            ExecuteUpdate(GENERATED_SQL, options);
+                        }
+                        else if (options.ExecuteReplace)
+                        {
+                            ExecuteReplace(GENERATED_SQL, options);
+                        }
+
+                        return 0;
+                    } 
+                    catch(CeusdlCompilationException) 
+                    {
+                        return 1;
+                    }
                 });
 
                 cla.Execute(args);
@@ -248,7 +264,7 @@ namespace CeusDL2
             if (validationResult.ContainsErrors())
             {
                 Console.WriteLine("ERROR: Compilation stopped by validation errors");
-                return;
+                throw new CeusdlCompilationException(validationResult);
             }
 
             // CeusDL generieren.
@@ -492,7 +508,12 @@ namespace CeusDL2
             }
             
             foreach(var file in code) {
-                File.WriteAllText(Path.Combine(baseFolder, file.FileName), file.Content);
+                var path = Path.Combine(baseFolder, file.FileName.Replace('/', Path.DirectorySeparatorChar));
+                var f = new FileInfo(path);
+                if(!f.Directory.Exists) {
+                    f.Directory.Create();
+                }
+                File.WriteAllText(path, file.Content);
             }
 
             return code;

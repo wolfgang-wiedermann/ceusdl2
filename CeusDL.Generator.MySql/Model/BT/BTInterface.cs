@@ -21,6 +21,7 @@ namespace KDV.CeusDL.Model.MySql.BT {
             this.InterfaceType = coreInterface.Type;
             this.IsMandant = ifa.IsMandant;
             this.IsHistorized = ifa.IsHistorized;
+            this.IsCalculated = ifa.IsCalculated;
 
             // TODO: evtl. ist es auch vorteilhaft, wenn die beiden
             //       Interfaces _VERSION und das Original eine Referenz aufeinander haben.
@@ -114,6 +115,7 @@ namespace KDV.CeusDL.Model.MySql.BT {
         public bool IsHistorizedFactTable { get; private set; }
         // für den Fall mandant="true"
         public bool IsMandant { get; private set; }
+        public bool IsCalculated { get; private set; }
 
         internal void PostProcess()
         {
