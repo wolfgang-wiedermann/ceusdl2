@@ -76,7 +76,7 @@ namespace KDV.CeusDL.Model.BL.Test
             Assert.IsNotNull(attrKont);
             Assert.AreEqual("Kontinent_KNZ", attrKont.Name);
             Assert.AreEqual("Kont_Kontinent_KNZ", attrKont.FormerName);
-            Assert.AreEqual("AP_BL_D_Kontinent.Kont_Kontinent_KNZ", attrKont.FullFormerName);
+            Assert.AreEqual("AP_BL_D_Land.Kont_Kontinent_KNZ", attrKont.FullFormerName);
 
             // Das wird noch interessant, denn was ist, wenn Attributbezeichnung und Tabellenbezeichnung
             // zu unterschiedlichen Zeitpunkten geändert werden?
