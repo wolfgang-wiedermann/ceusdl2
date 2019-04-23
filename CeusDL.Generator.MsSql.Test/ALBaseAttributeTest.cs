@@ -15,7 +15,7 @@ namespace KDV.CeusDL.Model.AL.Test
         public void TestALBaseAttribute_GetName()
         {
             // Daten einlesen...
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\al_tests.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\al_tests.ceusdl";
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
@@ -41,7 +41,7 @@ namespace KDV.CeusDL.Model.AL.Test
         public void TestDimensionALInterface_GetName()
         {
             // Daten einlesen...
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\al_tests.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\al_tests.ceusdl";
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
@@ -59,7 +59,7 @@ namespace KDV.CeusDL.Model.AL.Test
         public void TestDimensionALInterface_CheckReferences()
         {
             // Daten einlesen...
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\al_tests.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\al_tests.ceusdl";
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
