@@ -18,8 +18,10 @@ using System.Runtime.InteropServices;
 namespace CeusDL2
 {
     ///
-    /// Nach Exe kompilieren mit Aufruf 
-    /// dotnet publish -c Release -r win7-x64 
+    /// Eine Windows-Exe kompilieren mit Aufruf 
+    /// dotnet publish -c Release -r win7-x64
+    /// Native ausführbare Datei für MacOS kompilieren
+    /// dotnet publish -c Release -r osx.10.11-x64
     /// in der Commandline
     ///
     class Program
@@ -66,7 +68,7 @@ namespace CeusDL2
                     options.GenerateMsSql = false;
                     options.ExecuteReplace = false;
                     options.ExecuteUpdate = true;
-                    options.ExecuteUpdateWithReload = false;
+                    options.ExecuteUpdateWithReload = true;
                 }
 
                 string rootFolder = "."; 

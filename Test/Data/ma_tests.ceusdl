@@ -1,0 +1,45 @@
+/*
+interface TestSVerl : FactTable(history="true") {
+    base Matrikelnummer:varchar(primary_key="true", len="50");
+    ref Semester.KNZ(primary_key="true");
+    ref Studiengang.KNZ;
+    fact Alter_F:int(calculated="true"); 
+}
+
+interface TestPruef : DimTable(history="true") {
+    base LabNummer:varchar(primary_key="true", len="50");
+    ref TestSVerl.Matrikelnummer;
+    ref Pruefung.KNZ;
+    ref Note.KNZ(calculated="true");
+    ref Anzahl.KNZ(calculated="true") as Versuch; 
+}
+*/
+
+/*
+* Beispiel zu berechneten Interfaces
+*/
+
+interface Kontenart : DefTable {
+    base KNZ:int(primary_key="true");
+    base BEZ:varchar(len="100");
+}
+
+interface Konto : DimTable {
+    base NR:varchar(len="6", primary_key="true");
+    base BEZ:varchar(len="100");
+    ref Kontenart.KNZ;
+}
+
+interface Buchung : FactTable {
+    base BNR:int(primary_key="true");
+    ref  Konto.NR(primary_key="true");
+    ref  Jahr.KNZ;
+    base BTXT:varchar(len="100");
+    fact Betrag:decimal(len="12,2");
+}
+
+interface GuV : FactTable(calculated="true") {
+    ref  Konto.NR(primary_key="true");
+    ref  Jahr.KNZ(primary_key="true");
+    fact Saldo:decimal(len="12,2");
+}

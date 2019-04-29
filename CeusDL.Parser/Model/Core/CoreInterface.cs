@@ -77,7 +77,11 @@ namespace KDV.CeusDL.Model.Core {
                 throw new InvalidParameterException($"Fehler in Interface {Name}: Now-Tables sind nur für historisierte Tabellen zulässig");
             }
 
-            if(tmp.Parameters != null && tmp.Parameters.Where(a => a.Name == "finest_time_attribute" && a.Value == "true").Count() > 0) {
+            if(tmp.Parameters != null 
+                && (
+                    tmp.Parameters.Where(a => a.Name == "finest_time_attribute" && a.Value == "true").Count() > 0
+                    || tmp.Parameters.Where(a => a.Name == "history_attribute" && a.Value == "true").Count() > 0
+                )) {
                 // Prüfung: InterfaceType muss TemporalTable sein
                 if(Type != CoreInterfaceType.TEMPORAL_TABLE) {                    
                     throw new InvalidParameterException($"Fehler in Interface {Name}: Nur TemporalTables können finest_time_attribute sein");

@@ -16,6 +16,7 @@ import "ma_part_studiengang.ceusdl"
 import "ma_part_pruefung.ceusdl"
 
 import "common/common_geographie.ceusdl"
+import "ma_tests.ceusdl"
 
 /*
 interface Test:DefTable(mandant="true") {
