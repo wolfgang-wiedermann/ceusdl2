@@ -60,7 +60,7 @@ namespace KDV.CeusDL.Parser.Test
             
             var model = new CoreModel(result);
 
-            Assert.AreEqual(34, model.Interfaces.Count);
+            Assert.AreEqual(39, model.Interfaces.Count);
             Assert.AreEqual("Tag", model.Interfaces.Where(i => i.Name == "Tag").First().Name);
             Assert.AreEqual("Studienfach", model.Interfaces.Where(i => i.Name == "Studienfach").First().Name);
         }

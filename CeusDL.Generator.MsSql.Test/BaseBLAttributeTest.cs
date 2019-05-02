@@ -15,7 +15,7 @@ namespace KDV.CeusDL.Model.BL.Test
         public void TestBaseBLAttribute_ByCoreBaseAttribute()
         {
             // Daten einlesen...
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\interface_demo.ceusdl";
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
@@ -43,7 +43,7 @@ namespace KDV.CeusDL.Model.BL.Test
         [TestMethod]
         public void TestBaseBLAttribute_FormerName() 
         {
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo.1.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\interface_demo.1.ceusdl";
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
@@ -63,7 +63,7 @@ namespace KDV.CeusDL.Model.BL.Test
         [TestMethod]
         public void TestRefBLAttribute_FormerName()
         {
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo.2.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\interface_demo.2.ceusdl";
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
@@ -76,7 +76,7 @@ namespace KDV.CeusDL.Model.BL.Test
             Assert.IsNotNull(attrKont);
             Assert.AreEqual("Kontinent_KNZ", attrKont.Name);
             Assert.AreEqual("Kont_Kontinent_KNZ", attrKont.FormerName);
-            Assert.AreEqual("AP_BL_D_Kontinent.Kont_Kontinent_KNZ", attrKont.FullFormerName);
+            Assert.AreEqual("AP_BL_D_Land.Kont_Kontinent_KNZ", attrKont.FullFormerName);
 
             // Das wird noch interessant, denn was ist, wenn Attributbezeichnung und Tabellenbezeichnung
             // zu unterschiedlichen Zeitpunkten geändert werden?

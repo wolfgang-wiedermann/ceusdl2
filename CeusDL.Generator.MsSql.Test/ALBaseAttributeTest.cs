@@ -15,7 +15,7 @@ namespace KDV.CeusDL.Model.AL.Test
         public void TestALBaseAttribute_GetName()
         {
             // Daten einlesen...
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\al_tests.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\al_tests.ceusdl";
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
@@ -30,18 +30,18 @@ namespace KDV.CeusDL.Model.AL.Test
 
             baseAttr = alModel.DimensionInterfaces[0].Attributes.Where(a => a is BaseALAttribute).FirstOrDefault();
             Assert.IsNotNull(baseAttr);            
-            Assert.AreEqual("Primary_TermGroup_ID", baseAttr.Name);
+            Assert.AreEqual("Term_Primary_TermGroup_ID", baseAttr.Name);
 
             baseAttr = alModel.DimensionInterfaces[2].Attributes.Where(a => a is BaseALAttribute).FirstOrDefault();
             Assert.IsNotNull(baseAttr);            
-            Assert.AreEqual("Term_ID", baseAttr.Name);
+            Assert.AreEqual("Term_Term_ID", baseAttr.Name);
         }        
 
         [TestMethod]
         public void TestDimensionALInterface_GetName()
         {
             // Daten einlesen...
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\al_tests.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\al_tests.ceusdl";
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
@@ -59,7 +59,7 @@ namespace KDV.CeusDL.Model.AL.Test
         public void TestDimensionALInterface_CheckReferences()
         {
             // Daten einlesen...
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\al_tests.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\al_tests.ceusdl";
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
@@ -69,7 +69,7 @@ namespace KDV.CeusDL.Model.AL.Test
             var alModel = new AL.ALModel(bt);
             var refAttr = alModel.FactInterfaces[0].Attributes.Where(a => a is RefALAttribute).Select(a => (RefALAttribute)a).FirstOrDefault();
             Assert.IsNotNull(refAttr);
-            Assert.AreEqual("Term_ID", refAttr.Name);
+            Assert.AreEqual("Term_Term_ID", refAttr.Name);
             
             var dim = refAttr.ReferencedDimension;
             Assert.IsNotNull(dim);
@@ -79,7 +79,7 @@ namespace KDV.CeusDL.Model.AL.Test
 
             var childRef = dim.Attributes.Where(a => a is RefALAttribute).Select(a => (RefALAttribute)a).FirstOrDefault();
             Assert.IsNotNull(childRef);
-            Assert.AreEqual("Primary_TermGroup_ID", childRef.Name);
+            Assert.AreEqual("Term_Primary_TermGroup_ID", childRef.Name);
             Assert.IsNotNull(childRef.ReferencedDimension);
             var childDim = childRef.ReferencedDimension;
             Assert.AreEqual("ARC_D_Term_2_Primary_TermGroup", childDim.Name);
@@ -87,7 +87,7 @@ namespace KDV.CeusDL.Model.AL.Test
 
             refAttr = alModel.FactInterfaces[0].Attributes.Where(a => a is RefALAttribute).Select(a => (RefALAttribute)a).LastOrDefault();
             Assert.IsNotNull(refAttr);
-            Assert.AreEqual("Former_Gender_ID", refAttr.Name);
+            Assert.AreEqual("Former_Gender_Former_Gender_ID", refAttr.Name);
         }  
     }
 }

@@ -13,7 +13,7 @@ namespace KDV.CeusDL.Model.BT.Test
         public void TestBTModel_BySimpleFileWithConfig()
         {
             // Daten einlesen aus Datei mit Config-Section
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo.4.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\interface_demo.4.ceusdl";
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
@@ -36,7 +36,7 @@ namespace KDV.CeusDL.Model.BT.Test
         public void TestBTModel_BySimpleFile()
         {
             // Daten einlesen aus Datei ohne Config-Section
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\interface_demo.ceusdl";
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
@@ -59,7 +59,7 @@ namespace KDV.CeusDL.Model.BT.Test
         public void TestBTModel_WithMandantFile()
         {
             // Daten einlesen aus Datei ohne Config-Section
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo.2.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\interface_demo.2.ceusdl";
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
@@ -83,7 +83,7 @@ namespace KDV.CeusDL.Model.BT.Test
         public void TestBTModel_WithMandantAndHistoryFile()
         {
             // Daten einlesen aus Datei ohne Config-Section
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo.5.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\interface_demo.5.ceusdl";
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
@@ -106,7 +106,7 @@ namespace KDV.CeusDL.Model.BT.Test
         public void TestBTModel_WithMandantAndHistoryFile2()
         {
             // Daten einlesen aus Datei ohne Config-Section
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo.6.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\interface_demo.6.ceusdl";
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
