@@ -106,8 +106,8 @@ namespace CeusDL2
                 var mysqlOpt = cla.Option("--mysql", "Generate for MySQL and MariaDB", CommandOptionType.NoValue);
                 var starOpt = cla.Option("--star", "Generate analytical layer as star scheme", CommandOptionType.NoValue);
                 var snowflakeOpt = cla.Option("--snowflake", "Generate analytical layer as snowflake scheme", CommandOptionType.NoValue);
-                var executeUpdate = cla.Option("--update", "Update Baselayer, Replace everything else", CommandOptionType.NoValue);
-                var executeUpdateWithReload = cla.Option("--update-with-reload", "Update BaseLayer like --update and reload data to bt and al", CommandOptionType.NoValue);
+                var executeUpdate = cla.Option("--update", "Update Base Layer, Replace everything else", CommandOptionType.NoValue);
+                var executeUpdateWithReload = cla.Option("--update-with-reload", "Update Base Layer like --update and reload data to bt and al", CommandOptionType.NoValue);
                 var executeReplace = cla.Option("--replace", "Replace all Layers (deletes all Data)", CommandOptionType.NoValue);
                 var generateConstraints = cla.Option("--generate-constraints", "Generate SQL-Constraints for BaseLayer", CommandOptionType.NoValue);
                 var help = cla.HelpOption("-? | --help");
