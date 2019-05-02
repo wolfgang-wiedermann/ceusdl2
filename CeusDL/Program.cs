@@ -109,7 +109,7 @@ namespace CeusDL2
                 var executeUpdate = cla.Option("--update", "Update Base Layer, Replace everything else", CommandOptionType.NoValue);
                 var executeUpdateWithReload = cla.Option("--update-with-reload", "Update Base Layer like --update and reload data to BT and AL", CommandOptionType.NoValue);
                 var executeReplace = cla.Option("--replace", "Replace all Layers (deletes all Data)", CommandOptionType.NoValue);
-                var generateConstraints = cla.Option("--generate-constraints", "Generate SQL-Constraints for BaseLayer", CommandOptionType.NoValue);
+                var generateConstraints = cla.Option("--generate-constraints", "Generate SQL-Constraints for Base Layer", CommandOptionType.NoValue);
                 var help = cla.HelpOption("-? | --help");
 
                 cla.OnExecute(() => {
