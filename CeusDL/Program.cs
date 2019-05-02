@@ -101,13 +101,13 @@ namespace CeusDL2
                 cla.Name = "ceusdlc";
                 var ceusdlOpt = cla.Option("-c | --ceusdl <ceusdlfile>", "Path to the ceusdl file to compile", CommandOptionType.SingleValue);
                 var dirOpt = cla.Option("-d | --directory <target_directory>", "Path to store the result of compilation.", CommandOptionType.SingleValue);
-                var conOpt = cla.Option("--connection <connectionfile>", "Textfile containing connection string to Database", CommandOptionType.SingleValue);
+                var conOpt = cla.Option("--connection <connectionfile>", "Textfile containing connection string to database", CommandOptionType.SingleValue);
                 var mssqlOpt = cla.Option("--mssql", "Generate for Microsoft SQL Server", CommandOptionType.NoValue);
                 var mysqlOpt = cla.Option("--mysql", "Generate for MySQL and MariaDB", CommandOptionType.NoValue);
-                var starOpt = cla.Option("--star", "Generate analytical layer as star scheme", CommandOptionType.NoValue);
-                var snowflakeOpt = cla.Option("--snowflake", "Generate analytical layer as snowflake scheme", CommandOptionType.NoValue);
+                var starOpt = cla.Option("--star", "Generate Analytical Layer as Star Scheme", CommandOptionType.NoValue);
+                var snowflakeOpt = cla.Option("--snowflake", "Generate Analytical Layer as Snowflake Scheme", CommandOptionType.NoValue);
                 var executeUpdate = cla.Option("--update", "Update Base Layer, Replace everything else", CommandOptionType.NoValue);
-                var executeUpdateWithReload = cla.Option("--update-with-reload", "Update Base Layer like --update and reload data to bt and al", CommandOptionType.NoValue);
+                var executeUpdateWithReload = cla.Option("--update-with-reload", "Update Base Layer like --update and reload data to BT and AL", CommandOptionType.NoValue);
                 var executeReplace = cla.Option("--replace", "Replace all Layers (deletes all Data)", CommandOptionType.NoValue);
                 var generateConstraints = cla.Option("--generate-constraints", "Generate SQL-Constraints for BaseLayer", CommandOptionType.NoValue);
                 var help = cla.HelpOption("-? | --help");
