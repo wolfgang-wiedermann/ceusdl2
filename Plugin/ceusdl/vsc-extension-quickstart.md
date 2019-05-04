@@ -1,4 +1,4 @@
-# Welcome to your VS Code Extension
+# Welcome to the ceusdl VS Code Extension
 
 ## Installing your extension locally
 
