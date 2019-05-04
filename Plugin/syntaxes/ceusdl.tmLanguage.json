@@ -1,0 +1,64 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "ceusdl",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#interfacetypes"
+		},
+		{
+			"include": "#datatypes"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.ceusdl",
+				"match": "\\b(config|interface|import|base|ref|fact|as)\\b"
+			}]
+		},
+		"interfacetypes": {
+			"patterns": [{
+				"name": "storage.type.ceusdl",
+				"match": "\\b(DimTable|DefTable|TemporalTable|FactTable)\\b"
+			}]
+		},
+		"datatypes": {
+			"patterns": [{
+				"name": "entity.name.type",
+				"match": "\\b(int|varchar|date|time|datetime|decimal)\\b"
+			}]
+		},
+		"strings": {
+			"name": "string.quoted.double.ceusdl",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.ceusdl",
+					"match": "\\\\."
+				}
+			]
+		},
+		"comments": {
+			"patterns": [{
+				"name": "comment.control.ceusdl",
+				"begin": "//",
+				"end": "\\n"
+			}, {
+				"name": "comment.block.ceusdl",
+				"begin": "/\\*",
+				"end": "\\*/"
+			}]
+		}
+	},
+	"scopeName": "source.ceusdl"
+}

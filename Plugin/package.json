@@ -1,0 +1,25 @@
+{
+    "name": "ceusdl",
+    "displayName": "ceusdl",
+    "description": "CEUSDL Language",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.29.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "ceusdl",
+            "aliases": ["ceusdl", "ceusdl"],
+            "extensions": [".ceusdl", ".cdl"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "ceusdl",
+            "scopeName": "source.ceusdl",
+            "path": "./syntaxes/ceusdl.tmLanguage.json"
+        }]
+    }
+}
