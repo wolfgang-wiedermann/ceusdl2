@@ -16,8 +16,11 @@ namespace KDV.CeusDL.Generator.MySql.IL {
         public List<GeneratorResult> GenerateCode()
         {
             string code = "--\n-- InterfaceLayer (MySQL) \n--\n\n";
-            code += $"create database if not exists {model.Database};\n\n";
-            code += $"use {model.Database};\n\n";
+
+            if(!String.IsNullOrEmpty(model.Database)) {
+                code += $"create database if not exists {model.Database};\n\n";
+                code += $"use {model.Database};\n\n";
+            }
 
             foreach(var ifa in model.Interfaces.Where(i => i.IsILRelevant())) {
                 code += GenerateIfaCode(ifa);

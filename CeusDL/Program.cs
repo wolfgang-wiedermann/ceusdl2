@@ -22,6 +22,8 @@ namespace CeusDL2
     /// dotnet publish -c Release -r win7-x64
     /// Native ausführbare Datei für MacOS kompilieren
     /// dotnet publish -c Release -r osx.10.11-x64
+    /// Native ausführbare Datei für Linux kompilieren
+    /// dotnet publish -c Release -r linux-x64
     /// in der Commandline
     ///
     class Program
