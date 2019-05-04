@@ -17,5 +17,5 @@ After copying you should have a new folder
 
 \[SYSTEM_DEPENDENT\]/.vscode/extensions/ceusdl
 
-containing. After that, restart your visual studio code and open a ceusdl file. 
+containing the ceusdl extension. After that, restart your visual studio code and open a ceusdl file. 
 Now you should see the files content with a colorful syntax highlighting.
