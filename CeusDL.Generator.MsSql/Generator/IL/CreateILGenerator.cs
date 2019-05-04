@@ -16,7 +16,9 @@ namespace KDV.CeusDL.Generator.IL {
         public List<GeneratorResult> GenerateCode()
         {
             string code = "--\n-- InterfaceLayer\n--\n\n";
-            code += $"use {model.Database}\n\n";
+            if(!string.IsNullOrEmpty(model.Database)) {
+                code += $"use {model.Database}\n\n";
+            }
 
             foreach(var ifa in model.Interfaces.Where(i => i.IsILRelevant())) {
                 code += GenerateIfaCode(ifa);
