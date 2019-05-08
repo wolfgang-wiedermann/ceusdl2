@@ -43,3 +43,10 @@ interface GuV : FactTable(calculated="true") {
     ref  Jahr.KNZ(primary_key="true");
     fact Saldo:decimal(len="12,2");
 }
+
+interface TestFT : FactTable(history="true") {
+    base BNR:int(primary_key="true");
+    ref  Konto.NR;
+    ref  Semester.KNZ;
+    fact Betrag:decimal(len="12,2");
+}
