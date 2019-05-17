@@ -284,6 +284,9 @@ namespace CeusDL2
 
         private static void ExecuteGenerationMySql(GenerationOptions options, string conStr, CoreModel model)
         {
+            // Diagramm generieren
+            ExecuteStep(new GraphvizCeusDLGenerator(model), GENERATED_GRAPHVIZ);
+
             // IL generieren.
             CoreILSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.IL.DropILGenerator(model), GENERATED_SQL));
             CoreILSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.IL.CreateILGenerator(model), GENERATED_SQL));
@@ -335,6 +338,9 @@ namespace CeusDL2
 
         private static void ExecuteGenerationMsSql(GenerationOptions options, string conStr, CoreModel model)
         {
+            // Diagramm generieren
+            ExecuteStep(new GraphvizCeusDLGenerator(model), GENERATED_GRAPHVIZ);
+
             // IL generieren.
             CoreILSQLStatements.AddRange(ExecuteStep(new DropILGenerator(model), GENERATED_SQL));
             CoreILSQLStatements.AddRange(ExecuteStep(new CreateILGenerator(model), GENERATED_SQL));

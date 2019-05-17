@@ -110,11 +110,11 @@ namespace KDV.CeusDL.Generator.CeusDL
             return code;
         }
 
-        private string GenerateBaseAttribute(CoreBaseAttribute attr, CoreInterface ifa, CoreModel model) {
+        public string GenerateBaseAttribute(CoreBaseAttribute attr, CoreInterface ifa, CoreModel model) {
             return GenerateBaseAttribute("base", attr, ifa, model);
         }
 
-        private string GenerateFactAttribute(CoreBaseAttribute attr, CoreInterface ifa, CoreModel model) {
+        public string GenerateFactAttribute(CoreBaseAttribute attr, CoreInterface ifa, CoreModel model) {
             return GenerateBaseAttribute("fact", attr, ifa, model);
         }
 
@@ -164,7 +164,7 @@ namespace KDV.CeusDL.Generator.CeusDL
             return code;
         }
 
-        private string GenerateRefAttribute(CoreRefAttribute attr, CoreInterface ifa, CoreModel model)
+        public string GenerateRefAttribute(CoreRefAttribute attr, CoreInterface ifa, CoreModel model)
         {
             string code = $"ref  {attr.ReferencedInterface.Name}.{attr.ReferencedAttribute.Name}".Indent(1);
             bool dirty = false;
