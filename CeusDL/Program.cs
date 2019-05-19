@@ -69,8 +69,8 @@ namespace CeusDL2
                     options.GenerateMySql = true;
                     options.GenerateMsSql = false;
                     options.ExecuteReplace = false;
-                    options.ExecuteUpdate = true;
-                    options.ExecuteUpdateWithReload = true;
+                    options.ExecuteUpdate = false;
+                    options.ExecuteUpdateWithReload = false;
                 }
 
                 string rootFolder = "."; 
@@ -79,6 +79,7 @@ namespace CeusDL2
                 options.DbConnectionString = File.ReadAllText(dbConnectionFileName);
                 //options.GenerateSnowflake = true;
                 options.GenerateStar = true;
+                options.GenerateSlimDiagram = true;
 
                 try
                 {
@@ -107,6 +108,7 @@ namespace CeusDL2
                 var mssqlOpt = cla.Option("--mssql", "Generate for Microsoft SQL Server", CommandOptionType.NoValue);
                 var mysqlOpt = cla.Option("--mysql", "Generate for MySQL and MariaDB", CommandOptionType.NoValue);
                 var starOpt = cla.Option("--star", "Generate Analytical Layer as Star Scheme", CommandOptionType.NoValue);
+                var slimOpt = cla.Option("--slim-diagram", "Generate ceusdl diagram with short texts", CommandOptionType.NoValue);
                 var snowflakeOpt = cla.Option("--snowflake", "Generate Analytical Layer as Snowflake Scheme", CommandOptionType.NoValue);
                 var executeUpdate = cla.Option("--update", "Update Base Layer, Replace everything else", CommandOptionType.NoValue);
                 var executeUpdateWithReload = cla.Option("--update-with-reload", "Update Base Layer like --update and reload data to BT and AL", CommandOptionType.NoValue);
@@ -140,6 +142,7 @@ namespace CeusDL2
                     options.GenerateSnowflake = snowflakeOpt.HasValue();
                     options.GenerateMySql = mysqlOpt.HasValue() && (!mssqlOpt.HasValue());
                     options.GenerateMsSql = (!mysqlOpt.HasValue()) || mssqlOpt.HasValue();
+                    options.GenerateSlimDiagram = slimOpt.HasValue();
                     options.ExecuteUpdate = executeUpdate.HasValue() || executeUpdateWithReload.HasValue();
                     options.ExecuteUpdateWithReload = executeUpdateWithReload.HasValue();
                     options.ExecuteReplace = executeReplace.HasValue();
@@ -285,7 +288,7 @@ namespace CeusDL2
         private static void ExecuteGenerationMySql(GenerationOptions options, string conStr, CoreModel model)
         {
             // Diagramm generieren
-            ExecuteStep(new GraphvizCeusDLGenerator(model), GENERATED_GRAPHVIZ);
+            ExecuteStep(new GraphvizCeusDLGenerator(model, options.GenerateSlimDiagram), GENERATED_GRAPHVIZ);
 
             // IL generieren.
             CoreILSQLStatements.AddRange(ExecuteStep(new KDV.CeusDL.Generator.MySql.IL.DropILGenerator(model), GENERATED_SQL));
@@ -339,7 +342,7 @@ namespace CeusDL2
         private static void ExecuteGenerationMsSql(GenerationOptions options, string conStr, CoreModel model)
         {
             // Diagramm generieren
-            ExecuteStep(new GraphvizCeusDLGenerator(model), GENERATED_GRAPHVIZ);
+            ExecuteStep(new GraphvizCeusDLGenerator(model, options.GenerateSlimDiagram), GENERATED_GRAPHVIZ);
 
             // IL generieren.
             CoreILSQLStatements.AddRange(ExecuteStep(new DropILGenerator(model), GENERATED_SQL));

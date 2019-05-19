@@ -13,13 +13,18 @@ namespace KDV.CeusDL.Generator.CeusDL
         private CoreModel model = null;
         private CeusDLGenerator helper = null;
 
-        public GraphvizCeusDLGenerator(CoreModel model) {
+        private bool generateSlim = false;
+
+        public GraphvizCeusDLGenerator(CoreModel model, bool generateSlim) {
+            this.generateSlim = generateSlim;
             this.model = model;            
             this.helper = new CeusDLGenerator(model);
         }
 
-        public GraphvizCeusDLGenerator(CoreImport model) {            
-            this.model = new CoreModel(model);            
+        public GraphvizCeusDLGenerator(CoreImport model, bool generateSlim) {
+            this.generateSlim = generateSlim;      
+            this.model = new CoreModel(model);  
+            this.helper = new CeusDLGenerator(model);          
         }
 
         public List<GeneratorResult> GenerateCode()
@@ -51,18 +56,33 @@ namespace KDV.CeusDL.Generator.CeusDL
         {
             sb.Append($"{ifa.Name}[label=<\n");
             sb.Append("<table border=\"0\" cellborder=\"1\" cellspacing=\"0\">\n");
-            sb.Append($"<tr><td><b>{ifa.Name}:{InterfaceTypeToString(ifa.Type)}</b></td></tr>\n");
+            sb.Append($"<tr><td><b>{ifa.Name}:{InterfaceTypeToString(ifa.Type)}    </b></td></tr>\n");
 
             foreach(var attr in ifa.Attributes) {
                 if(attr is CoreFactAttribute) {
                     var fattr = (CoreFactAttribute)attr;
-                    sb.Append($"<tr><td port=\"{attr.Name}\">{helper.GenerateFactAttribute(fattr, ifa, model)}</td></tr>\n");
+                    string tmp = helper.GenerateFactAttribute(fattr, ifa, model);
+                    if(generateSlim) {
+                        tmp = fattr.Name;
+                    } 
+                    sb.Append($"<tr><td port=\"{attr.Name}\">{tmp}</td></tr>\n");
                 } else if(attr is CoreBaseAttribute) {
                     var battr = (CoreBaseAttribute)attr;
-                    sb.Append($"<tr><td port=\"{attr.Name}\">{helper.GenerateBaseAttribute(battr, ifa, model)}</td></tr>\n");
+                    string tmp = helper.GenerateBaseAttribute(battr, ifa, model);
+                    if(generateSlim) {
+                        tmp = battr.Name;
+                    } 
+                    sb.Append($"<tr><td port=\"{attr.Name}\">{tmp}</td></tr>\n");
                 } else if(attr is CoreRefAttribute) {
                     var rattr = (CoreRefAttribute)attr;
-                    sb.Append($"<tr><td port=\"{attr.Name}\">{helper.GenerateRefAttribute(rattr, ifa, model)}</td></tr>\n");
+                    string tmp = helper.GenerateRefAttribute(rattr, ifa, model);
+                    if(generateSlim) {
+                        tmp = $"{rattr.ReferencedInterface.Name}.{rattr.ReferencedAttribute.Name}";
+                        if(!string.IsNullOrEmpty(rattr.Alias)) {
+                            tmp += $" as {rattr.Alias}";
+                        }
+                    } 
+                    sb.Append($"<tr><td port=\"{attr.Name}\">{tmp}</td></tr>\n");
                 }
             }
 
