@@ -56,23 +56,23 @@ namespace KDV.CeusDL.Generator.CeusDL
         {
             sb.Append($"{ifa.Name}[label=<\n");
             sb.Append("<table border=\"0\" cellborder=\"1\" cellspacing=\"0\">\n");
-            sb.Append($"<tr><td><b>{ifa.Name}:{InterfaceTypeToString(ifa.Type)}    </b></td></tr>\n");
+            sb.Append($"<tr><td align=\"left\"><b>{ifa.Name}:{InterfaceTypeToString(ifa.Type)}    </b></td></tr>\n");
 
             foreach(var attr in ifa.Attributes) {
                 if(attr is CoreFactAttribute) {
                     var fattr = (CoreFactAttribute)attr;
                     string tmp = helper.GenerateFactAttribute(fattr, ifa, model);
                     if(generateSlim) {
-                        tmp = fattr.Name;
+                        tmp = $"fact {fattr.Name}";
                     } 
-                    sb.Append($"<tr><td port=\"{attr.Name}\">{tmp}</td></tr>\n");
+                    sb.Append($"<tr><td port=\"{attr.Name}\" align=\"left\">{tmp}</td></tr>\n");
                 } else if(attr is CoreBaseAttribute) {
                     var battr = (CoreBaseAttribute)attr;
                     string tmp = helper.GenerateBaseAttribute(battr, ifa, model);
                     if(generateSlim) {
-                        tmp = battr.Name;
+                        tmp = $"base {battr.Name}";
                     } 
-                    sb.Append($"<tr><td port=\"{attr.Name}\">{tmp}</td></tr>\n");
+                    sb.Append($"<tr><td port=\"{attr.Name}\" align=\"left\">{tmp}</td></tr>\n");
                 } else if(attr is CoreRefAttribute) {
                     var rattr = (CoreRefAttribute)attr;
                     string tmp = helper.GenerateRefAttribute(rattr, ifa, model);
@@ -82,7 +82,7 @@ namespace KDV.CeusDL.Generator.CeusDL
                             tmp += $" as {rattr.Alias}";
                         }
                     } 
-                    sb.Append($"<tr><td port=\"{attr.Name}\">{tmp}</td></tr>\n");
+                    sb.Append($"<tr><td port=\"{attr.Name}\" align=\"left\">{tmp}</td></tr>\n");
                 }
             }
 
@@ -104,8 +104,10 @@ namespace KDV.CeusDL.Generator.CeusDL
             sb.Append("    graph [pad=\"0.5\", nodesep=\"0.5\", ranksep=\"2\"]\n");
             sb.Append("    node [shape=none]\n");
             sb.Append("    rankdir=LR\n");
-            sb.Append("    labelloc=t\n"); 
-            sb.Append("    label=\"Diagramm des Modells\"\n");
+            if(!generateSlim) {
+                sb.Append("    labelloc=t\n"); 
+                sb.Append("    label=\"Diagramm des ceusdl-Modells\"\n");
+            }
         }
 
 
