@@ -6,7 +6,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySqlConnector" Version="*" />
+    <PackageReference Include="MySql.Data" Version="*" />
   </ItemGroup>
 
   <PropertyGroup>
