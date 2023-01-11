@@ -113,17 +113,17 @@ namespace KDV.CeusDL.Parser.Test {
 
         [TestMethod]
         public void TestInterfaceParser() {
-            var data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo.ceusdl"));
+            var data = new ParsableData(System.IO.File.ReadAllText(@"..\..\..\..\Test\Data\interface_demo.ceusdl"));
             var p = new InterfaceParser(data);
             var result = p.Parse();
 
             // TODO: Ausgabe
 
-            data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo2.ceusdl"));
+            data = new ParsableData(System.IO.File.ReadAllText(@"..\..\..\..\Test\Data\interface_demo2.ceusdl"));
             p = new InterfaceParser(data);
             result = p.Parse();
 
-            data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\interface_demo3.ceusdl"));
+            data = new ParsableData(System.IO.File.ReadAllText(@"..\..\..\..\Test\Data\interface_demo3.ceusdl"));
             p = new InterfaceParser(data);
             var result2 = p.Parse();
 
@@ -135,7 +135,7 @@ namespace KDV.CeusDL.Parser.Test {
 
         [TestMethod]
         public void TestFileParser() {
-            var data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\file_demo.ceusdl"));
+            var data = new ParsableData(System.IO.File.ReadAllText(@"..\..\..\..\Test\Data\file_demo.ceusdl"));
             var p = new FileParser(data);
             var result = p.Parse();
 
@@ -144,7 +144,7 @@ namespace KDV.CeusDL.Parser.Test {
             Assert.AreEqual(4, result.Interfaces?.Count);
             if(result.Interfaces?.Count != 4) throw new InvalidOperationException("Falsche Zahl an Interfaces gefunden");
 
-            data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\file_demo2.ceusdl"));
+            data = new ParsableData(System.IO.File.ReadAllText(@"..\..\..\..\Test\Data\file_demo2.ceusdl"));
             p = new FileParser(data);
             result = p.Parse();
 
@@ -152,7 +152,7 @@ namespace KDV.CeusDL.Parser.Test {
             if(result.Config?.Parameters?.Count != 6) throw new InvalidOperationException("Falsche Zahl an Config-Parametern gefunden");
             if(result.Interfaces?.Count != 34) throw new InvalidOperationException("Falsche Zahl an Interfaces gefunden");
 
-            data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\file_demo3.ceusdl"));
+            data = new ParsableData(System.IO.File.ReadAllText(@"..\..\..\..\Test\Data\file_demo3.ceusdl"));
             p = new FileParser(data);
             result = p.Parse();
 

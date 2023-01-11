@@ -15,7 +15,7 @@ namespace KDV.CeusDL.Utilities.BL.Test
     {
         [TestMethod]
         public void TestInterfaceRenamed_Complex() {
-            var fileName = @"..\..\..\..\Test\Data\interface_demo.3.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\interface_demo.3.ceusdl".Replace('\\', System.IO.Path.DirectorySeparatorChar);
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            

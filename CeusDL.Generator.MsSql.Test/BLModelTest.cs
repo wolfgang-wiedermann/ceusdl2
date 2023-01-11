@@ -12,7 +12,7 @@ namespace KDV.CeusDL.Model.BL.Test
         public void TestBLModel_BySimpleFile()
         {
             // Daten einlesen...
-            var fileName = @"..\..\..\..\Test\Data\interface_demo.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\interface_demo.ceusdl".Replace('\\', System.IO.Path.DirectorySeparatorChar);
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
@@ -65,7 +65,7 @@ namespace KDV.CeusDL.Model.BL.Test
         [TestMethod]
         public void TestBLModel_ByComplexFile() {
             // Daten einlesen...
-            var fileName = @"..\..\..\..\Test\Data\file_demo2.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\file_demo2.ceusdl".Replace('\\', System.IO.Path.DirectorySeparatorChar);
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            

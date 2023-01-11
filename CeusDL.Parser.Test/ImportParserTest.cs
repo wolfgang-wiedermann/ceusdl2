@@ -42,7 +42,7 @@ namespace KDV.CeusDL.Parser.Test
 
         [TestMethod]
         public void TestParseWithSplitFile() {
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\split_main.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\split_main.ceusdl".Replace('\\', System.IO.Path.DirectorySeparatorChar);
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();
@@ -53,7 +53,7 @@ namespace KDV.CeusDL.Parser.Test
 
         [TestMethod]
         public void TestParseToCoreModelWithSplitFile() {
-            var fileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\split_main.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\split_main.ceusdl".Replace('\\', System.IO.Path.DirectorySeparatorChar);
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();

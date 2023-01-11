@@ -15,7 +15,7 @@ namespace KDV.CeusDL.Model.BL.Test
         public void TestBaseBLAttribute_ByCoreBaseAttribute()
         {
             // Daten einlesen...
-            var fileName = @"..\..\..\..\Test\Data\interface_demo.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\interface_demo.ceusdl".Replace('\\', System.IO.Path.DirectorySeparatorChar);
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
@@ -43,7 +43,7 @@ namespace KDV.CeusDL.Model.BL.Test
         [TestMethod]
         public void TestBaseBLAttribute_FormerName() 
         {
-            var fileName = @"..\..\..\..\Test\Data\interface_demo.1.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\interface_demo.1.ceusdl".Replace('\\', System.IO.Path.DirectorySeparatorChar);
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            
@@ -63,7 +63,7 @@ namespace KDV.CeusDL.Model.BL.Test
         [TestMethod]
         public void TestRefBLAttribute_FormerName()
         {
-            var fileName = @"..\..\..\..\Test\Data\interface_demo.2.ceusdl";
+            var fileName = @"..\..\..\..\Test\Data\interface_demo.2.ceusdl".Replace('\\', System.IO.Path.DirectorySeparatorChar);
             var data = new ParsableData(System.IO.File.ReadAllText(fileName), fileName);
             var p = new FileParser(data);
             var result = p.Parse();            

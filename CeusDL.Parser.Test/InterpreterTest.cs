@@ -12,7 +12,7 @@ namespace KDV.CeusDL.Parser.Test {
         [TestMethod]
         public void TestAttributeRecognition_Case1()
         {
-            var data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\file_demo.ceusdl"));
+            var data = new ParsableData(System.IO.File.ReadAllText(@"..\..\..\..\Test\Data\file_demo.ceusdl".Replace('\\', System.IO.Path.DirectorySeparatorChar)));
             var p = new FileParser(data);
             var result = p.Parse();
 
@@ -28,7 +28,7 @@ namespace KDV.CeusDL.Parser.Test {
         [TestMethod]
         public void TestAttributeRecognition_Case2()
         {
-            var data = new ParsableData(System.IO.File.ReadAllText(@"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\file_demo2.ceusdl"));
+            var data = new ParsableData(System.IO.File.ReadAllText(@"..\..\..\..\Test\Data\file_demo2.ceusdl".Replace('\\', System.IO.Path.DirectorySeparatorChar)));
             var p = new FileParser(data);
             var result = p.Parse();
             CoreModel m = new CoreModel(result);            
