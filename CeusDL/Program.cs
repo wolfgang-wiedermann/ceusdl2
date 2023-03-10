@@ -178,7 +178,21 @@ namespace CeusDL2
                     }
                 });
 
-                cla.Execute(args);
+                try 
+                {
+                    cla.Execute(args);
+                } 
+                catch (Microsoft.Extensions.CommandLineUtils.CommandParsingException ex) 
+                {
+                    Console.WriteLine($"Fehlerhafter Aufruf: {ex.Message}");
+                    Environment.Exit(2);
+                }
+                catch(Exception ex) 
+                {
+                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(ex.StackTrace);
+                    Environment.Exit(3);
+                }
             }
         }
 
