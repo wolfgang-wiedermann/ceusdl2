@@ -126,7 +126,7 @@ namespace KDV.CeusDL.Generator.BT {
 
         private void GenerateTruncate(StringBuilder sb, BTInterface ifa)
         {
-            sb.Append($"truncate table {ifa.FullName}\ngo\n\n");
+            sb.Append($"truncate table {ifa.FullName};\n\n");
         }
 
         private void CreateUsing(StringBuilder sb) {
