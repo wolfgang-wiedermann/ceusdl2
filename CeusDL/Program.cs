@@ -28,6 +28,8 @@ namespace CeusDL2
     ///
     class Program
     {
+        public const string CEUSDLC_VERSION = "1.0.1";
+
         static string GENERATED_SQL;
         static string GENERATED_SCP;
         static string GENERATED_CEUSDL;
@@ -58,7 +60,7 @@ namespace CeusDL2
                 string dbConnectionFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\connection.txt";
                 options.GenerateMySql = false;
                 options.GenerateMsSql = true;
-                options.ExecuteReplace = true;
+                options.ExecuteReplace = false;
                 options.ExecuteUpdate = false;
                 options.ExecuteUpdateWithReload = false;
                 options.GenerateConstraints = false;
@@ -101,8 +103,8 @@ namespace CeusDL2
             } else {
                 // Dieser Code wird beim Aufruf über Commandline ausgeführt
                 var cla = new CommandLineApplication();                
-                cla.Name = "ceusdlc";
-                var ceusdlOpt = cla.Option("-c | --ceusdl <ceusdlfile>", "Path to the ceusdl file to compile", CommandOptionType.SingleValue);
+                cla.Name = "ceusdlc";                
+                var ceusdlOpt = cla.Option("-c | --ceusdl <ceusdlfile>", "Path to the ceusdl file to compile", CommandOptionType.SingleValue);                
                 var dirOpt = cla.Option("-d | --directory <target_directory>", "Path to store the result of compilation.", CommandOptionType.SingleValue);
                 var conOpt = cla.Option("--connection <connectionfile>", "Textfile containing connection string to database", CommandOptionType.SingleValue);
                 var mssqlOpt = cla.Option("--mssql", "Generate for Microsoft SQL Server", CommandOptionType.NoValue);
@@ -115,10 +117,15 @@ namespace CeusDL2
                 var executeReplace = cla.Option("--replace", "Replace all Layers (deletes all Data)", CommandOptionType.NoValue);
                 var generateConstraints = cla.Option("--generate-constraints", "Generate SQL-Constraints for Base Layer", CommandOptionType.NoValue);
                 var help = cla.HelpOption("-? | --help");
+                var versionOpt = cla.Option("-v | --version", "Tells you the version of ceusdlc", CommandOptionType.NoValue);
 
                 cla.OnExecute(() => {
                     string rootFolder = ".";
                     string conStr = null;
+                    if(versionOpt.HasValue()) {
+                        Console.WriteLine($"ceusdlc version {Program.CEUSDLC_VERSION}");
+                        return 0;
+                    }
                     if(!ceusdlOpt.HasValue()) {
                         Console.WriteLine("ERROR: you have to specify a ceusdl file to start its compilation, use -c <filename>.ceusdl");
                         Console.WriteLine("     : list help using --help");
