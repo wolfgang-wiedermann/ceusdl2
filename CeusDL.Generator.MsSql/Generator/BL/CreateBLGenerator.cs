@@ -355,6 +355,10 @@ namespace KDV.CeusDL.Generator.BL {
             var finestTimeAttribute = this.model.FinestTimeAttribute.GetILInterface().PrimaryKeyAttributes.First();
             var relevantTables = this.model.FactTableInterfaces.Where(f => f.IsHistorized);
 
+            if (relevantTables.Count() < 1) {
+                throw new InvalidOperationException($"The Usage of finest_time_attribute=true is not allowed without having a FactTable being history=true");
+            }
+
             string code = $"select @value = max({finestTimeAttribute.Name}) from (\n";
             foreach(var table in relevantTables) {
                 code += $"select max({finestTimeAttribute.Name}) as {finestTimeAttribute.Name} from {table.GetILInterface().FullName}\n";

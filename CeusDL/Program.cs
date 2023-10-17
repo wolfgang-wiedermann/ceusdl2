@@ -19,7 +19,7 @@ namespace CeusDL2
 {
     ///
     /// Eine Windows-Exe kompilieren mit Aufruf 
-    /// dotnet publish -c Release -r win7-x64
+    /// dotnet publish -c Release -r win7-x64 --self-contained 
     /// Native ausführbare Datei für MacOS kompilieren
     /// dotnet publish -c Release -r osx.10.11-x64
     /// Native ausführbare Datei für Linux kompilieren
@@ -58,7 +58,7 @@ namespace CeusDL2
                 string dbConnectionFileName = @"C:\Users\wiw39784\Documents\git\CeusDL2\Test\Data\connection.txt";
                 options.GenerateMySql = false;
                 options.GenerateMsSql = true;
-                options.ExecuteReplace = false;
+                options.ExecuteReplace = true;
                 options.ExecuteUpdate = false;
                 options.ExecuteUpdateWithReload = false;
                 options.GenerateConstraints = false;
@@ -444,10 +444,12 @@ namespace CeusDL2
         {
             foreach (var stm in CoreILSQLStatements)
             {
+                Console.WriteLine($"DEBUG: Replace: Executing: {stm.FileName}");
                 exec.ExecuteSQL(stm.FileName);
             }
             foreach (var stm in ReplaceSQLStatements)
             {
+                Console.WriteLine($"DEBUG: Replace: Executing: {stm.FileName}");
                 exec.ExecuteSQL(stm.FileName);
             }
             foreach (var stm in CoreBTSQLStatements)
