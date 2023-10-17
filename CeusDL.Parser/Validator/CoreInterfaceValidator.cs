@@ -12,6 +12,10 @@ namespace KDV.CeusDL.Validator {
                 repo.AddError($"Your ceusdl code contains historized interfaces ({ifa.Name}) but no TemporalTable which is the finest_time_attribute", ValidationResult.OT_INTERFACE);
             }
 
+            if(ifa.IsFinestTime && !HasFacttableWithHistory(m)) {
+                repo.AddError($"Your ceusdl code contains a temporal interface ({ifa.Name}) being marked as finest_time_attribute, but there is no FactTable with history=\"true\"", ValidationResult.OT_INTERFACE);
+            }
+
             if(HasNoPrimaryKey(ifa)) {
                 repo.AddError($"Your ceusdl code for {ifa.Name} does not have a primary key definition", ValidationResult.OT_INTERFACE);
             }
@@ -144,6 +148,13 @@ namespace KDV.CeusDL.Validator {
         private static bool HasFinestTimeUnit(CoreModel m)
         {
             return m.Interfaces.Where(i => i.IsFinestTime).Count() > 0;
+        }
+
+        private static bool HasFacttableWithHistory(CoreModel m) {
+            return m.Interfaces.Where(i => 
+                    i.Type == CoreInterfaceType.FACT_TABLE 
+                    && i.IsHistorized
+                ).Count() > 0;
         }
         
     }
