@@ -28,7 +28,7 @@ namespace CeusDL2
     ///
     class Program
     {
-        public const string CEUSDLC_VERSION = "1.0.1";
+        public const string CEUSDLC_VERSION = "1.0.2";
 
         static string GENERATED_SQL;
         static string GENERATED_SCP;
